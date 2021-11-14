@@ -1,0 +1,5 @@
+rootProject.name = 'optimk'
+include 'optimk-common'
+include 'optimk-bga'
+include 'optimk-de'
+

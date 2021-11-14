@@ -1,0 +1,22 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+}
+
+group 'com.mellonita.optimk'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":optimk-common")
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.31'
+    implementation 'io.kotest:kotest-runner-junit5-jvm:4.6.3'
+    testImplementation 'io.kotest:kotest-assertions-core:4.6.3'
+
+}
+
+test {
+    useJUnitPlatform()
+}
