@@ -8,9 +8,10 @@ import kotlin.reflect.KClass
 open class DefaultEngine<T>(
     problem: Problem<T>,
     stoppingCriterion: StoppingCriterion,
+    goalType: GoalType,
     optimizerClass: KClass<out Optimizer>,
     params: Map<String, Any>
-) : Engine<T>(problem, stoppingCriterion, optimizerClass, params) {
+) : Engine<T>(problem, stoppingCriterion, goalType, optimizerClass, params) {
 
     private var iterationCounter: Long = 0
     private var starTime: Long = 0
@@ -44,7 +45,8 @@ open class DefaultEngine<T>(
             iterationCounter++
         }
 
-        return OptimizationResult(bestCandidate!!, bestFitness, stopReason, iterationCounter)
+        val b = if (goalType == GoalType.Maximize) -bestFitness else bestFitness
+        return OptimizationResult(bestCandidate!!, b, stopReason, iterationCounter)
     }
 
     /**
@@ -63,13 +65,17 @@ open class DefaultEngine<T>(
      *
      */
     private fun isStopping(): Pair<Boolean, String> {
+        val f =
+            if (goalType == GoalType.Maximize) -stoppingCriterion.whenFitnessReach
+            else stoppingCriterion.whenFitnessReach
+
         if (iterationCounter >= stoppingCriterion.afterIteration) {
             return Pair(true, "Max iteration (${stoppingCriterion.afterIteration}) reached")
         }
         if (stillCounter >= stoppingCriterion.afterFitnessUnchangedFor) {
             return Pair(true, "Fitness remains unchanged for ${stoppingCriterion.afterFitnessUnchangedFor} iterations")
         }
-        if (bestFitness <= stoppingCriterion.whenFitnessReach) {
+        if (bestFitness <= f) {
             return Pair(true, "Fitness goal (${stoppingCriterion.whenFitnessReach}) reached")
         }
         if ((System.currentTimeMillis() - starTime) >= stoppingCriterion.afterMilliseconds) {

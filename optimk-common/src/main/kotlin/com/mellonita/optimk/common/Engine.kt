@@ -2,6 +2,14 @@ package com.mellonita.optimk.common
 
 import kotlin.reflect.KClass
 
+
+/**
+ * Goal types
+ */
+enum class GoalType {
+    Maximize, Minimize
+}
+
 /**
  * Stopping criteria
  */
@@ -38,6 +46,7 @@ data class OptimizationResult<T>(
 abstract class Engine<T>(
     val problem: Problem<T>,
     val stoppingCriterion: StoppingCriterion,
+    val goalType: GoalType,
     optimizerClass: KClass<out Optimizer>,
     params: Map<String, Any>
 ) {
@@ -65,11 +74,12 @@ abstract class Engine<T>(
         // Decode keys
         val decoded = problem.decoder(keys)
         // Evaluate candidate
-        return if (problem.feasible(decoded)) {
+        val f = if (problem.feasible(decoded)) {
             problem.fitness(decoded)
         } else {
             Double.MAX_VALUE
         }
+        return if (goalType == GoalType.Maximize) -f else f
     }
 
     /**
