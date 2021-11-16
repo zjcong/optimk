@@ -1,4 +1,4 @@
-package com.mellonita.optimk.common
+package com.mellonita.optimk
 
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -11,6 +11,11 @@ import kotlin.math.roundToLong
 interface Problem<T> {
 
     /**
+     * Dimension of the problem
+     */
+    val dimensions: Int
+
+    /**
      * Decode a vector of random keys into actual solution
      *
      * @param keys A vector of real number in range [0,1)
@@ -19,19 +24,19 @@ interface Problem<T> {
     fun decode(keys: DoubleArray): T
 
     /**
-     * Fitness function
+     * Objective function
      *
      * @param candidate Candidate solution
-     * @return Fitness value
+     * @return Fitness of the candidate
      */
-    fun fitness(candidate: T): Double
+    fun objective(candidate: T): Double
 
     /**
      * If a given solution is feasible
      * @param candidate Candidate solution
      * @return Is feasible
      */
-    fun feasible(candidate: T): Boolean = true
+    fun isFeasible(candidate: T): Boolean = true
 
 }
 

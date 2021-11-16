@@ -1,11 +1,14 @@
-package com.mellonita.optimk.common.optimizer
+package com.mellonita.optimk.ga
 
-import com.mellonita.optimk.common.Optimizer
+import com.mellonita.optimk.Optimizer
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
 
-class BRKGA(params: Map<String, Any>) : Optimizer(params) {
+class BRKGA(
+    params: Map<String, Any>,
+    objective: (DoubleArray) -> Double
+) : Optimizer(params, objective) {
 
     private val rnd: Random = Random(0)
 
@@ -38,7 +41,7 @@ class BRKGA(params: Map<String, Any>) : Optimizer(params) {
      *
      *
      */
-    override fun nextGeneration(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray> {
+    override fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray> {
         val nextGeneration: Array<DoubleArray> = Array(population) { DoubleArray(0) }
 
         val indicesSorted = fitnessValues
@@ -55,13 +58,20 @@ class BRKGA(params: Map<String, Any>) : Optimizer(params) {
         // Crossover
         ((elites + mutants) until population).forEach { s ->
             val eliteParent = currentGeneration[indicesSorted.subList(0, elites).random()]
-            val normalParent = currentGeneration.random()
+            val normalParent = currentGeneration[rnd.nextInt(elites, population)]
             val child =
                 DoubleArray(dimensions) { i -> if (rnd.nextDouble() < bias) eliteParent[i] else normalParent[i] }
             nextGeneration[s] = child
         }
         return nextGeneration
     }
+
+
+    /**
+     * Generate init population
+     */
+    override fun initialize(): Array<DoubleArray> = Array(population) { DoubleArray(dimensions) { rnd.nextDouble() } }
+
 
     companion object {
         const val PARAM_DIMENSIONS = "dimensions"
