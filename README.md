@@ -42,6 +42,7 @@ __Example__ : A 5-dimensional Rastrigin function would be implemented as:
 
 ````kotlin
 class Rastrigin(override val dimensions: Int) : Problem<DoubleArray> {
+  
     private val A = 5
 
     override fun decode(keys: DoubleArray): DoubleArray {
