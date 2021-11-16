@@ -1,4 +1,4 @@
-@file:Suppress("UNUSED_PARAMETER")
+@file:Suppress("UNUSED_PARAMETER", "MemberVisibilityCanBePrivate")
 
 package com.mellonita.optimk.common
 
@@ -7,13 +7,11 @@ package com.mellonita.optimk.common
  * Abstract optimizer class
  *
  * @param params Parameters
- * @param fitnessFunc Fitness Function
  */
+abstract class Optimizer(val params: Map<String, Any>) {
 
-abstract class Optimizer(
-    params: Map<String, Any>,
-    val fitnessFunc: (DoubleArray) -> Double
-) {
-    abstract val currentGeneration: Array<DoubleArray>
-    abstract fun iterate()
+    /**
+     * Fill the currentGeneration with a new generation of solutions
+     */
+    abstract fun nextGeneration(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray>
 }
