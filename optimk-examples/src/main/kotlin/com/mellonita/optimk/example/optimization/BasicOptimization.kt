@@ -5,7 +5,7 @@ import com.mellonita.optimk.engine.StopCriterion
 import com.mellonita.optimk.engine.StopType
 import com.mellonita.optimk.engine.BasicEngine
 import com.mellonita.optimk.example.benchmarkfuncs.Rastrigin
-import com.mellonita.optimk.ga.BRKGA
+import com.mellonita.optimk.optimizer.BRKGA
 
 
 fun main() {

@@ -1,4 +1,4 @@
-package com.mellonita.optimk.ga
+package com.mellonita.optimk.optimizer
 
 import com.mellonita.optimk.Optimizer
 import kotlin.math.roundToInt
