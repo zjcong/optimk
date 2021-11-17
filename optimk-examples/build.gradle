@@ -11,6 +11,5 @@ repositories {
 
 dependencies {
     implementation project(":optimk-common")
-    implementation project(":optimk-ga")
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.31'
 }
