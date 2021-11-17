@@ -17,20 +17,20 @@ fun main() {
     val engine =
         //ParallelEngine(
         SequentialEngine(
-        goal = GoalType.Minimize,
-        optimizerClass = BRKGA::class,
-        optimizerParameters = mapOf(
-            BRKGA.PARAM_POPULATION to 200,
-            BRKGA.PARAM_DIMENSIONS to dimensions,
-        ),
-        problem = zeroOneCounting, //rastrigin, oneCounting
-        stop = fun(itr: Long, fitness: Double, eval: Long, start: Long): Boolean {
-            return fitness == 0.0
-        },
-        monitor = { _, fitnessValues ->
-            //println(fitnessValues.minOf { it })
-        }
-    )
+            goal = GoalType.Minimize,
+            optimizerClass = BRKGA::class,
+            optimizerParameters = mapOf(
+                BRKGA.PARAM_POPULATION to 200,
+                BRKGA.PARAM_DIMENSIONS to dimensions,
+            ),
+            problem = zeroOneCounting, //rastrigin, oneCounting
+            stop = { itr: Long, fitness: Double, eval: Long, start: Long ->
+                fitness == 0.0
+            },
+            monitor = { _, fitnessValues ->
+                //println(fitnessValues.minOf { it })
+            }
+        )
 
     val result = engine.optimize()
 
