@@ -10,7 +10,6 @@ package com.mellonita.optimk
  */
 abstract class Optimizer(
     val params: Map<String, Any>,
-    val objective: (DoubleArray) -> Double
 ) {
 
     /**

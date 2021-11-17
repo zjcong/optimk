@@ -7,8 +7,7 @@ import kotlin.random.Random
 
 class BRKGA(
     params: Map<String, Any>,
-    objective: (DoubleArray) -> Double
-) : Optimizer(params, objective) {
+) : Optimizer(params) {
 
     private val rnd: Random = Random(0)
 

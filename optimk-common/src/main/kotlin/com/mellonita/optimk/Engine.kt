@@ -1,5 +1,7 @@
 package com.mellonita.optimk
 
+import com.mellonita.optimk.engine.OptimizationResult
+
 /**
  *
  */

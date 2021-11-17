@@ -1,7 +1,10 @@
 @file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
-package com.mellonita.optimk
+package com.mellonita.optimk.engine
 
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.Optimizer
+import com.mellonita.optimk.Problem
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
@@ -64,7 +67,7 @@ data class OptimizationResult<T>(
 /**
  * Engine
  */
-abstract class DefaultEngine<T>(
+abstract class SequentialEngine<T>(
     val problem: Problem<T>,
     val stoppingCriteria: Set<StopCriterion>,
     val goalType: GoalType,
@@ -80,12 +83,7 @@ abstract class DefaultEngine<T>(
     protected var objectiveCounter: Long = 0
 
 
-    protected val optimizer: Optimizer
-
-    init {
-        //TODO add constructor check
-        optimizer = optimizerClass.primaryConstructor!!.call(optimizerParameters, ::evaluate)
-    }
+    protected val optimizer: Optimizer = optimizerClass.primaryConstructor!!.call(optimizerParameters)
 
 
     /**

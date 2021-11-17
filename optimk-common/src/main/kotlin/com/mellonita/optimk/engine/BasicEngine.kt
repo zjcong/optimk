@@ -12,8 +12,14 @@ open class BasicEngine<T>(
     goalType: GoalType,
     optimizerClass: KClass<out Optimizer>,
     optimizerParams: Map<String, Any>
-) : DefaultEngine<T>(problem, stoppingCriteria, goalType, optimizerClass, optimizerParams) {
+) : SequentialEngine<T>(problem, stoppingCriteria, goalType, optimizerClass, optimizerParams) {
 
+
+    open fun iterate(population: Array<DoubleArray>): Array<DoubleArray> {
+        iterationCounter++
+        val fitnessValues = population.map { evaluate(it) }.toDoubleArray()
+        return optimizer.iterate(population, fitnessValues)
+    }
 
     /**
      *
@@ -24,9 +30,7 @@ open class BasicEngine<T>(
         var population = optimizer.initialize()
 
         while (!shouldStop()) {
-            iterationCounter++
-            val fitnessValues = population.map { evaluate(it) }.toDoubleArray()
-            population = optimizer.iterate(population, fitnessValues)
+            population = iterate(population)
         }
 
         return OptimizationResult(
