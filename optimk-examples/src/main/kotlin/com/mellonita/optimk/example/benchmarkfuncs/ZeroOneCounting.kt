@@ -13,3 +13,4 @@ class ZeroOneCounting(d: Int) : Problem<IntArray> {
     override fun isFeasible(candidate: IntArray): Boolean = candidate[0] == 0
 
 }
+
