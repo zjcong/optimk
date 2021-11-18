@@ -6,9 +6,6 @@ import kotlin.math.*
 
 class Ackley(private val d: Int) : Problem<DoubleArray> {
 
-    override val dimensions: Int
-        get() = d
-
     private var a = 20
     private var b = 0.2
     private var c = 2 * PI

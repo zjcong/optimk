@@ -5,8 +5,7 @@ import com.mellonita.optimk.Optimizer
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-
-class BRKGA(
+class BRKGA @JvmOverloads constructor(
 
     private val dimensions: Int,
     private val population: Int,

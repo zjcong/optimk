@@ -11,11 +11,6 @@ import kotlin.math.roundToLong
 interface Problem<T> {
 
     /**
-     * Dimension of the problem
-     */
-    val dimensions: Int
-
-    /**
      * Decode a vector of random keys into actual solution
      *
      * @param keys A vector of real number in range [0,1)

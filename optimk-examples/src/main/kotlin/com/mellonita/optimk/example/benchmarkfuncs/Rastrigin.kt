@@ -6,7 +6,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.pow
 
-class Rastrigin(override val dimensions:Int) : Problem<DoubleArray> {
+class Rastrigin(private val dimensions: Int) : Problem<DoubleArray> {
     private val A = 5
 
     override fun decode(keys: DoubleArray): DoubleArray {
