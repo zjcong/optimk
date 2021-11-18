@@ -2,22 +2,24 @@
 
 package com.mellonita.optimk
 
-import kotlin.random.Random
+/**
+ *
+ */
+interface AcceptImmigrant
 
 
 /**
  * Abstract optimizer class
  *
- * @param params Parameters
  */
-abstract class Optimizer(val params: Map<String, Any>) {
+abstract class Optimizer {
 
-    val rng = Random(1994L)
+    var objective: (DoubleArray) -> Double by InitOnceProperty()
 
     /**
-     * Fill the currentGeneration with a new generation of solutions
+     *
      */
-    abstract fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray>
+    abstract fun iterate(previousGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray>
 
 
     /**
@@ -25,8 +27,5 @@ abstract class Optimizer(val params: Map<String, Any>) {
      */
     abstract fun initialize(): Array<DoubleArray>
 
-    companion object {
-        const val PARAM_DIMENSIONS = "dimensions"
-        const val PARAM_POPULATION = "population"
-    }
+
 }

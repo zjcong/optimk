@@ -1,16 +1,20 @@
 package com.mellonita.optimk
 
-import kotlin.random.Random
-import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
-
 
 /**
  * Goal types
- *
  */
 enum class GoalType { Maximize, Minimize }
 
+/**
+ *
+ */
+data class IterationInfo(
+    val iteration: Long,
+    val evaluation: Long,
+    val time: Long,
+    val bestFitness: Double
+)
 
 /**
  * Optimization result
@@ -33,6 +37,7 @@ data class OptimizationResult<T>(
             is IntArray -> solution.joinToString(", ")
             is DoubleArray -> solution.joinToString(", ")
             is LongArray -> solution.joinToString(",")
+            is ByteArray -> solution.joinToString(", ")
             else -> solution.toString()
         }
 
@@ -46,19 +51,27 @@ data class OptimizationResult<T>(
     }
 }
 
+
 /**
- *
+ * Engine
  */
 abstract class Engine<T>(
-    optimizerClass: KClass<out Optimizer>,
-    optimizerParameters: Map<String, Any>
+    val optimizer: Optimizer,
+    val monitor: Monitor
 ) {
 
-
-    protected val optimizer: Optimizer = optimizerClass.primaryConstructor!!.call(optimizerParameters)
+    init {
+        optimizer.objective = ::evaluate
+    }
 
     /**
      * Perform optimization
      */
     abstract fun optimize(): OptimizationResult<T>
+
+    /**
+     *
+     */
+    abstract fun evaluate(candidate: DoubleArray): Double
+
 }

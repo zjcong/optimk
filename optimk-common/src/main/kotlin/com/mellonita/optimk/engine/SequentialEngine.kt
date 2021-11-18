@@ -1,35 +1,47 @@
-@file:Suppress("unused")
-
 package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.*
-import kotlin.reflect.KClass
 
 
 /**
  * Engine
  */
 class SequentialEngine<T>(
-    optimizerClass: KClass<out Optimizer>,
-    optimizerParameters: Map<String, Any>,
     private val problem: Problem<T>,
     private val goal: GoalType,
-    private val stop: (itr: Long, fitness: Double, eval: Long, start: Long) -> Boolean,
-    private val monitor: (population: Array<DoubleArray>, fitness: DoubleArray) -> Unit = { _, _ -> }
-) : Engine<T>(optimizerClass, optimizerParameters) {
+    optimizer: Optimizer,
+    monitor: Monitor
+) : Engine<T>(optimizer, monitor) {
 
     private var bestSolution: DoubleArray = doubleArrayOf()
     private var bestFitness: Double = Double.NaN
 
     private var itrCounter: Long = 0
     private var evalCounter: Long = 0
+    private var startTime: Long by InitOnceProperty()
 
+
+    constructor(
+        problem: Problem<T>,
+        goal: GoalType,
+        optimizer: Optimizer,
+        stop: (info: IterationInfo) -> Boolean = { it.time > 3000 },
+        monitor: (info: IterationInfo, population: Array<DoubleArray>, fitness: DoubleArray) -> Unit = { _, _, _ -> ; }
+    ) : this(problem, goal, optimizer, object : Monitor {
+        override fun stop(info: IterationInfo): Boolean {
+            return stop(info)
+        }
+
+        override fun report(info: IterationInfo, population: Array<DoubleArray>, fitnessValues: DoubleArray) {
+            monitor(info, population, fitnessValues)
+        }
+    })
 
     /**
      *
      *
      */
-    private fun evaluate(candidate: DoubleArray): Double {
+    override fun evaluate(candidate: DoubleArray): Double {
         evalCounter++
         val actualCandidate = problem.decode(candidate)
 
@@ -59,31 +71,37 @@ class SequentialEngine<T>(
         return fitness
     }
 
-
-    private fun iterate(population: Array<DoubleArray>): Array<DoubleArray> {
+    /**
+     *
+     */
+    private fun iterate(population: Array<DoubleArray>): Pair<Array<DoubleArray>, IterationInfo> {
         itrCounter++
         val fitnessValues = population.map { evaluate(it) }.toDoubleArray()
-        monitor(population, fitnessValues)
-        return optimizer.iterate(population, fitnessValues)
+
+        val info = IterationInfo(
+            bestFitness = if (goal == GoalType.Maximize) -bestFitness else bestFitness,
+            evaluation = evalCounter,
+            iteration = itrCounter,
+            time = System.currentTimeMillis() - startTime
+        )
+        monitor.report(info, population, fitnessValues)
+
+        return Pair(optimizer.iterate(population, fitnessValues), info)
     }
 
     /**
      *
      */
     override fun optimize(): OptimizationResult<T> {
-        val startTime = System.currentTimeMillis()
+        startTime = System.currentTimeMillis()
 
         var population = optimizer.initialize()
 
         do {
-            population = iterate(population)
-        } while (!stop(
-                itrCounter,
-                if (goal == GoalType.Maximize) -bestFitness else bestFitness,
-                evalCounter,
-                startTime
-            )
-        )
+            val (p, i) = iterate(population)
+            population = p
+        } while (!monitor.stop(i))
+
         return OptimizationResult(
             problem.decode(bestSolution),
             if (goal == GoalType.Maximize) -bestFitness else bestFitness,
