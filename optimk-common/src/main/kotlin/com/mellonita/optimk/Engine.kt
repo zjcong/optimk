@@ -1,55 +1,21 @@
 package com.mellonita.optimk
 
-
-/**
- * Goal types
- */
-enum class GoalType { Maximize, Minimize }
+const val GOAL_MAX = -1
+const val GOAL_MIN = 1
 
 /**
  *
  */
-data class IterationInfo(
+data class IterationInfo<T>(
+    val bestSolution: T,
     val iteration: Long,
     val evaluation: Long,
     val time: Long,
-    val bestFitness: Double
+    val bestFitness: Double,
+    val min: Double,
+    val max: Double,
+    val average: Double,
 )
-
-/**
- * Optimization result
- *
- * @property solution Best solution
- * @property fitness Fitness value of the best solution
- * @property iteration Total iterations
- * @property time Run time in milliseconds
- */
-data class OptimizationResult<T>(
-    val solution: T,
-    val fitness: Double,
-    val iteration: Long,
-    val time: Long,
-    val eval: Long
-) {
-    override fun toString(): String {
-
-        val solutionString = when (solution) {
-            is IntArray -> solution.joinToString(", ")
-            is DoubleArray -> solution.joinToString(", ")
-            is LongArray -> solution.joinToString(",")
-            is ByteArray -> solution.joinToString(", ")
-            else -> solution.toString()
-        }
-
-        return StringBuilder()
-            .appendLine("Optimization terminated")
-            .appendLine("Optimization has run for $iteration iterations, in $time milliseconds")
-            .appendLine("Objective function has been evaluated $eval times")
-            .appendLine("Best solution has fitness value of $fitness")
-            .appendLine("Best solution is: $solutionString")
-            .toString()
-    }
-}
 
 
 /**
@@ -57,7 +23,7 @@ data class OptimizationResult<T>(
  */
 abstract class Engine<T>(
     val optimizer: Optimizer,
-    val monitor: Monitor
+    val monitor: (info: IterationInfo<T>) -> Boolean
 ) {
 
     init {
@@ -67,7 +33,7 @@ abstract class Engine<T>(
     /**
      * Perform optimization
      */
-    abstract fun optimize(): OptimizationResult<T>
+    abstract fun optimize(): IterationInfo<T>
 
     /**
      *

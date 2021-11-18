@@ -1,23 +1,24 @@
 package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.*
+import java.util.concurrent.atomic.AtomicLong
 
 
 /**
  * Engine
  */
-class SequentialEngine<T>(
+class ParallelEngine<T>(
     private val problem: Problem<T>,
     private val goal: Int,
     optimizer: Optimizer,
     monitor: (info: IterationInfo<T>) -> Boolean
 ) : Engine<T>(optimizer, monitor) {
 
-    private var bestSolution: DoubleArray = doubleArrayOf()
-    private var bestFitness: Double = Double.MAX_VALUE
+    private var bestSolution: DoubleArray by SynchronizedProperty(doubleArrayOf())
+    private var bestFitness: Double by SynchronizedProperty(Double.MAX_VALUE)
 
     private var itrCounter: Long = 0
-    private var evalCounter: Long = 0
+    private var evalCounter: AtomicLong = AtomicLong(0)
     private var startTime: Long by InitOnceProperty()
 
 
@@ -25,7 +26,7 @@ class SequentialEngine<T>(
      *
      */
     override fun evaluate(candidate: DoubleArray): Double {
-        evalCounter++
+        evalCounter.incrementAndGet()
 
         val actualCandidate = problem.decode(candidate)
         var fitness = Double.MAX_VALUE
@@ -51,11 +52,11 @@ class SequentialEngine<T>(
 
         do {
             itrCounter++
-            val fitnessValues = population.map { evaluate(it) }.toDoubleArray()
+            val fitnessValues = population.toList().parallelStream().mapToDouble { evaluate(it) }.toArray()
             info = IterationInfo(
-                bestSolution = problem.decode(this.bestSolution),
+                bestSolution = problem.decode(bestSolution),
                 bestFitness = goal * bestFitness,
-                evaluation = evalCounter,
+                evaluation = evalCounter.get(),
                 iteration = itrCounter,
                 time = System.currentTimeMillis() - startTime,
                 min = fitnessValues.minOf { it },
