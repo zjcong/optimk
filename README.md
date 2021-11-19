@@ -2,6 +2,9 @@
 
 OptimK is a mathematical optimization framework written in Kotlin.
 
+> :warning: **THIS IS A WORK IN PROGRESS**
+
+
 ## Introduction
 
 OptimK decouples optimization algorithms from the actual problem by encoding solutions with a vector of real number in

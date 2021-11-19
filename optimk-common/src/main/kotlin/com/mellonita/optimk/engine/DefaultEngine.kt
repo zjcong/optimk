@@ -5,9 +5,13 @@ import java.util.concurrent.atomic.AtomicLong
 
 
 /**
- * Engine
+ * Basic optimization engine
+ * @param problem Problem to solve
+ * @param goal Goal type, GOAL_MIN or GOAL_MAX
+ * @param optimizer Optimizer
+ * @param monitor
  */
-class SequentialEngine<T>(
+class DefaultEngine<T>(
     private val problem: Problem<T>,
     private val goal: Int,
     optimizer: Optimizer,
@@ -48,9 +52,11 @@ class SequentialEngine<T>(
 
         var info: IterationInfo<T>
 
+        var currentGeneration = optimizer.initialize()
+
         do {
             itrCounter++
-            val fitnessValues = optimizer.iterate()
+            val fitnessValues = currentGeneration.toList().stream().parallel().mapToDouble { evaluate(it) }.toArray()
 
             info = IterationInfo(
                 bestSolution = problem.decode(bestSolution),
@@ -62,6 +68,9 @@ class SequentialEngine<T>(
                 max = fitnessValues.maxOf { it },
                 average = fitnessValues.average()
             )
+
+            currentGeneration = optimizer.iterate(currentGeneration, fitnessValues)
+
         } while (!monitor(info))
 
         return info

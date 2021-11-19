@@ -14,13 +14,17 @@ interface AcceptImmigrant
  */
 abstract class Optimizer {
 
-    var objective: (DoubleArray) -> Double by InitOnceProperty()
+    /**
+     * Iterate
+     * @param currentGeneration current pool of solutions
+     * @param fitnessValues fitness values of the solutions
+     * @return next generation
+     */
+    abstract fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray>
 
     /**
-     *
+     * Initialize the optimizer
+     * @return an initial population
      */
-    abstract fun iterate(): DoubleArray
-
-
+    abstract fun initialize(): Array<DoubleArray>
 }
-

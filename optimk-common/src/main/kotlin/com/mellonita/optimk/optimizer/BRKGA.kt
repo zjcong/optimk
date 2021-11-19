@@ -13,13 +13,9 @@ class BRKGA @JvmOverloads constructor(
     private val bias: Double = 0.70,
     private val elites: Int = (population * 0.25).roundToInt(),
     private val mutants: Int = (population * 0.2).roundToInt(),
-    private val rng: Random = Random(0),
-    private val parallel: Boolean = true
+    private val rng: Random = Random(0)
 
 ) : Optimizer(), AcceptImmigrant {
-
-    private var currentGeneration: Array<DoubleArray> =
-        Array(population) { DoubleArray(dimensions) { rng.nextDouble() } }
 
 
     init {
@@ -34,13 +30,9 @@ class BRKGA @JvmOverloads constructor(
      *
      *
      */
-    override fun iterate(): DoubleArray {
-        val nextGeneration: Array<DoubleArray> = Array(population) { DoubleArray(0) }
+    override fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray> {
 
-        val fitnessValues: DoubleArray = if (parallel)
-            currentGeneration.toList().parallelStream().mapToDouble(objective).toArray()
-        else
-            currentGeneration.map(objective).toDoubleArray()
+        val nextGeneration: Array<DoubleArray> = Array(population) { DoubleArray(0) }
 
         val indicesSorted = fitnessValues
             .withIndex()
@@ -62,9 +54,14 @@ class BRKGA @JvmOverloads constructor(
             nextGeneration[s] = child
         }
 
-        currentGeneration = nextGeneration
+        return nextGeneration
+    }
 
-        return fitnessValues
+    /**
+     * Initialize a population with random solutions
+     */
+    override fun initialize(): Array<DoubleArray> {
+        return Array(population) { DoubleArray(dimensions) { rng.nextDouble() } }
     }
 
 

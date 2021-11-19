@@ -2,7 +2,7 @@ package com.mellonita.optimk.example.optimization
 
 import com.mellonita.optimk.GOAL_MAX
 import com.mellonita.optimk.IterationInfo
-import com.mellonita.optimk.engine.SequentialEngine
+import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.example.benchmarkfuncs.Ackley
 import com.mellonita.optimk.optimizer.BRKGA
 import org.knowm.xchart.QuickChart
@@ -60,7 +60,7 @@ fun main() {
 
     val monitor = Monitor<DoubleArray>()
 
-    val engine = SequentialEngine(
+    val engine = DefaultEngine(
         optimizer = BRKGA(dimensions = dimensions, population = 100),
         goal = GOAL_MAX,
         problem = Ackley(dimensions), //rastrigin, zeroOneCounting
