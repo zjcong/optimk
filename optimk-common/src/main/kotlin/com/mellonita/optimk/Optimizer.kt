@@ -2,6 +2,8 @@
 
 package com.mellonita.optimk
 
+import kotlin.random.Random
+
 /**
  *
  */
@@ -28,4 +30,6 @@ abstract class Optimizer {
     abstract fun initialize(): Array<DoubleArray>
 
 
+    fun uniformRandomSolution(rng: Random, dimension: Int): DoubleArray = DoubleArray(dimension) { rng.nextDouble() }
 }
+

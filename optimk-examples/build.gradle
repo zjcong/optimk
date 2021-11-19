@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation 'org.knowm.xchart:xchart:3.8.1'
     implementation project(":optimk-common")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.31'
+    //noinspection GradlePackageUpdate
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
 }
 

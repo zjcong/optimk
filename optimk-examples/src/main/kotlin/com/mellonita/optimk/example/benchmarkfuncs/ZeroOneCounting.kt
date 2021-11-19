@@ -3,7 +3,7 @@ package com.mellonita.optimk.example.benchmarkfuncs
 import com.mellonita.optimk.Problem
 import com.mellonita.optimk.elementIn
 
-class ZeroOneCounting(d: Int) : Problem<IntArray> {
+class ZeroOneCounting : Problem<IntArray> {
 
     override fun decode(keys: DoubleArray): IntArray = keys.map { it.elementIn(listOf(0, 1)) }.toIntArray()
 

@@ -6,7 +6,7 @@ import com.mellonita.optimk.elementIn
 /**
  *
  */
-class ExpensiveProblem(d: Int) : Problem<IntArray> {
+class ExpensiveProblem : Problem<IntArray> {
 
     override fun decode(keys: DoubleArray): IntArray = keys.map { it.elementIn(listOf(0, 1)) }.toIntArray()
 

@@ -1,3 +1,4 @@
+//file:noinspection GradlePackageUpdate
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.dokka'
@@ -12,8 +13,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.31'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.31"
+    implementation 'org.hipparchus:hipparchus-optim:2.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'io.kotest:kotest-runner-junit5-jvm:4.6.3'
 }
 

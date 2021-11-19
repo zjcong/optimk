@@ -1,6 +1,7 @@
 package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.*
+import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 
@@ -53,6 +54,8 @@ class ParallelEngine<T>(
         do {
             itrCounter++
             val fitnessValues = population.toList().parallelStream().mapToDouble { evaluate(it) }.toArray()
+
+
             info = IterationInfo(
                 bestSolution = problem.decode(bestSolution),
                 bestFitness = goal * bestFitness,
