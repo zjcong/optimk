@@ -14,9 +14,9 @@ import java.util.concurrent.atomic.AtomicLong
 class DefaultEngine<T>(
     private val problem: Problem<T>,
     private val goal: Int,
-    optimizer: Optimizer,
+    private val optimizer: Optimizer,
     monitor: (info: IterationInfo<T>) -> Boolean
-) : Engine<T>(optimizer, monitor) {
+) : Engine<T>(monitor) {
 
     private var bestSolution: DoubleArray by SynchronizedProperty(doubleArrayOf())
     private var bestFitness: Double by SynchronizedProperty(Double.MAX_VALUE)

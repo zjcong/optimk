@@ -21,8 +21,7 @@ data class IterationInfo<T>(
 /**
  * Engine
  */
-abstract class Engine<T>(val optimizer: Optimizer, val monitor: (info: IterationInfo<T>) -> Boolean) {
-
+abstract class Engine<T>(val monitor: (info: IterationInfo<T>) -> Boolean) {
 
 
     /**
