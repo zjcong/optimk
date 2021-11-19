@@ -1,6 +1,7 @@
 package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.*
+import java.util.concurrent.atomic.AtomicLong
 
 
 /**
@@ -13,11 +14,11 @@ class SequentialEngine<T>(
     monitor: (info: IterationInfo<T>) -> Boolean
 ) : Engine<T>(optimizer, monitor) {
 
-    private var bestSolution: DoubleArray = doubleArrayOf()
-    private var bestFitness: Double = Double.MAX_VALUE
+    private var bestSolution: DoubleArray by SynchronizedProperty(doubleArrayOf())
+    private var bestFitness: Double by SynchronizedProperty(Double.MAX_VALUE)
 
     private var itrCounter: Long = 0
-    private var evalCounter: Long = 0
+    private var evalCounter: AtomicLong = AtomicLong(0)
     private var startTime: Long by InitOnceProperty()
 
 
@@ -25,7 +26,7 @@ class SequentialEngine<T>(
      *
      */
     override fun evaluate(candidate: DoubleArray): Double {
-        evalCounter++
+        evalCounter.incrementAndGet()
 
         val actualCandidate = problem.decode(candidate)
         var fitness = Double.MAX_VALUE
@@ -45,24 +46,22 @@ class SequentialEngine<T>(
     override fun optimize(): IterationInfo<T> {
         this.startTime = System.currentTimeMillis()
 
-        var population = optimizer.initialize()
-        this.bestSolution = population[0]
         var info: IterationInfo<T>
 
         do {
             itrCounter++
-            val fitnessValues = population.map { evaluate(it) }.toDoubleArray()
+            val fitnessValues = optimizer.iterate()
+
             info = IterationInfo(
-                bestSolution = problem.decode(this.bestSolution),
+                bestSolution = problem.decode(bestSolution),
                 bestFitness = goal * bestFitness,
-                evaluation = evalCounter,
+                evaluation = evalCounter.get(),
                 iteration = itrCounter,
                 time = System.currentTimeMillis() - startTime,
                 min = fitnessValues.minOf { it },
                 max = fitnessValues.maxOf { it },
                 average = fitnessValues.average()
             )
-            population = optimizer.iterate(population, fitnessValues)
         } while (!monitor(info))
 
         return info

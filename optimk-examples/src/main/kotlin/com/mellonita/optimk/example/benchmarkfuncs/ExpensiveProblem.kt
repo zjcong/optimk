@@ -1,21 +1,20 @@
 package com.mellonita.optimk.example.benchmarkfuncs
 
 import com.mellonita.optimk.Problem
-import com.mellonita.optimk.elementIn
 
 /**
  *
  */
-class ExpensiveProblem : Problem<IntArray> {
+class ExpensiveProblem : Problem<DoubleArray> {
 
-    override fun decode(keys: DoubleArray): IntArray = keys.map { it.elementIn(listOf(0, 1)) }.toIntArray()
+    override fun decode(keys: DoubleArray): DoubleArray = keys
 
-    override fun objective(candidate: IntArray): Double {
+    override fun objective(candidate: DoubleArray): Double {
         Thread.sleep(10)
-        return candidate.sumOf { it }.toDouble()
+        return candidate.sumOf { it }
     }
 
-    override fun isFeasible(candidate: IntArray): Boolean = true
+    override fun isFeasible(candidate: DoubleArray): Boolean = true
 
 }
 

@@ -14,5 +14,7 @@ dependencies {
     implementation project(":optimk-common")
     //noinspection GradlePackageUpdate
     implementation 'org.jetbrains.kotlin:kotlin-stdlib'
+    implementation 'org.hipparchus:hipparchus-optim:2.0'
+
 }
 

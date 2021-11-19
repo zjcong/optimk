@@ -2,8 +2,6 @@
 
 package com.mellonita.optimk
 
-import kotlin.random.Random
-
 /**
  *
  */
@@ -21,15 +19,8 @@ abstract class Optimizer {
     /**
      *
      */
-    abstract fun iterate(previousGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray>
+    abstract fun iterate(): DoubleArray
 
 
-    /**
-     * Initialize the population
-     */
-    abstract fun initialize(): Array<DoubleArray>
-
-
-    fun uniformRandomSolution(rng: Random, dimension: Int): DoubleArray = DoubleArray(dimension) { rng.nextDouble() }
 }
 

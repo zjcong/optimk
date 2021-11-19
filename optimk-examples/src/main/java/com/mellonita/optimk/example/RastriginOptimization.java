@@ -2,7 +2,7 @@ package com.mellonita.optimk.example;
 
 import com.mellonita.optimk.IterationInfo;
 import com.mellonita.optimk.Problem;
-import com.mellonita.optimk.engine.ParallelEngine;
+import com.mellonita.optimk.engine.SequentialEngine;
 import com.mellonita.optimk.example.benchmarkfuncs.Rastrigin;
 import com.mellonita.optimk.optimizer.BRKGA;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +46,7 @@ class RastriginOptimization implements Problem<double[]> {
         var rastrigin10D = new Rastrigin(10);
         var optimizer = new BRKGA(10, 1000);
 
-        var engine = new ParallelEngine<>(
+        var engine = new SequentialEngine<>(
                 rastrigin10D,
                 GOAL_MIN,
                 optimizer,
