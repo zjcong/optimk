@@ -3,7 +3,7 @@ package com.mellonita.optimk.example.optimization
 import com.mellonita.optimk.Goal
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.IslandEngine
-import com.mellonita.optimk.example.benchmarkfuncs.Ackley
+import com.mellonita.optimk.example.benchmarkfuncs.Rastrigin
 import com.mellonita.optimk.optimizer.BRKGA
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
@@ -58,42 +58,57 @@ class Monitor<T> {
 */
 
 fun main() {
-    val dimensions = 5
+    val dimensions = 10
     val stopIteration = 100_000
-    val recordInterval = 5_000
+    val recordInterval = 100
     val defaultEngineHistory = mutableListOf<Double>()
     val islandEngineHistory = mutableListOf<Double>()
 
     val engine = DefaultEngine(
-        optimizer = BRKGA(dimensions = dimensions, population = 200, rng = Random(System.currentTimeMillis())),
+        optimizer = BRKGA(
+            dimensions = dimensions,
+            population = 200,
+            elites = 40,
+            mutants = 40,
+            rng = Random(System.currentTimeMillis())
+        ),
         goal = Goal.Minimize,
-        problem = Ackley(dimensions), //rastrigin, zeroOneCounting
+        problem = Rastrigin(dimensions), //rastrigin, zeroOneCounting
         monitor = {
             if (it.iteration.rem(recordInterval) == 0L)
                 defaultEngineHistory.add(it.bestFitness)
-            it.iteration >= stopIteration
+            it.bestFitness <= 0.01
         }
     )
 
     val islandEngine = IslandEngine(
-        problem = Ackley(dimensions),
+        problem = Rastrigin(dimensions),
         goal = Goal.Minimize,
-        migrationInterval = 100,
+        migrationInterval = 5,
         optimizers = buildSet {
             (0 until 4).forEach { i ->
-                add(BRKGA(dimensions = dimensions, population = 50, rng = Random(i)))
+                add(
+                    BRKGA(
+                        dimensions = dimensions,
+                        elites = 10,
+                        mutants = 10,
+                        population = 50,
+                        rng = Random(i)
+                    )
+                )
             }
         },
         monitor = {
             if (it.iteration.rem(recordInterval) == 0L)
                 islandEngineHistory.add(it.bestFitness)
-            it.iteration >= stopIteration
+            it.bestFitness <= 0.01
         }
     )
 
     val defaultEngineResult = engine.optimize()
     val islandEngineResult = islandEngine.optimize()
-
+    println(defaultEngineResult)
+    println(islandEngineResult)
     val chart = XYChartBuilder()
         .width(1024)
         .height(800)
@@ -107,7 +122,6 @@ fun main() {
 
     chart.seriesMap.forEach { it.value.marker = SeriesMarkers.NONE }
 
-    println(defaultEngineResult)
-    println(islandEngineResult)
+
     SwingWrapper(chart).displayChart();
 }

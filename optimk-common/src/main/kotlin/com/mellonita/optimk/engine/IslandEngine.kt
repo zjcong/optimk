@@ -45,9 +45,9 @@ private data class Island(
  */
 class IslandEngine<T>(
     private val problem: Problem<T>,
-    private val migrationInterval: Int,
     optimizers: Set<Optimizer>,
     goal: Goal,
+    private val migrationInterval: Int,
     monitor: (IterationInfo<T>) -> Boolean
 ) : Engine<T>(goal, monitor) {
 
