@@ -13,7 +13,7 @@ class BRKGA @JvmOverloads constructor(
     private val bias: Double = 0.70,
     private val elites: Int = (population * 0.25).roundToInt(),
     private val mutants: Int = (population * 0.2).roundToInt(),
-    private val rng: Random = Random(0)
+    private val rng: Random = Random(System.currentTimeMillis())
 
 ) : Optimizer(), OpenBorder {
 

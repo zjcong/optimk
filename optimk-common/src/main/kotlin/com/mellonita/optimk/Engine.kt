@@ -1,8 +1,5 @@
 package com.mellonita.optimk
 
-const val GOAL_MAX = -1
-const val GOAL_MIN = 1
-
 /**
  *
  */
@@ -18,14 +15,18 @@ data class IterationInfo<T>(
 )
 
 
+enum class Goal(private val value: Int) {
+    Maximize(-1),
+    Minimize(1);
+
+    operator fun times(d: Double) = this.value.toDouble() * d
+}
+
 /**
  * Engine
  */
-abstract class Engine<T>(val goal: Int, val monitor: (info: IterationInfo<T>) -> Boolean) {
+abstract class Engine<T>(val goal: Goal, val monitor: (info: IterationInfo<T>) -> Boolean) {
 
-    init {
-        require(goal == GOAL_MAX || goal == GOAL_MIN)
-    }
 
     /**
      * Perform optimization

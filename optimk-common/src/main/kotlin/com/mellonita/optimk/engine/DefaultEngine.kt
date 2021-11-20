@@ -14,12 +14,12 @@ import java.util.concurrent.atomic.AtomicLong
 class DefaultEngine<T>(
     private val problem: Problem<T>,
     private val optimizer: Optimizer,
-    goal: Int,
+    goal: Goal,
     monitor: (info: IterationInfo<T>) -> Boolean
 ) : Engine<T>(goal, monitor) {
 
-    private var bestSolution: DoubleArray by SynchronizedProperty(doubleArrayOf())
-    private var bestFitness: Double by SynchronizedProperty(Double.MAX_VALUE)
+    private var bestSolution: DoubleArray = doubleArrayOf()
+    private var bestFitness: Double = Double.MAX_VALUE
 
     private var itrCounter: Long = 0
     private var evalCounter: AtomicLong = AtomicLong(0)
@@ -31,17 +31,11 @@ class DefaultEngine<T>(
      */
     override fun evaluate(candidate: DoubleArray): Double {
         evalCounter.incrementAndGet()
-
         val actualCandidate = problem.decode(candidate)
-        var fitness = Double.MAX_VALUE
-
-        if (problem.isFeasible(actualCandidate))
-            fitness = goal * problem.objective(actualCandidate)
-        if (fitness < bestFitness) {
-            bestFitness = fitness
-            bestSolution = candidate
-        }
-        return fitness
+        return if (problem.isFeasible(actualCandidate))
+            goal * problem.objective(actualCandidate)
+        else
+            Double.MAX_VALUE
     }
 
     /**
@@ -57,6 +51,13 @@ class DefaultEngine<T>(
         do {
             itrCounter++
             val fitnessValues = currentGeneration.toList().stream().parallel().mapToDouble { evaluate(it) }.toArray()
+
+            val min = fitnessValues.withIndex().minByOrNull { it.value }!!
+
+            if (min.value < bestFitness) {
+                bestFitness = min.value
+                bestSolution = currentGeneration[min.index]
+            }
 
             info = IterationInfo(
                 bestSolution = problem.decode(bestSolution),
