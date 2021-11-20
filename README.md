@@ -68,3 +68,8 @@ General Public License version 3.
 Please contact the author via Telegram [@drzjcong](https://telegram.me/drzjcong) if this license does not meet your
 needs. 
 
+## TODO
++ Island Model Engine
++ Particle Swamp Optimization
++ Differential Evolution
++ ...

@@ -21,8 +21,11 @@ data class IterationInfo<T>(
 /**
  * Engine
  */
-abstract class Engine<T>(val monitor: (info: IterationInfo<T>) -> Boolean) {
+abstract class Engine<T>(val goal: Int, val monitor: (info: IterationInfo<T>) -> Boolean) {
 
+    init {
+        require(goal == GOAL_MAX || goal == GOAL_MIN)
+    }
 
     /**
      * Perform optimization

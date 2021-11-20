@@ -5,7 +5,7 @@ package com.mellonita.optimk
 /**
  *
  */
-interface AcceptImmigrant
+interface OpenBorder
 
 
 /**
