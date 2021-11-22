@@ -3,11 +3,8 @@ package com.mellonita.optimk.example.optimization
 import com.mellonita.optimk.Goal
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.IslandEngine
-import com.mellonita.optimk.example.benchmarkfuncs.Rastrigin
-import com.mellonita.optimk.optimizer.BRKGA
-import org.knowm.xchart.SwingWrapper
-import org.knowm.xchart.XYChartBuilder
-import org.knowm.xchart.style.markers.SeriesMarkers
+import com.mellonita.optimk.example.benchmarkfuncs.Ackley
+import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import kotlin.random.Random
 
 
@@ -58,70 +55,51 @@ class Monitor<T> {
 */
 
 fun main() {
-    val dimensions = 10
-    val stopIteration = 100_000
-    val recordInterval = 100
+    val dimensions = 50
+    val recordInterval = 1000
+    val maxIteration = 1_000_000
     val defaultEngineHistory = mutableListOf<Double>()
     val islandEngineHistory = mutableListOf<Double>()
 
     val engine = DefaultEngine(
-        optimizer = BRKGA(
-            dimensions = dimensions,
-            population = 200,
-            elites = 40,
-            mutants = 40,
-            rng = Random(System.currentTimeMillis())
-        ),
+        optimizer = BiasedGeneticAlgorithm(dimensions = dimensions, population = 150, rng = Random(0)),
+        //optimizer = DifferentialEvolution(dimensions, 100, DifferentialEvolution.rand1(0.8), Random(0)),
         goal = Goal.Minimize,
-        problem = Rastrigin(dimensions), //rastrigin, zeroOneCounting
+        problem = Ackley(dimensions), //rastrigin, zeroOneCounting
         monitor = {
-            if (it.iteration.rem(recordInterval) == 0L)
+            if (it.iteration.rem(recordInterval) == 0L) {
                 defaultEngineHistory.add(it.bestFitness)
-            it.bestFitness <= 0.01
+            }
+            it.bestFitness <= 1E-7 || it.iteration >= maxIteration
         }
     )
 
     val islandEngine = IslandEngine(
-        problem = Rastrigin(dimensions),
+        problem = Ackley(dimensions),
         goal = Goal.Minimize,
         migrationInterval = 5,
         optimizers = buildSet {
-            (0 until 4).forEach { i ->
+            (0 until 10).forEach { i ->
                 add(
-                    BRKGA(
-                        dimensions = dimensions,
-                        elites = 10,
-                        mutants = 10,
-                        population = 50,
-                        rng = Random(i)
-                    )
+                    if (i.rem(2) == 0)
+                    //DifferentialEvolution(dimensions, 15, DifferentialEvolution.rand1(0.9), Random(i))
+                        BiasedGeneticAlgorithm(dimensions, 15)
+                    else
+                        BiasedGeneticAlgorithm(dimensions, 15)
                 )
             }
         },
         monitor = {
             if (it.iteration.rem(recordInterval) == 0L)
                 islandEngineHistory.add(it.bestFitness)
-            it.bestFitness <= 0.01
+            it.bestFitness <= 1E-7 || it.iteration >= maxIteration
         }
     )
 
     val defaultEngineResult = engine.optimize()
     val islandEngineResult = islandEngine.optimize()
+
     println(defaultEngineResult)
     println(islandEngineResult)
-    val chart = XYChartBuilder()
-        .width(1024)
-        .height(800)
-        .title("Default vs Island Engine")
-        .xAxisTitle("X")
-        .yAxisTitle("Y")
-        .build()
 
-    chart.addSeries("Default", defaultEngineHistory)
-    chart.addSeries("Island", islandEngineHistory)
-
-    chart.seriesMap.forEach { it.value.marker = SeriesMarkers.NONE }
-
-
-    SwingWrapper(chart).displayChart();
 }

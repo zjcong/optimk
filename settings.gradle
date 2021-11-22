@@ -1,3 +1,5 @@
 rootProject.name = 'optimk'
 include 'optimk-common'
 include 'optimk-examples'
+include 'optimk-distributed'
+

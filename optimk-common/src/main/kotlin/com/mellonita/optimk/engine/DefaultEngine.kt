@@ -1,7 +1,6 @@
 package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.*
-import java.util.concurrent.atomic.AtomicLong
 
 
 /**
@@ -12,31 +11,17 @@ import java.util.concurrent.atomic.AtomicLong
  * @param monitor
  */
 class DefaultEngine<T>(
-    private val problem: Problem<T>,
+    problem: Problem<T>,
     private val optimizer: Optimizer,
     goal: Goal,
     monitor: (info: IterationInfo<T>) -> Boolean
-) : Engine<T>(goal, monitor) {
+) : Engine<T>(problem, goal, monitor) {
 
     private var bestSolution: DoubleArray = doubleArrayOf()
     private var bestFitness: Double = Double.MAX_VALUE
 
-    private var itrCounter: Long = 0
-    private var evalCounter: AtomicLong = AtomicLong(0)
+    private var itrCounter: Long = -1
     private var startTime: Long by InitOnceProperty()
-
-
-    /**
-     *
-     */
-    override fun evaluate(candidate: DoubleArray): Double {
-        evalCounter.incrementAndGet()
-        val actualCandidate = problem.decode(candidate)
-        return if (problem.isFeasible(actualCandidate))
-            goal * problem.objective(actualCandidate)
-        else
-            Double.MAX_VALUE
-    }
 
     /**
      *
@@ -45,11 +30,11 @@ class DefaultEngine<T>(
         this.startTime = System.currentTimeMillis()
 
         var info: IterationInfo<T>
-
         var currentGeneration = optimizer.initialize()
 
         do {
             itrCounter++
+
             val fitnessValues = currentGeneration.toList().stream().parallel().mapToDouble { evaluate(it) }.toArray()
 
             val min = fitnessValues.withIndex().minByOrNull { it.value }!!
@@ -64,13 +49,10 @@ class DefaultEngine<T>(
                 bestFitness = goal * bestFitness,
                 evaluation = evalCounter.get(),
                 iteration = itrCounter,
-                time = System.currentTimeMillis() - startTime,
-                min = fitnessValues.minOf { it },
-                max = fitnessValues.maxOf { it },
-                average = fitnessValues.average()
+                time = System.currentTimeMillis() - startTime
             )
-
             currentGeneration = optimizer.iterate(currentGeneration, fitnessValues)
+
 
         } while (!monitor(info))
 

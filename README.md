@@ -57,9 +57,15 @@ class Rastrigin(val n: Int) : Problem<DoubleArray> {
 
 ### Engine
 
+TODO
+
+### Optimizer
+
+TODO
+
 ## License
 
-This software is licensed under General Public License version 3.
+Unless explicitly stated otherwise, every module of this software is licensed under General Public License version 3.
 
 ````
     OptimK is a mathematical optimization framework written in Kotlin.
@@ -84,7 +90,8 @@ needs.
 
 ## TODO
 
-+ Island Model Engine
++ ~~Island Model Engine~~
 + Particle Swamp Optimization
-+ Differential Evolution
-+ ...
++ ~~Differential Evolution~~
++ Restart Engine
++ Server Engine

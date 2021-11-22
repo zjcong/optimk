@@ -2,10 +2,11 @@ package com.mellonita.optimk.optimizer
 
 import com.mellonita.optimk.OpenBorder
 import com.mellonita.optimk.Optimizer
+import com.mellonita.optimk.Stateless
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class BRKGA @JvmOverloads constructor(
+class BiasedGeneticAlgorithm @JvmOverloads constructor(
 
     private val dimensions: Int,
     private val population: Int,
@@ -15,7 +16,7 @@ class BRKGA @JvmOverloads constructor(
     private val mutants: Int = (population * 0.2).roundToInt(),
     private val rng: Random = Random(System.currentTimeMillis())
 
-) : Optimizer(), OpenBorder {
+) : Optimizer, OpenBorder, Stateless {
 
 
     init {

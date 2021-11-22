@@ -4,6 +4,18 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 
+operator fun DoubleArray.plus(a: DoubleArray): DoubleArray {
+    return this.mapIndexed { index, d -> d + a[index] }.toDoubleArray()
+}
+
+operator fun DoubleArray.minus(a: DoubleArray): DoubleArray {
+    return this.mapIndexed { index, d -> d - a[index] }.toDoubleArray()
+}
+
+operator fun Double.times(a: DoubleArray): DoubleArray {
+    return a.map { it * this }.toDoubleArray()
+}
+
 /**
  *
  */
@@ -47,3 +59,4 @@ internal class InitOnceProperty<T> : ReadWriteProperty<Any, T> {
         this.value = value
     }
 }
+

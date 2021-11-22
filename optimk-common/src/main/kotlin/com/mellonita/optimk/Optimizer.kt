@@ -2,17 +2,23 @@
 
 package com.mellonita.optimk
 
+import java.io.Serializable
+
 /**
  *
  */
-interface OpenBorder
-
+interface OpenBorder : Optimizer
 
 /**
- * Abstract optimizer class
  *
  */
-abstract class Optimizer {
+interface Stateless : Optimizer
+
+/**
+ * Optimizer Interface
+ *
+ */
+interface Optimizer : Serializable {
 
     /**
      * Iterate
@@ -20,11 +26,13 @@ abstract class Optimizer {
      * @param fitnessValues fitness values of the solutions
      * @return next generation
      */
-    abstract fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray>
+    fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray>
 
     /**
      * Initialize the optimizer
      * @return an initial population
      */
-    abstract fun initialize(): Array<DoubleArray>
+    fun initialize(): Array<DoubleArray>
+
+
 }
