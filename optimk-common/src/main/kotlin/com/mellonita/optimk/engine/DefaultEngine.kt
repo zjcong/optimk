@@ -17,11 +17,6 @@ class DefaultEngine<T>(
     monitor: (info: IterationInfo<T>) -> Boolean
 ) : Engine<T>(problem, goal, monitor) {
 
-    private var bestSolution: DoubleArray = doubleArrayOf()
-    private var bestFitness: Double = Double.MAX_VALUE
-
-    private var itrCounter: Long = -1
-    private var startTime: Long by InitOnceProperty()
 
     /**
      *
@@ -51,8 +46,8 @@ class DefaultEngine<T>(
                 iteration = itrCounter,
                 time = System.currentTimeMillis() - startTime
             )
-            currentGeneration = optimizer.iterate(currentGeneration, fitnessValues)
 
+            currentGeneration = optimizer.iterate(currentGeneration, fitnessValues)
 
         } while (!monitor(info))
 

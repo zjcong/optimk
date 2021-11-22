@@ -1,10 +1,9 @@
 package com.mellonita.optimk.example.benchmarkfuncs
 
-import com.mellonita.optimk.Problem
 import com.mellonita.optimk.valueIn
 import kotlin.math.*
 
-class Ackley(private val d: Int) : Problem<DoubleArray> {
+class Ackley(d: Int) : Benchmark(d) {
 
     private var a = 20
     private var b = 0.2

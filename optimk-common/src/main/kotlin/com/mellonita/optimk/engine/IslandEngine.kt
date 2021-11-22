@@ -2,6 +2,41 @@ package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.*
 
+
+/**
+ * Island
+ */
+private class SimpleIsland(
+    val optimizer: Optimizer,
+    var fitnessValues: DoubleArray,
+    var bestFitness: Double,
+    var bestSolution: DoubleArray,
+    val objectiveFunc: (DoubleArray) -> Double
+) {
+
+    var currentGeneration = optimizer.initialize()
+
+    val isOpen = optimizer is OpenBorder
+
+    /**
+     *
+     */
+    fun updateFitness() {
+        fitnessValues = currentGeneration.map { objectiveFunc(it) }.toDoubleArray()
+        val min = fitnessValues.withIndex().minByOrNull { it.value }!!
+        this.bestFitness = min.value
+        this.bestSolution = currentGeneration[min.index]
+    }
+
+    /**
+     *
+     */
+    fun iterate() {
+        currentGeneration = optimizer.iterate(currentGeneration, fitnessValues)
+    }
+
+}
+
 /**
  * Island Model Engine
  */
@@ -13,77 +48,34 @@ class IslandEngine<T>(
     monitor: (IterationInfo<T>) -> Boolean
 ) : Engine<T>(problem, goal, monitor) {
 
-    private data class Island(
-        val optimizer: Optimizer,
-        var currentGeneration: Array<DoubleArray>,
-        var fitnessValues: DoubleArray,
-        var bestFitness: Double,
-        var bestSolution: DoubleArray
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Island
-
-            if (optimizer != other.optimizer) return false
-            if (!currentGeneration.contentDeepEquals(other.currentGeneration)) return false
-            if (!fitnessValues.contentEquals(other.fitnessValues)) return false
-            if (bestFitness != other.bestFitness) return false
-            if (!bestSolution.contentEquals(other.bestSolution)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = optimizer.hashCode()
-            result = 31 * result + currentGeneration.contentDeepHashCode()
-            result = 31 * result + fitnessValues.contentHashCode()
-            result = 31 * result + bestFitness.hashCode()
-            result = 31 * result + bestSolution.contentHashCode()
-            return result
-        }
-
-    }
-
     //Islands
-    private val islands: Set<Island> = optimizers.map {
-        Island(
+    private val islands: List<SimpleIsland> = optimizers.map {
+        SimpleIsland(
             optimizer = it,
-            currentGeneration = it.initialize(),
             fitnessValues = doubleArrayOf(),
             bestFitness = Double.MAX_VALUE,
-            bestSolution = doubleArrayOf()
+            bestSolution = doubleArrayOf(),
+            objectiveFunc = ::evaluate
         )
-    }.toSet()
-
-    private var bestSolution: DoubleArray by SynchronizedProperty(doubleArrayOf())
-    private var bestFitness: Double by SynchronizedProperty(Double.MAX_VALUE)
-
-    private var itrCounter: Long = -1
-    private var startTime: Long by InitOnceProperty()
-
-    private val openIslands = islands.filter { it.optimizer is OpenBorder }
-
-
-    init {
-        check(openIslands.isNotEmpty()) { TODO() }
     }
+
+    //Open Island
+    private val openIslands = islands.filter { it.isOpen }
 
     /**
      * Perform optimization
      */
     override fun optimize(): IterationInfo<T> {
         startTime = System.currentTimeMillis()
+
         var info: IterationInfo<T>
 
         do {
             itrCounter++
 
-            islands.parallelStream().forEach { islandEvaluate(it) }
+            islands.parallelStream().forEach { it.updateFitness() }
 
             val min = islands.minByOrNull { it.bestFitness }!!
-
             if (min.bestFitness < bestFitness) {
                 bestFitness = min.bestFitness
                 bestSolution = min.bestSolution
@@ -101,29 +93,17 @@ class IslandEngine<T>(
                 time = System.currentTimeMillis() - startTime
             )
 
-            islands.parallelStream()
-                .forEach { it.currentGeneration = it.optimizer.iterate(it.currentGeneration, it.fitnessValues) }
-
+            islands.parallelStream().forEach { it.iterate() }
         } while (!monitor(info))
 
         return info
-    }
-
-
-    /**
-     *
-     */
-    private fun islandEvaluate(island: Island) {
-        island.fitnessValues = island.currentGeneration.map { evaluate(it) }.toDoubleArray()
-        val min = island.fitnessValues.withIndex().minByOrNull { it.value }!!
-        island.bestFitness = min.value
-        island.bestSolution = island.currentGeneration[min.index]
     }
 
     /**
      *
      */
     private fun migrate() {
+        if (openIslands.isEmpty()) return
         val from = islands.random()
         val to = openIslands.random()
         val worst = to.fitnessValues.withIndex().maxByOrNull { it.value }!!

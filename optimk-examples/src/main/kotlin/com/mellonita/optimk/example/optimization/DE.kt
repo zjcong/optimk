@@ -2,7 +2,7 @@ package com.mellonita.optimk.example.optimization
 
 import com.mellonita.optimk.Goal
 import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.example.benchmarkfuncs.Rastrigin
+import com.mellonita.optimk.example.benchmarkfuncs.Sphere
 import com.mellonita.optimk.optimizer.DifferentialEvolution
 import kotlin.random.Random
 
@@ -18,11 +18,11 @@ fun main() {
         optimizer = DifferentialEvolution(
             dimensions = dimensions,
             population = 60,
-            mutation = DifferentialEvolution.rand1(0.3),
+            mutation = DifferentialEvolution.best2(0.3, 0.7),
             rng = Random(0)
         ),
         goal = Goal.Minimize,
-        problem = Rastrigin(dimensions), //rastrigin, zeroOneCounting
+        problem = Sphere(dimensions), //rastrigin, zeroOneCounting
         monitor = {
             if (it.iteration.rem(recordInterval) == 0L) {
                 strategy1History.add(it.bestFitness)
@@ -36,11 +36,11 @@ fun main() {
         optimizer = DifferentialEvolution(
             dimensions = dimensions,
             population = 60,
-            mutation = DifferentialEvolution.currentToRand1(0.3, 0.7),
+            mutation = DifferentialEvolution.currentToBest1(0.3, 0.7),
             rng = Random(0)
         ),
         goal = Goal.Minimize,
-        problem = Rastrigin(dimensions), //rastrigin, zeroOneCounting
+        problem = Sphere(dimensions), //rastrigin, zeroOneCounting
         monitor = {
             if (it.iteration.rem(recordInterval) == 0L) {
                 strategy2History.add(it.bestFitness)

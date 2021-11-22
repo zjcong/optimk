@@ -32,6 +32,11 @@ abstract class Engine<T>(
 
     val evalCounter: AtomicLong = AtomicLong(0)
 
+    protected var startTime: Long by InitOnceProperty()
+    protected var itrCounter: Long = 0
+    protected var bestSolution: DoubleArray = doubleArrayOf()
+    protected var bestFitness: Double = Double.MAX_VALUE
+
     /**
      * Perform optimization
      */
@@ -51,6 +56,4 @@ abstract class Engine<T>(
         else
             Double.MAX_VALUE
     }
-
-
 }
