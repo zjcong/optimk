@@ -1,4 +1,4 @@
-package com.mellonita.optimk.example.benchmarkfuncs
+package com.mellonita.optimk.example.benchmark
 
 import com.mellonita.optimk.valueIn
 import kotlin.math.PI

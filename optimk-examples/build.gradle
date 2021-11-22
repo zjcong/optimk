@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation project(":optimk-common")
+    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
 }
 

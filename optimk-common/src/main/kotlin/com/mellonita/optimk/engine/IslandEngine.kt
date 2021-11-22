@@ -8,12 +8,11 @@ import com.mellonita.optimk.*
  */
 private class SimpleIsland(
     val optimizer: Optimizer,
-    var fitnessValues: DoubleArray,
-    var bestFitness: Double,
-    var bestSolution: DoubleArray,
     val objectiveFunc: (DoubleArray) -> Double
 ) {
-
+    var fitnessValues: DoubleArray = doubleArrayOf()
+    var bestFitness: Double = Double.MAX_VALUE
+    var bestSolution: DoubleArray = doubleArrayOf()
     var currentGeneration = optimizer.initialize()
 
     val isOpen = optimizer is OpenBorder
@@ -21,7 +20,7 @@ private class SimpleIsland(
     /**
      *
      */
-    fun updateFitness() {
+    fun evaluate() {
         fitnessValues = currentGeneration.map { objectiveFunc(it) }.toDoubleArray()
         val min = fitnessValues.withIndex().minByOrNull { it.value }!!
         this.bestFitness = min.value
@@ -49,15 +48,7 @@ class IslandEngine<T>(
 ) : Engine<T>(problem, goal, monitor) {
 
     //Islands
-    private val islands: List<SimpleIsland> = optimizers.map {
-        SimpleIsland(
-            optimizer = it,
-            fitnessValues = doubleArrayOf(),
-            bestFitness = Double.MAX_VALUE,
-            bestSolution = doubleArrayOf(),
-            objectiveFunc = ::evaluate
-        )
-    }
+    private val islands: List<SimpleIsland> = optimizers.map { SimpleIsland(it, ::evaluate) }
 
     //Open Island
     private val openIslands = islands.filter { it.isOpen }
@@ -73,7 +64,7 @@ class IslandEngine<T>(
         do {
             itrCounter++
 
-            islands.parallelStream().forEach { it.updateFitness() }
+            islands.parallelStream().forEach { it.evaluate() }
 
             val min = islands.minByOrNull { it.bestFitness }!!
             if (min.bestFitness < bestFitness) {
@@ -94,6 +85,7 @@ class IslandEngine<T>(
             )
 
             islands.parallelStream().forEach { it.iterate() }
+
         } while (!monitor(info))
 
         return info

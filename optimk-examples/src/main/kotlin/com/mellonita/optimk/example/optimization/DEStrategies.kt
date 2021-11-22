@@ -2,7 +2,7 @@ package com.mellonita.optimk.example.optimization
 
 import com.mellonita.optimk.Goal
 import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.example.benchmarkfuncs.Sphere
+import com.mellonita.optimk.example.benchmark.Sphere
 import com.mellonita.optimk.optimizer.DifferentialEvolution
 import kotlin.random.Random
 

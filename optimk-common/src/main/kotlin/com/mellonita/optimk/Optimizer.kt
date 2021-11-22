@@ -9,10 +9,6 @@ import java.io.Serializable
  */
 interface OpenBorder : Optimizer
 
-/**
- *
- */
-interface Stateless : Optimizer
 
 /**
  * Optimizer Interface

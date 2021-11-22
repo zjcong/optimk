@@ -91,7 +91,7 @@ needs.
 ## TODO
 
 + ~~Island Model Engine~~
-+ Particle Swamp Optimization
++ ~~Particle Swamp Optimization~~
 + ~~Differential Evolution~~
 + Restart Engine
 + Server Engine

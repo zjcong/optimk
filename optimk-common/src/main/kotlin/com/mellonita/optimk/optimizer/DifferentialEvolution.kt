@@ -16,7 +16,7 @@ class DifferentialEvolution @JvmOverloads constructor(
     private val mutation: MutationStrategy,
     private val rng: Random = Random(System.currentTimeMillis()),
     private val cr: Double = 0.8,
-) : Optimizer, OpenBorder, Stateless {
+) : Optimizer, OpenBorder {
 
 
     /**
