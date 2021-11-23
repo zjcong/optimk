@@ -7,9 +7,10 @@ import kotlin.random.Random
 
 
 /**
- * Indicate this optimizer accepts immigrant
+ * Migratable marker interface
  */
 public interface OpenBorder : Serializable
+
 
 
 /**

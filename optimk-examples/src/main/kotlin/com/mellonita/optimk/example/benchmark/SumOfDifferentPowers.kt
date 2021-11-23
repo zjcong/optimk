@@ -15,30 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.island
+package com.mellonita.optimk.example.benchmark
 
-import com.mellonita.optimk.Problem
-import com.mellonita.optimk.engine.Goal
-import com.mellonita.optimk.optimizer.Optimizer
+import com.mellonita.optimk.valueIn
+import kotlin.math.abs
+import kotlin.math.pow
 
+class SumOfDifferentPowers(d: Int) : Benchmark(d) {
+    override fun decode(keys: DoubleArray): DoubleArray {
+        return keys.map { it.valueIn((-1.0).rangeTo(1.0)) }.toDoubleArray()
+    }
 
-/**
- * Island
- */
-public class DefaultIsland<T>(
-    problem: Problem<T>,
-    goal: Goal,
-    optimizer: Optimizer,
-) : Island<T>(problem, goal, optimizer) {
-
-    public override fun iterate(){
-        fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
-        val min = fitness.withIndex().minByOrNull { it.value }!!
-        if (min.value < bestFitness) {
-            bestFitness = min.value
-            bestSolution = population[min.index]
+    override fun objective(solution: DoubleArray): Double {
+        return solution.withIndex().sumOf {
+            abs(it.value).pow(it.index + 1)
         }
-         optimizer.iterate(population, fitness)
     }
 
 }

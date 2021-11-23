@@ -14,8 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-
 @file:Suppress("MemberVisibilityCanBePrivate")
 
 package com.mellonita.optimk.engine
@@ -57,20 +55,24 @@ public abstract class Engine<T> : Serializable {
      */
     public abstract fun optimize(): T
 
+
     /**
      * Single objective function evaluation
      */
-    public open fun evaluateIndividual(candidate: DoubleArray): Double {
+    protected open fun evaluateIndividual(solution: DoubleArray): Double {
         evaluations++
-        if (candidate.any { it !in (0.0).rangeTo(1.0) })
+        if (solution.any { it !in (0.0).rangeTo(1.0) })
             return Double.MAX_VALUE
-        val actualCandidate = problem.decode(candidate)
+        val actualCandidate = problem.decode(solution)
         return if (problem.isFeasible(actualCandidate))
             goal * problem.objective(actualCandidate)
         else
             Double.MAX_VALUE
     }
 
+    /**
+     * Serialize this engine to file
+     */
     public fun suspendTo(file: File) {
         val fos = FileOutputStream(file)
         val oos = ObjectOutputStream(fos)
@@ -82,6 +84,9 @@ public abstract class Engine<T> : Serializable {
 
     public companion object {
 
+        /**
+         * Deserialize from file
+         */
         @Suppress("UNCHECKED_CAST")
         public fun <T> resumeFrom(f: File): T {
             val fis = FileInputStream(f)
@@ -92,4 +97,29 @@ public abstract class Engine<T> : Serializable {
             return engine as T
         }
     }
+}
+
+/**
+ *
+ */
+public abstract class Island<T> : Engine<T>() {
+
+    public abstract val isOpen: Boolean
+
+
+    /**
+     * Single iteration
+     */
+    public abstract fun evaluatePopulation()
+
+    /**
+     *
+     */
+    protected abstract fun nextIteration(current: Array<DoubleArray>): Array<DoubleArray>
+
+
+    /**
+     *
+     */
+    public abstract fun arrival(s: DoubleArray, f: Double): Boolean
 }

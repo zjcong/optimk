@@ -22,8 +22,6 @@ package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Problem
-import com.mellonita.optimk.island.DefaultIsland
-import com.mellonita.optimk.optimizer.Optimizer
 import kotlin.random.Random
 
 
@@ -33,18 +31,14 @@ import kotlin.random.Random
 public open class IslandEngine<T>(
     override val problem: Problem<T>,
     override val goal: Goal,
-    optimizers: Set<Optimizer>,
+    protected val islands: List<Island<T>>,
     protected val migrationInterval: Int,
     protected val rng: Random = Random(System.currentTimeMillis()),
     override val monitor: Monitor<T>,
 ) : Engine<T>() {
 
-    //Islands
-    protected val islands: List<DefaultIsland<T>> = optimizers.map { DefaultIsland(problem, goal, it) }
-
     //Open Island
-    protected val openIslands: List<DefaultIsland<T>> = islands.filter { it.isOpen }
-
+    protected val openIslands: List<Island<T>> = islands.filter { it.isOpen }
 
     /**
      * Perform optimization
@@ -55,7 +49,8 @@ public open class IslandEngine<T>(
         do {
             iterations++
 
-            islands.parallelStream().forEach { it.evaluate() }
+            // Evaluate islands
+            islands.parallelStream().forEach { it.evaluatePopulation() }
 
             val min = islands.minByOrNull { it.bestFitness }!!
             if (min.bestFitness < bestFitness) {
@@ -63,6 +58,7 @@ public open class IslandEngine<T>(
                 bestSolution = min.bestSolution
             }
 
+            // migrate
             if (iterations != 0L && iterations.rem(migrationInterval) == 0L)
                 migrate()
 
@@ -71,7 +67,7 @@ public open class IslandEngine<T>(
 
             monitor.debug(solutions, fitness)
 
-            islands.parallelStream().forEach { it.iterate() }
+            islands.parallelStream().forEach { it.evaluatePopulation() }
 
         } while (!monitor.stop(this))
 

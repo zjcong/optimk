@@ -19,6 +19,7 @@ package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Problem
+import com.mellonita.optimk.optimizer.OpenBorder
 import com.mellonita.optimk.optimizer.Optimizer
 
 
@@ -33,25 +34,43 @@ public open class DefaultEngine<T>(
     override val goal: Goal,
     private val optimizer: Optimizer,
     override val monitor: Monitor<T>,
-) : Engine<T>() {
+) : Island<T>() {
 
-    private var currentGeneration = optimizer.initialize()
+    private var population: Array<DoubleArray> = optimizer.initialize()
+    private var fitness: DoubleArray = doubleArrayOf()
+    override var isOpen: Boolean = optimizer is OpenBorder
 
     /**
-     *
+     * Single iteration
      */
-    private fun iterate(population: Array<DoubleArray>): Array<DoubleArray> {
+    public override fun evaluatePopulation() {
         iterations++
-        val fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
+        fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
         val min = fitness.withIndex().minByOrNull { it.value }!!
         if (min.value < bestFitness) {
             bestFitness = min.value
             bestSolution = population[min.index]
         }
         monitor.debug(population, fitness)
-        return optimizer.iterate(population, fitness)
     }
 
+    /**
+     *
+     */
+    override fun arrival(s: DoubleArray, f: Double): Boolean {
+        if (!isOpen) return false
+        val worst = this.fitness.withIndex().minByOrNull { it.value }!!.index
+        if (this.fitness[worst] >= f) return false
+        population[worst] = s
+        this.fitness[worst] = f
+        return true
+    }
+
+    /**
+     *
+     */
+    override fun nextIteration(current: Array<DoubleArray>): Array<DoubleArray> =
+        optimizer.iterate(population, fitness)
 
     /**
      *
@@ -59,11 +78,17 @@ public open class DefaultEngine<T>(
     override fun optimize(): T {
         this.startTime = System.currentTimeMillis()
         do {
-            currentGeneration = iterate(currentGeneration)
+            // Evaluate population
+            evaluatePopulation()
+
+            // Sample next population
+            population = nextIteration(population)
         } while (!monitor.stop(this))
 
         return problem.decode(bestSolution)
     }
+
+
 }
 
 

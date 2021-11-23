@@ -94,4 +94,5 @@ needs.
 + ~~Particle Swamp Optimization~~
 + ~~Differential Evolution~~
 + Restart Engine
-+ Server Engine
++ AlternatingEngine
++ ~~Engine suspension~~

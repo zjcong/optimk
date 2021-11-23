@@ -5,12 +5,13 @@ import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.Engine
 import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.example.benchmark.Sphere
+import com.mellonita.optimk.example.benchmark.SumOfDifferentPowers
 import com.mellonita.optimk.optimizer.DifferentialEvolution
 import com.mellonita.optimk.optimizer.MutationStrategy
 import java.io.File
 
-val problem = Sphere(50) //10-D Sphere function
-const val population = 100
+val problem = SumOfDifferentPowers(10) //10-D Sphere function
+const val population = 20
 
 fun deEngineOf(mutationStrategy: MutationStrategy, monitor: Monitor<DoubleArray>): DefaultEngine<DoubleArray> {
     return DefaultEngine(
