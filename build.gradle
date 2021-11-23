@@ -3,6 +3,10 @@ plugins {
     id 'org.jetbrains.dokka' version "1.5.30"
 }
 
+repositories {
+    mavenCentral()
+}
+
 group = 'com.mellonita.optimk'
 version = '0.0.1'
 

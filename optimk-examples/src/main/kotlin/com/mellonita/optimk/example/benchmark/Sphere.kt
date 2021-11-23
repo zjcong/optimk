@@ -9,6 +9,6 @@ class Sphere(d: Int) : Benchmark(d) {
         return keys.map { it.valueIn((-5.12).rangeTo(5.12)) }.toDoubleArray()
     }
 
-    override fun objective(candidate: DoubleArray): Double = candidate.sumOf { it.pow(2) }
+    override fun objective(solution: DoubleArray): Double = solution.sumOf { it.pow(2) }
 
 }

@@ -12,7 +12,7 @@ class Rastrigin(d: Int) : Benchmark(d) {
         return keys.map { it.valueIn((-5.12).rangeTo(5.12)) }.toDoubleArray()
     }
 
-    override fun objective(candidate: DoubleArray): Double {
-        return A * d + candidate.sumOf { x -> x.pow(2) - A * cos(2 * PI * x) }
+    override fun objective(solution: DoubleArray): Double {
+        return A * d + solution.sumOf { x -> x.pow(2) - A * cos(2 * PI * x) }
     }
 }

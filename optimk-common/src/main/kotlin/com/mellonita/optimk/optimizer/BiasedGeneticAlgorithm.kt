@@ -1,68 +1,76 @@
+/*
+ * Copyright (C) Zijie Cong 2021
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
 package com.mellonita.optimk.optimizer
 
-import com.mellonita.optimk.OpenBorder
-import com.mellonita.optimk.Optimizer
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class BiasedGeneticAlgorithm @JvmOverloads constructor(
-
-    private val dimensions: Int,
-    private val population: Int,
-
+/**
+ *
+ */
+public class BiasedGeneticAlgorithm @JvmOverloads constructor(
+    d: Int,
+    p: Int,
     private val bias: Double = 0.70,
-    private val elites: Int = (population * 0.25).roundToInt(),
-    private val mutants: Int = (population * 0.2).roundToInt(),
-    private val rng: Random = Random(System.currentTimeMillis())
-
-) : Optimizer, OpenBorder {
+    private val elites: Int = (p * 0.25).roundToInt(),
+    private val mutants: Int = (p * 0.2).roundToInt(),
+    rng: Random = Random(System.currentTimeMillis())
+) : Optimizer(d, p, rng), OpenBorder {
 
 
     init {
-        require(dimensions > 0) { "Number of dimensions ($dimensions) must be greater than zero" }
-        require(population > 4) { "Population size ($population) must be greater than 4" }
+        require(d > 0) { "Number of dimensions ($d) must be greater than zero" }
+        require(p > 4) { "Population size ($p) must be greater than 4" }
         require(elites > 0) { "Elites ($elites) must be greater than 0" }
         require(mutants > 0) { "Mutant ($mutants) must be greater than 0" }
-        require(elites + mutants < population) { "Sum of elites and mutants exceeds population size" }
+        require(elites + mutants < p) { "Sum of elites and mutants exceeds population size" }
     }
 
     /**
      *
      *
      */
-    override fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray> {
+    override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
 
-        val nextGeneration: Array<DoubleArray> = Array(population) { DoubleArray(0) }
+        val nextGeneration: Array<DoubleArray> = Array(p) { DoubleArray(0) }
 
-        val indicesSorted = fitnessValues
+        val indicesSorted = fitness
             .withIndex()
             .sortedBy { it.value }
             .map { it.index }
 
         // Copy elites
-        (0 until elites).forEach { i -> nextGeneration[i] = currentGeneration[indicesSorted[i]] }
+        (0 until elites).forEach { i -> nextGeneration[i] = population[indicesSorted[i]] }
 
         // Generate Mutants
-        (0 until mutants).forEach { i -> nextGeneration[i + elites] = DoubleArray(dimensions) { rng.nextDouble() } }
+        (0 until mutants).forEach { i -> nextGeneration[i + elites] = DoubleArray(d) { rng.nextDouble() } }
 
         // Crossover
-        ((elites + mutants) until population).forEach { s ->
-            val eliteParent = currentGeneration[indicesSorted.subList(0, elites)[rng.nextInt(0, elites)]]
-            val normalParent = currentGeneration[rng.nextInt(elites, population)]
+        ((elites + mutants) until p).forEach { s ->
+            val eliteParent = population[indicesSorted.subList(0, elites)[rng.nextInt(0, elites)]]
+            val normalParent = population[rng.nextInt(elites, p)]
             val child =
-                DoubleArray(dimensions) { i -> if (rng.nextDouble() < bias) eliteParent[i] else normalParent[i] }
+                DoubleArray(d) { i -> if (rng.nextDouble() < bias) eliteParent[i] else normalParent[i] }
             nextGeneration[s] = child
         }
 
         return nextGeneration
     }
-
-    /**
-     * Initialize a population with random solutions
-     */
-    override fun initialize(): Array<DoubleArray> {
-        return Array(population) { DoubleArray(dimensions) { rng.nextDouble() } }
-    }
-
 
 }

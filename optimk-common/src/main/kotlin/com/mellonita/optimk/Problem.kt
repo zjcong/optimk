@@ -8,7 +8,9 @@ import kotlin.math.roundToLong
  * Problem Interface
  *
  */
-interface Problem<T> {
+public interface Problem<T> {
+
+    public val d: Int
 
     /**
      * Decode a vector of random keys into actual solution
@@ -16,22 +18,22 @@ interface Problem<T> {
      * @param keys A vector of real number in range [0,1)
      * @return Actual solution
      */
-    fun decode(keys: DoubleArray): T
+    public fun decode(keys: DoubleArray): T
 
     /**
      * Objective function
      *
-     * @param candidate Candidate solution
+     * @param solution Candidate solution
      * @return Fitness of the candidate
      */
-    fun objective(candidate: T): Double
+    public fun objective(solution: T): Double
 
     /**
      * If a given solution is feasible
-     * @param candidate Candidate solution
+     * @param solution Candidate solution
      * @return Is feasible
      */
-    fun isFeasible(candidate: T): Boolean = true
+    public fun isFeasible(solution: T): Boolean = true
 
 }
 
@@ -41,7 +43,7 @@ interface Problem<T> {
  * @param range Range
  * @return value
  */
-fun Double.valueIn(range: ClosedFloatingPointRange<Double>): Double {
+public fun Double.valueIn(range: ClosedFloatingPointRange<Double>): Double {
     val r = range.endInclusive - range.start
     require(r.isFinite()) { "Infinite range" }
     require(!r.isNaN()) { "Invalid range" }
@@ -54,13 +56,13 @@ fun Double.valueIn(range: ClosedFloatingPointRange<Double>): Double {
  * @param list List
  * @return element
  */
-fun <T> Double.elementIn(list: List<T>): T = list[this.valueIn(list.indices)]
+public fun <T> Double.elementIn(list: List<T>): T = list[this.valueIn(list.indices)]
 
 
 /**
  * Maps a double value to a value in a integer range
  */
-fun Double.valueIn(range: IntRange): Int =
+public fun Double.valueIn(range: IntRange): Int =
     this.valueIn(range.first.toDouble().rangeTo(range.last.toDouble())).roundToInt()
 
 
@@ -69,5 +71,5 @@ fun Double.valueIn(range: IntRange): Int =
  * @param range Range of long
  * @return value
  */
-fun Double.valueIn(range: LongRange): Long =
+public fun Double.valueIn(range: LongRange): Long =
     this.valueIn(range.first.toDouble().rangeTo(range.last.toDouble())).roundToLong()

@@ -1,24 +1,26 @@
 package com.mellonita.optimk.optimizer
 
-import com.mellonita.optimk.*
+import com.mellonita.optimk.minus
+import com.mellonita.optimk.plus
+import com.mellonita.optimk.times
 import kotlin.random.Random
 
 
 /**
- * Classic particle swamp optimization
+ * Particle swamp optimization
  */
-class ParticleSwampOptimization(
-    val dimensions: Int,
-    val population: Int,
-    val w: Double = 0.8,
-    val c1: Double = 0.1,
-    val c2: Double = 0.1,
-    val rng: Random = Random(System.currentTimeMillis())
-) : Optimizer, OpenBorder {
+public class ParticleSwampOptimization(
+    d: Int,
+    p: Int,
+    private val w: Double = 0.8,
+    private val c1: Double = 0.1,
+    private val c2: Double = 0.1,
+    rng: Random = Random(System.currentTimeMillis())
+) : Optimizer(d, p, rng), OpenBorder {
 
-    private val pBest = Array(population) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
+    private val pBest = Array(p) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
     private var gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-    private val velocities = Array(population) { DoubleArray(dimensions) { rng.nextDouble() } }
+    private val velocities = Array(p) { DoubleArray(p) { rng.nextDouble() } }
 
     /**
      *
@@ -33,32 +35,20 @@ class ParticleSwampOptimization(
             val vn = w * v + c1 * r1 * (pb - x) + c2 * r2 * (gBest.first - x)
             velocities[i] = vn
         }
-
     }
 
     /**
      *
      */
-    override fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray> {
-
+    override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
         //update pBest and gBest
-        fitnessValues.indices.forEach { i ->
-            if (pBest[i].second > fitnessValues[i]) pBest[i] = Pair(currentGeneration[i], fitnessValues[i])
-            if (gBest.second > fitnessValues[i]) gBest = Pair(currentGeneration[i], fitnessValues[i])
+        fitness.indices.forEach { i ->
+            if (pBest[i].second > fitness[i]) pBest[i] = Pair(population[i], fitness[i])
+            if (gBest.second > fitness[i]) gBest = Pair(population[i], fitness[i])
         }
-
-        updateVelocities(currentGeneration)
-
-        val n = currentGeneration.indices.map { i -> currentGeneration[i] + velocities[i] }.toTypedArray()
-        check(n.size == population)
-        return n
+        //update velocities
+        updateVelocities(population)
+        return population.indices.map { i -> population[i] + velocities[i] }.toTypedArray()
     }
 
-
-    /**
-     *
-     */
-    override fun initialize(): Array<DoubleArray> {
-        return Array(population) { DoubleArray(dimensions) { rng.nextDouble() } }
-    }
 }

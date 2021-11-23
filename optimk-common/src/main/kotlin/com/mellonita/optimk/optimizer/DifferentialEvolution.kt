@@ -2,53 +2,55 @@
 
 package com.mellonita.optimk.optimizer
 
-import com.mellonita.optimk.*
+import com.mellonita.optimk.minus
+import com.mellonita.optimk.plus
+import com.mellonita.optimk.times
 import kotlin.random.Random
 
-typealias MutationStrategy = (Array<DoubleArray>, DoubleArray, Random) -> Array<DoubleArray>
+public typealias MutationStrategy = (Array<DoubleArray>, DoubleArray, Random) -> Array<DoubleArray>
 
 /**
  *
  */
-class DifferentialEvolution @JvmOverloads constructor(
-    private val dimensions: Int,
-    private val population: Int,
-    private val mutation: MutationStrategy,
-    private val rng: Random = Random(System.currentTimeMillis()),
+public class DifferentialEvolution @JvmOverloads constructor(
+    d: Int,
+    p: Int,
     private val cr: Double = 0.8,
-) : Optimizer, OpenBorder {
+    private val mutation: MutationStrategy,
+    rng: Random = Random(System.currentTimeMillis())
+) : Optimizer(d, p, rng), OpenBorder {
 
 
     /**
      *
      */
-    override fun iterate(currentGeneration: Array<DoubleArray>, fitnessValues: DoubleArray): Array<DoubleArray> {
+    override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
 
-        require(currentGeneration.size == population * 2) { "Invalid population" }
-        require(fitnessValues.size == currentGeneration.size)
+        require(population.size == p * 2) { "Invalid population" }
+        require(fitness.size == population.size)
 
-        val p = currentGeneration.sliceArray(0 until population)
-        val fp = fitnessValues.sliceArray(0 until population)
-        val t = currentGeneration.sliceArray(population until currentGeneration.size)
-        val ft = fitnessValues.sliceArray(population until currentGeneration.size)
+        val pp = population.sliceArray(0 until p)
+        val fp = fitness.sliceArray(0 until p)
+        val t = population.sliceArray(p until population.size)
+        val ft = fitness.sliceArray(p until population.size)
 
-        val n = Array(population) { doubleArrayOf() }
-        val fn = DoubleArray(population)
+        val n = Array(p) { doubleArrayOf() }
+        val fn = DoubleArray(p)
 
         //Selection
-        p.indices.forEach { i ->
-            n[i] = if (fp[i] < ft[i]) p[i] else t[i]
+        pp.indices.forEach { i ->
+            n[i] = if (fp[i] < ft[i]) pp[i] else t[i]
             fn[i] = if (fp[i] < ft[i]) fp[i] else ft[i]
         }
 
 
         // Mutation and crossover
         val tn = mutation(n, fn, rng).withIndex().map { m ->
-            check(m.value.size == dimensions)
+            check(m.value.size == d)
             val i = m.index
             val mutation = m.value
-            val jRand = rng.nextInt(0, dimensions)
-            DoubleArray(dimensions) { j ->
+            val jRand = rng.nextInt(0, d)
+            DoubleArray(d) { j ->
                 if (rng.nextDouble() >= cr && j != jRand) n[i][j]
                 else mutation[j]
             }
@@ -61,18 +63,28 @@ class DifferentialEvolution @JvmOverloads constructor(
      *
      */
     override fun initialize(): Array<DoubleArray> {
-        return Array(population * 2) { DoubleArray(dimensions) { rng.nextDouble() } }
+        return Array(p * 2) { DoubleArray(d) { rng.nextDouble() } }
     }
 
+    /**
+     *
+     */
+    override fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
+        if (init.size >= p * 2) return init.sliceArray(0 until p * 2)
+        return Array(p * 2) {
+            if (it < init.size) init[it]
+            else DoubleArray(d) { rng.nextDouble() }
+        }
+    }
 
     /**
      * Mutation Strategies
      */
-    companion object {
+    public companion object {
         /**
          * DE/rand/1
          */
-        fun rand1(f: Double): MutationStrategy =
+        public fun rand1(f: Double): MutationStrategy =
             fun(g: Array<DoubleArray>, _: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 3)
                 return Array(g.size) {
@@ -86,7 +98,7 @@ class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/best/1
          */
-        fun best1(f: Double): MutationStrategy =
+        public fun best1(f: Double): MutationStrategy =
             fun(g: Array<DoubleArray>, fit: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 3)
                 val best = g[fit.withIndex().minByOrNull { it.value }!!.index]
@@ -102,7 +114,7 @@ class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/best/2
          */
-        fun best2(f1: Double, f2: Double) =
+        public fun best2(f1: Double, f2: Double): MutationStrategy =
             fun(g: Array<DoubleArray>, fit: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 5)
                 val best = g[fit.withIndex().minByOrNull { it.value }!!.index]
@@ -118,7 +130,7 @@ class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/current-to-rand/1
          */
-        fun currentToRand1(f1: Double, f2: Double) =
+        public fun currentToRand1(f1: Double, f2: Double): MutationStrategy =
             fun(g: Array<DoubleArray>, _: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 5)
                 return Array(g.size) { i ->
@@ -132,7 +144,7 @@ class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/current-to-best/1
          */
-        fun currentToBest1(f1: Double, f2: Double) =
+        public fun currentToBest1(f1: Double, f2: Double): MutationStrategy =
             fun(g: Array<DoubleArray>, fit: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 5)
                 val best = g[fit.withIndex().minByOrNull { it.value }!!.index]

@@ -1,58 +1,44 @@
 package com.mellonita.optimk.example.optimization
 
-import com.mellonita.optimk.Goal
+import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.engine.DefaultEngine
+import com.mellonita.optimk.engine.Engine
+import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.example.benchmark.Sphere
 import com.mellonita.optimk.optimizer.DifferentialEvolution
-import kotlin.random.Random
+import com.mellonita.optimk.optimizer.MutationStrategy
+
+val problem = Sphere(10) //10-D Sphere function
+const val population = 100
+const val reportInterval = 1
+
+
+fun deEngineOf(mutationStrategy: MutationStrategy, monitor: Monitor<DoubleArray>): DefaultEngine<DoubleArray> {
+    return DefaultEngine(
+        problem = problem,
+        goal = Goal.Minimize,
+        optimizer = DifferentialEvolution(
+            d = problem.d,
+            p = population,
+            mutation = mutationStrategy
+        ),
+        monitor = monitor
+    )
+}
+
+fun monitorOf() = object : Monitor<DoubleArray> {
+    override fun stop(engine: Engine<DoubleArray>): Boolean {
+        return if (engine.bestFitness < 1E-5) {
+            println("Optimization terminated after ${engine.itrCounter} iterations with best fitness of ${engine.bestFitness}")
+            true
+        } else false
+    }
+}
+
 
 fun main() {
-    val dimensions = 30
-    val recordInterval = 10
-    val maxIteration = 10_000
-    val strategy1History = mutableListOf<Double>()
-    val strategy2History = mutableListOf<Double>()
-
-
-    val strategy1 = DefaultEngine(
-        optimizer = DifferentialEvolution(
-            dimensions = dimensions,
-            population = 60,
-            mutation = DifferentialEvolution.best2(0.3, 0.7),
-            rng = Random(0)
-        ),
-        goal = Goal.Minimize,
-        problem = Sphere(dimensions), //rastrigin, zeroOneCounting
-        monitor = {
-            if (it.iteration.rem(recordInterval) == 0L) {
-                strategy1History.add(it.bestFitness)
-            }
-            it.bestFitness <= 10E-8 || it.iteration >= maxIteration
-        }
-    )
-
-
-    val strategy2 = DefaultEngine(
-        optimizer = DifferentialEvolution(
-            dimensions = dimensions,
-            population = 60,
-            mutation = DifferentialEvolution.currentToBest1(0.3, 0.7),
-            rng = Random(0)
-        ),
-        goal = Goal.Minimize,
-        problem = Sphere(dimensions), //rastrigin, zeroOneCounting
-        monitor = {
-            if (it.iteration.rem(recordInterval) == 0L) {
-                strategy2History.add(it.bestFitness)
-            }
-            it.bestFitness <= 10E-8 || it.iteration >= maxIteration
-        }
-    )
-
-    val defaultEngineResult = strategy1.optimize()
-    val islandEngineResult = strategy2.optimize()
-
-    println(defaultEngineResult)
-    println(islandEngineResult)
-
+    val strategy1 = deEngineOf(DifferentialEvolution.rand1(0.8), monitorOf())
+    val strategy2 = deEngineOf(DifferentialEvolution.currentToBest1(0.4, 0.6), monitorOf())
+    strategy1.optimize()
+    strategy2.optimize()
 }

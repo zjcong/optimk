@@ -15,55 +15,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.engine
+package com.mellonita.optimk.island
 
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Problem
+import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.optimizer.Optimizer
 
 
 /**
- * Basic optimization engine
- * @param problem Problem to solve
- * @param goal Goal type, GOAL_MIN or GOAL_MAX
- * @param optimizer Optimizer
+ * Island
  */
-public open class DefaultEngine<T>(
-    override val problem: Problem<T>,
-    override val goal: Goal,
-    private val optimizer: Optimizer,
-    override val monitor: Monitor<T>,
-) : Engine<T>() {
+public class SimpleIsland<T>(
+    problem: Problem<T>,
+    goal: Goal,
+    optimizer: Optimizer,
+) : Island<T>(problem, goal, optimizer) {
 
-
-    /**
-     *
-     */
-    private fun iterate(population: Array<DoubleArray>): Array<DoubleArray> {
-        itrCounter++
-        val fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
+    public override fun iterate(){
+        fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
         val min = fitness.withIndex().minByOrNull { it.value }!!
         if (min.value < bestFitness) {
             bestFitness = min.value
             bestSolution = population[min.index]
         }
-        monitor.debug(population, fitness)
-        return optimizer.iterate(population, fitness)
+         optimizer.iterate(population, fitness)
     }
 
-
-    /**
-     *
-     */
-    override fun optimize(): T {
-        this.startTime = System.currentTimeMillis()
-        var currentGeneration = optimizer.initialize()
-        do {
-            currentGeneration = iterate(currentGeneration)
-        } while (!monitor.stop(this))
-
-        return problem.decode(bestSolution)
-    }
 }
-
-

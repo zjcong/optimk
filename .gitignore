@@ -114,3 +114,4 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 
+/island_default_history.csv

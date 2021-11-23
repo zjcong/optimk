@@ -1,65 +1,56 @@
+/*
+ * Copyright (C) Zijie Cong 2021
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.*
+import com.mellonita.optimk.Monitor
+import com.mellonita.optimk.Problem
+import com.mellonita.optimk.island.SimpleIsland
+import com.mellonita.optimk.optimizer.Optimizer
+import kotlin.random.Random
 
-
-/**
- * Island
- */
-private class SimpleIsland(
-    val optimizer: Optimizer,
-    val objectiveFunc: (DoubleArray) -> Double
-) {
-    var fitnessValues: DoubleArray = doubleArrayOf()
-    var bestFitness: Double = Double.MAX_VALUE
-    var bestSolution: DoubleArray = doubleArrayOf()
-    var currentGeneration = optimizer.initialize()
-
-    val isOpen = optimizer is OpenBorder
-
-    /**
-     *
-     */
-    fun evaluate() {
-        fitnessValues = currentGeneration.map { objectiveFunc(it) }.toDoubleArray()
-        val min = fitnessValues.withIndex().minByOrNull { it.value }!!
-        this.bestFitness = min.value
-        this.bestSolution = currentGeneration[min.index]
-    }
-
-    /**
-     *
-     */
-    fun iterate() {
-        currentGeneration = optimizer.iterate(currentGeneration, fitnessValues)
-    }
-
-}
 
 /**
  * Island Model Engine
  */
-class IslandEngine<T>(
-    problem: Problem<T>,
+public open class IslandEngine<T>(
+    override val problem: Problem<T>,
+    override val goal: Goal,
     optimizers: Set<Optimizer>,
-    goal: Goal,
-    private val migrationInterval: Int,
-    monitor: (IterationInfo<T>) -> Boolean
-) : Engine<T>(problem, goal, monitor) {
+    protected val migrationInterval: Int,
+    protected val rng: Random = Random(System.currentTimeMillis()),
+    override val monitor: Monitor<T>,
+) : Engine<T>() {
 
     //Islands
-    private val islands: List<SimpleIsland> = optimizers.map { SimpleIsland(it, ::evaluate) }
+    protected val islands: List<SimpleIsland<T>> = optimizers.map { SimpleIsland(problem, goal, it) }
 
     //Open Island
-    private val openIslands = islands.filter { it.isOpen }
+    protected val openIslands: List<SimpleIsland<T>> = islands.filter { it.isOpen }
+
 
     /**
      * Perform optimization
      */
-    override fun optimize(): IterationInfo<T> {
+    override fun optimize(): T {
         startTime = System.currentTimeMillis()
-
-        var info: IterationInfo<T>
 
         do {
             itrCounter++
@@ -72,34 +63,32 @@ class IslandEngine<T>(
                 bestSolution = min.bestSolution
             }
 
-            if (itrCounter.rem(migrationInterval) == 0L) {
+            if (itrCounter != 0L && itrCounter.rem(migrationInterval) == 0L)
                 migrate()
-            }
 
-            info = IterationInfo(
-                bestSolution = problem.decode(bestSolution),
-                bestFitness = goal * bestFitness,
-                evaluation = evalCounter.get(),
-                iteration = itrCounter,
-                time = System.currentTimeMillis() - startTime
-            )
+            val solutions = islands.map { it.bestSolution }.toTypedArray()
+            val fitness = islands.map { it.bestFitness }.toDoubleArray()
+
+            monitor.debug(solutions, fitness)
 
             islands.parallelStream().forEach { it.iterate() }
 
-        } while (!monitor(info))
+        } while (!monitor.stop(this))
 
-        return info
+        return problem.decode(bestSolution)
     }
 
     /**
      *
      */
-    private fun migrate() {
+    public open fun migrate() {
         if (openIslands.isEmpty()) return
-        val from = islands.random()
-        val to = openIslands.random()
-        val worst = to.fitnessValues.withIndex().maxByOrNull { it.value }!!
-        to.currentGeneration[worst.index] = from.bestSolution
-        to.fitnessValues[worst.index] = from.bestFitness
+        val n = rng.nextInt(openIslands.size)
+        repeat(n) {
+            val destination = openIslands[rng.nextInt(openIslands.size)]
+            val origin = islands[rng.nextInt(islands.size)]
+            if (destination != origin)
+                destination.arrival(origin.bestSolution, bestFitness)
+        }
     }
 }
