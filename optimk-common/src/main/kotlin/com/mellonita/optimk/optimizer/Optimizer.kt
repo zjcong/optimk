@@ -2,13 +2,14 @@
 
 package com.mellonita.optimk.optimizer
 
+import java.io.Serializable
 import kotlin.random.Random
 
 
 /**
  * Indicate this optimizer accepts immigrant
  */
-public interface OpenBorder
+public interface OpenBorder : Serializable
 
 
 /**
@@ -21,7 +22,7 @@ public abstract class Optimizer(
     public val d: Int,
     public val p: Int,
     public val rng: Random
-) {
+) : Serializable {
 
     init {
         require(d > 1) { "Dimensions (d) must be greater than 1" }

@@ -7,11 +7,10 @@ import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.example.benchmark.Sphere
 import com.mellonita.optimk.optimizer.DifferentialEvolution
 import com.mellonita.optimk.optimizer.MutationStrategy
+import java.io.File
 
-val problem = Sphere(10) //10-D Sphere function
+val problem = Sphere(50) //10-D Sphere function
 const val population = 100
-const val reportInterval = 1
-
 
 fun deEngineOf(mutationStrategy: MutationStrategy, monitor: Monitor<DoubleArray>): DefaultEngine<DoubleArray> {
     return DefaultEngine(
@@ -26,19 +25,35 @@ fun deEngineOf(mutationStrategy: MutationStrategy, monitor: Monitor<DoubleArray>
     )
 }
 
+
 fun monitorOf() = object : Monitor<DoubleArray> {
+
     override fun stop(engine: Engine<DoubleArray>): Boolean {
-        return if (engine.bestFitness < 1E-5) {
-            println("Optimization terminated after ${engine.itrCounter} iterations with best fitness of ${engine.bestFitness}")
-            true
-        } else false
+
+        //Save state every 100 iterations
+        if (engine.iterations.rem(100L) == 0L)
+            engine.suspendTo(File("suspended_engine.bin"))
+
+        if (engine.bestFitness >= 1E-5) return false
+        println("Optimization terminated after ${engine.iterations} iterations with best fitness of ${engine.bestFitness}")
+        return true
     }
 }
 
 
 fun main() {
-    val strategy1 = deEngineOf(DifferentialEvolution.rand1(0.8), monitorOf())
-    val strategy2 = deEngineOf(DifferentialEvolution.currentToBest1(0.4, 0.6), monitorOf())
-    strategy1.optimize()
-    strategy2.optimize()
+
+    val engine = deEngineOf(
+        mutationStrategy = DifferentialEvolution.rand1(0.8),
+        monitor = monitorOf()
+    )
+
+    val result1 = engine.optimize()
+
+    // resume from the saved state
+    val resumedEngine = Engine.resumeFrom<DefaultEngine<DoubleArray>>(File("suspended_engine.bin"))
+
+    val result2 = resumedEngine.optimize()
+
+    assert(result1.contentEquals(result2))
 }

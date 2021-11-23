@@ -18,8 +18,9 @@
 package com.mellonita.optimk
 
 import com.mellonita.optimk.engine.Engine
+import java.io.Serializable
 
-public interface Monitor<T> {
+public interface Monitor<T> : Serializable{
 
     public fun start(): Unit = Unit
 

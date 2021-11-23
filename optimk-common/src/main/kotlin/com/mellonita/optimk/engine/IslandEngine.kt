@@ -22,7 +22,7 @@ package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Problem
-import com.mellonita.optimk.island.SimpleIsland
+import com.mellonita.optimk.island.DefaultIsland
 import com.mellonita.optimk.optimizer.Optimizer
 import kotlin.random.Random
 
@@ -40,10 +40,10 @@ public open class IslandEngine<T>(
 ) : Engine<T>() {
 
     //Islands
-    protected val islands: List<SimpleIsland<T>> = optimizers.map { SimpleIsland(problem, goal, it) }
+    protected val islands: List<DefaultIsland<T>> = optimizers.map { DefaultIsland(problem, goal, it) }
 
     //Open Island
-    protected val openIslands: List<SimpleIsland<T>> = islands.filter { it.isOpen }
+    protected val openIslands: List<DefaultIsland<T>> = islands.filter { it.isOpen }
 
 
     /**
@@ -53,7 +53,7 @@ public open class IslandEngine<T>(
         startTime = System.currentTimeMillis()
 
         do {
-            itrCounter++
+            iterations++
 
             islands.parallelStream().forEach { it.evaluate() }
 
@@ -63,7 +63,7 @@ public open class IslandEngine<T>(
                 bestSolution = min.bestSolution
             }
 
-            if (itrCounter != 0L && itrCounter.rem(migrationInterval) == 0L)
+            if (iterations != 0L && iterations.rem(migrationInterval) == 0L)
                 migrate()
 
             val solutions = islands.map { it.bestSolution }.toTypedArray()

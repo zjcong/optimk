@@ -35,12 +35,13 @@ public open class DefaultEngine<T>(
     override val monitor: Monitor<T>,
 ) : Engine<T>() {
 
+    private var currentGeneration = optimizer.initialize()
 
     /**
      *
      */
     private fun iterate(population: Array<DoubleArray>): Array<DoubleArray> {
-        itrCounter++
+        iterations++
         val fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
         val min = fitness.withIndex().minByOrNull { it.value }!!
         if (min.value < bestFitness) {
@@ -57,7 +58,6 @@ public open class DefaultEngine<T>(
      */
     override fun optimize(): T {
         this.startTime = System.currentTimeMillis()
-        var currentGeneration = optimizer.initialize()
         do {
             currentGeneration = iterate(currentGeneration)
         } while (!monitor.stop(this))

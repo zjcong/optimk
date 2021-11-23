@@ -1,5 +1,6 @@
 package com.mellonita.optimk
 
+import java.io.Serializable
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
@@ -8,7 +9,7 @@ import kotlin.math.roundToLong
  * Problem Interface
  *
  */
-public interface Problem<T> {
+public interface Problem<T> : Serializable {
 
     public val d: Int
 

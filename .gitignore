@@ -115,3 +115,5 @@ gradle-app.setting
 
 
 /island_default_history.csv
+/suspended_engine.bin
+/suspended_engine/

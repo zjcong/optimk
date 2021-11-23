@@ -17,7 +17,6 @@
 
 package com.mellonita.optimk.island
 
-import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Problem
 import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.optimizer.Optimizer
@@ -26,7 +25,7 @@ import com.mellonita.optimk.optimizer.Optimizer
 /**
  * Island
  */
-public class SimpleIsland<T>(
+public class DefaultIsland<T>(
     problem: Problem<T>,
     goal: Goal,
     optimizer: Optimizer,

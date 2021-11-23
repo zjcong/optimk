@@ -18,6 +18,7 @@
 
 package com.mellonita.optimk
 
+import java.io.Serializable
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -35,7 +36,7 @@ public operator fun Double.times(a: DoubleArray): DoubleArray = a.map { it * thi
 /**
  *
  */
-internal class SynchronizedProperty<T>(initValue: T) {
+internal class SynchronizedProperty<T>(initValue: T) : Serializable {
     private var value: T = initValue
 
     @Synchronized
@@ -53,7 +54,7 @@ internal class SynchronizedProperty<T>(initValue: T) {
 /**
  *
  */
-internal class InitOnceProperty<T> : ReadWriteProperty<Any, T> {
+internal class InitOnceProperty<T> : ReadWriteProperty<Any, T>, Serializable {
 
     private object EMPTY
 
