@@ -21,6 +21,7 @@ import com.mellonita.optimk.monitor.Monitor
 import com.mellonita.optimk.optimizer.Optimizer
 import com.mellonita.optimk.problem.Problem
 import kotlin.math.min
+import kotlin.random.Random
 
 
 /**
@@ -32,7 +33,8 @@ public open class AlternatingEngine<T>(
     private val optimizers: List<Optimizer>,
     private val threshold: Long,
     monitor: Monitor<T>,
-) : DefaultEngine<T>(problem, goal, monitor, optimizers[0]) {
+    rng: Random = Random(0)
+) : DefaultEngine<T>(problem, goal, monitor, optimizers[0], rng) {
 
     /**
      * Number of iterations of unchanged best fitness

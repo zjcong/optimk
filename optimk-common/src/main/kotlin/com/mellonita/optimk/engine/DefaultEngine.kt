@@ -21,6 +21,7 @@ import com.mellonita.optimk.monitor.Monitor
 import com.mellonita.optimk.optimizer.OpenBorder
 import com.mellonita.optimk.optimizer.Optimizer
 import com.mellonita.optimk.problem.Problem
+import kotlin.random.Random
 
 
 /**
@@ -32,7 +33,8 @@ public open class DefaultEngine<T>(
     override val problem: Problem<T>,
     override val goal: Goal,
     override val monitor: Monitor<T>,
-    protected var optimizer: Optimizer
+    protected var optimizer: Optimizer,
+    private val rng: Random = Random(0)
 ) : Engine<T>() {
 
     /**
@@ -70,15 +72,12 @@ public open class DefaultEngine<T>(
             debug("Immigrant arrived but island is closed.")
             return false
         }
-        //val targetIndex = (population.indices).random()
-        val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index
-
-
+        val targetIndex = rng.nextInt(population.size)
+        //val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index //pick the worst individual
         if (this.fitness[targetIndex] < f) {
             debug("Immigrant [$f] arrived but is worse than worst individual [${this.fitness[targetIndex]}].")
             return false
         }
-
 
         population[targetIndex] = s
         this.fitness[targetIndex] = f

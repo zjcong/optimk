@@ -24,6 +24,21 @@ import java.io.*
 
 
 /**
+ * Island Interface
+ */
+public interface Island {
+    /**
+     * If this island is open
+     */
+    public val isOpen: Boolean
+
+    /**
+     * Upon immigrant arrival
+     */
+    public fun arrival(s: DoubleArray, f: Double): Boolean
+}
+
+/**
  * Goal Type
  */
 public enum class Goal(private val value: Int) : Serializable {
@@ -36,13 +51,12 @@ public enum class Goal(private val value: Int) : Serializable {
 /**
  * Engine
  */
-public abstract class Engine<T> : Serializable {
+public abstract class Engine<T> : Serializable, Island {
 
 
     public abstract val problem: Problem<T>
     public abstract val goal: Goal
     public abstract val monitor: Monitor<T>
-    public abstract val isOpen: Boolean
 
     public var bestSolution: DoubleArray = doubleArrayOf()
         protected set
@@ -67,11 +81,6 @@ public abstract class Engine<T> : Serializable {
      * Perform next iteration of sampling
      */
     public abstract fun nextIteration()
-
-    /**
-     * Upon immigrant arrival
-     */
-    public abstract fun arrival(s: DoubleArray, f: Double): Boolean
 
     /**
      * Perform batch optimization

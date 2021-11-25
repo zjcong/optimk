@@ -40,7 +40,7 @@ private class ExperimentMonitor<T>(private val itr: Long) : DefaultMonitor<T>() 
 /**
  *
  */
-class Experiment<T>(
+class EngineExperiment<T>(
     private val maxIterations: Long,
     names: Set<String>,
     enginesOf: (name: String, monitor: Monitor<T>) -> Engine<T>

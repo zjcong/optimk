@@ -30,14 +30,14 @@ public open class IslandEngine<T>(
     override val goal: Goal,
     protected val islands: List<Engine<T>>,
     protected val migrationInterval: Int,
-    protected val rng: Random = Random(System.currentTimeMillis()),
     override val monitor: Monitor<T>,
-) : Engine<T>() {
+    protected val rng: Random = Random(0),
+    ) : Engine<T>() {
 
     /**
      * Collection of open islands
      */
-    protected val openIslands: List<Engine<T>> = islands.filter { it.isOpen }
+    private val openIslands: List<Engine<T>> = islands.filter { it.isOpen }
 
     /**
      * If this engine is open

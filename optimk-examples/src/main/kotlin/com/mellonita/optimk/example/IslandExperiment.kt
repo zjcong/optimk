@@ -17,11 +17,11 @@
 
 package com.mellonita.optimk.example.experiment
 
+import com.formdev.flatlaf.FlatLightLaf
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.engine.IslandEngine
 import com.mellonita.optimk.example.benchmark.Ackley
-import com.mellonita.optimk.example.benchmark.Rastrigin
 import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import com.mellonita.optimk.optimizer.ParticleSwampOptimization
 import org.knowm.xchart.SwingWrapper
@@ -33,8 +33,8 @@ import kotlin.random.Random
 
 fun main() {
 
-    val dimensionality = 40
-    val population = 100
+    val dimensionality = 30
+    val population = 60
     //val problem = Rastrigin(dimensionality)
     val problem = Ackley(dimensionality)
     val maxItr = 5_000L
@@ -42,28 +42,24 @@ fun main() {
 
     val names = setOf(
         "PSO - Default",
-        "Island",
+        "PSO+GA Island",
     )
 
-    val experiment = Experiment<DoubleArray>(maxItr, names) { name, monitor ->
+    val engineExperiment = EngineExperiment<DoubleArray>(maxItr, names) { name, monitor ->
         when (name) {
             "PSO - Default" -> DefaultEngine(
                 problem = problem,
                 goal = Goal.Minimize,
-                optimizer = BiasedGeneticAlgorithm(
+                optimizer = ParticleSwampOptimization(
                     d = problem.d,
                     p = population,
-                    //c1 = 2.0,
-                    //c2 = 2.0,
-                    rng = Random(0),
                 ),
                 monitor = monitor
             )
-            "Island" -> IslandEngine(
+            "PSO+GA Island" -> IslandEngine(
                 problem = problem,
                 goal = Goal.Minimize,
                 migrationInterval = 1,
-                rng = Random(0),
                 monitor = monitor,
                 islands = (0 until islandNumber).map {
                     when (it.rem(2)) {
@@ -74,8 +70,6 @@ fun main() {
                             optimizer = ParticleSwampOptimization(
                                 d = problem.d,
                                 p = population / islandNumber + 1,
-                                c1 = 2.0,
-                                c2 = 2.0,
                                 rng = Random(it),
                             )
                         )
@@ -96,13 +90,13 @@ fun main() {
         }
     }
 
-    val results = experiment.start()
+    val results = engineExperiment.start()
 
     val chart =
         XYChartBuilder()
             .width(1024)
             .height(700)
-            .title("Default PSO vs PSO+GA Island on 40D Ackley function")
+            .title("Default PSO vs PSO+GA Island on 40D Ackley function (p=100)")
             .xAxisTitle("Iterations")
             .yAxisTitle("Cost")
             .theme(Styler.ChartTheme.GGPlot2)
@@ -113,6 +107,9 @@ fun main() {
         series.marker = SeriesMarkers.NONE
     }
 
-    SwingWrapper(chart).displayChart()
+    FlatLightLaf.setup() //I like it pretty
+    SwingWrapper(chart)
+        .setTitle("OptimK Experiment Result")
+        .displayChart()
 
 }

@@ -12,10 +12,10 @@ import kotlin.random.Random
 public class ParticleSwampOptimization(
     d: Int,
     p: Int,
-    private val w: Double = 0.8,
-    private val c1: Double = 0.1,
-    private val c2: Double = 0.1,
-    rng: Random = Random(System.currentTimeMillis())
+    private val w: Double = 0.5,
+    private val c1: Double = 2.0,
+    private val c2: Double = 2.0,
+    rng: Random = Random(0)
 ) : Optimizer(d, p, rng), OpenBorder {
 
     private val pBest = Array(p) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
