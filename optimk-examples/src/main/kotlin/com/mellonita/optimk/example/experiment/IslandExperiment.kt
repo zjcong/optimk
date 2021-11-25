@@ -35,9 +35,9 @@ fun main() {
 
     val dimensionality = 40
     val population = 100
-    val problem = Rastrigin(dimensionality)
-    //val problem = Ackley(dimensionality)
-    val maxItr = 3_000L
+    //val problem = Rastrigin(dimensionality)
+    val problem = Ackley(dimensionality)
+    val maxItr = 5_000L
     val islandNumber = 5
 
     val names = setOf(

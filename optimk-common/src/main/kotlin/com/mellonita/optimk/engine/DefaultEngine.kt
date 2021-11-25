@@ -35,13 +35,23 @@ public open class DefaultEngine<T>(
     protected var optimizer: Optimizer
 ) : Engine<T>() {
 
-
+    /**
+     * Individuals
+     */
     protected var population: Array<DoubleArray> = optimizer.initialize()
+
+    /**
+     * Fitness values of current population
+     */
     protected var fitness: DoubleArray = doubleArrayOf()
+
+    /**
+     * This engine is open if the optimizer is open border
+     */
     override var isOpen: Boolean = optimizer is OpenBorder
 
     /**
-     * Single iteration
+     * Update fitness
      */
     public override fun updateFitness() {
         fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
@@ -53,7 +63,7 @@ public open class DefaultEngine<T>(
     }
 
     /**
-     * On immigrant arrival
+     * Upon immigrant arrival
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
         if (!isOpen) {
@@ -61,7 +71,7 @@ public open class DefaultEngine<T>(
             return false
         }
         //val targetIndex = (population.indices).random()
-        val targetIndex = this.fitness.withIndex().minByOrNull { it.value }!!.index
+        val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index
 
 
         if (this.fitness[targetIndex] < f) {

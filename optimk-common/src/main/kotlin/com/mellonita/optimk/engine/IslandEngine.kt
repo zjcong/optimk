@@ -15,9 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.monitor.Monitor
@@ -37,9 +34,14 @@ public open class IslandEngine<T>(
     override val monitor: Monitor<T>,
 ) : Engine<T>() {
 
-    //Open Island
+    /**
+     * Collection of open islands
+     */
     protected val openIslands: List<Engine<T>> = islands.filter { it.isOpen }
 
+    /**
+     * If this engine is open
+     */
     override val isOpen: Boolean = openIslands.isNotEmpty()
 
     /**
@@ -56,42 +58,51 @@ public open class IslandEngine<T>(
     }
 
     /**
-     *
+     * Migrate the best individual from a randomly chosen island (origin) to another (destination)
+     * Destination island must be marked with OpenBorder interface. If no island is open then this function returns
+     * immediately without migration
      */
     public open fun migrate() {
         if (openIslands.isEmpty()) return
-        val n = rng.nextInt(openIslands.size)
-        repeat(n) {
-            val destination = openIslands[rng.nextInt(openIslands.size)]
-            val origin = islands[rng.nextInt(islands.size)]
-            if (destination != origin)
-                destination.arrival(origin.bestSolution, bestFitness)
-        }
+        val destination = openIslands[rng.nextInt(openIslands.size)]
+        val origin = islands[rng.nextInt(islands.size)]
+        if (destination != origin)
+            destination.arrival(origin.bestSolution, bestFitness)
     }
 
-
+    /**
+     * Perform evaluation of individuals on each island and update overall best individual.
+     */
     override fun updateFitness() {
+        // Update number of evaluations
+        evaluations = islands.sumOf { it.evaluations }
+        // Evaluate islands
+        islands.forEach { it.updateFitness() }
+        // Update best individual
         val min = islands.minByOrNull { it.bestFitness }!!
         if (min.bestFitness < bestFitness) {
             bestFitness = min.bestFitness
             bestSolution = min.bestSolution
         }
-        // Evaluate islands
-        evaluations = islands.sumOf { it.evaluations }
-        islands.parallelStream().forEach { it.updateFitness() }
     }
 
+    /**
+     * Next iteration of sampling
+     */
     override fun nextIteration() {
         iterations++
         // migrate
         if (iterations != 0L && iterations.rem(migrationInterval) == 0L)
             migrate()
-        islands.parallelStream().forEach { it.nextIteration() }
+        islands.forEach { it.nextIteration() }
         debug("Iteration [$iterations] finished, fitness: [$bestFitness]")
     }
 
     /**
-     *
+     * Upon arrival of a migrant, it will be sent to an open island
+     * @param s Solution
+     * @param f Fitness value of s
+     * @return if the migrant is accepted
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
         if (!isOpen) return false

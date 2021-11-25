@@ -64,18 +64,17 @@ public abstract class Engine<T> : Serializable {
     public abstract fun updateFitness()
 
     /**
-     *
+     * Perform next iteration of sampling
      */
     public abstract fun nextIteration()
 
-
     /**
-     *
+     * Upon immigrant arrival
      */
     public abstract fun arrival(s: DoubleArray, f: Double): Boolean
 
     /**
-     * Perform optimization
+     * Perform batch optimization
      */
     public abstract fun optimize(): T
 
@@ -93,7 +92,6 @@ public abstract class Engine<T> : Serializable {
             Double.MAX_VALUE
     }
 
-
     /**
      * Serialize this engine to file
      */
@@ -106,7 +104,9 @@ public abstract class Engine<T> : Serializable {
         debug("Engine suspended to [${file.name}]")
     }
 
-
+    /**
+     * Companion functions
+     */
     public companion object {
 
         /**

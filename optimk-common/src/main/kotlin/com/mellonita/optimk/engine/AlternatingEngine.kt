@@ -24,7 +24,7 @@ import kotlin.math.min
 
 
 /**
- *
+ * Alternating engine
  */
 public open class AlternatingEngine<T>(
     problem: Problem<T>,
@@ -34,18 +34,25 @@ public open class AlternatingEngine<T>(
     monitor: Monitor<T>,
 ) : DefaultEngine<T>(problem, goal, monitor, optimizers[0]) {
 
+    /**
+     * Number of iterations of unchanged best fitness
+     */
     private var stagnation: Int = 0
+
+    /**
+     * Index of active optimizer in optimizers list
+     */
     private var activeOptimizerIndex: Int = 0
 
     init {
-        require(optimizers.isNotEmpty())
-        require(threshold > 0)
-        require(optimizers.all { it.d == optimizers[0].d })
+        require(optimizers.isNotEmpty()) { "At least one optimizer must be specified" }
+        require(threshold > 0) { "Stagnation threshold must be greater than zero" }
+        require(optimizers.all { it.d == optimizers[0].d }) { "Optimizers must have consistent dimensionality" }
     }
 
 
     /**
-     *
+     * Update fitness values and stagnation count
      */
     override fun updateFitness() {
         val lastBF = bestFitness
@@ -55,7 +62,7 @@ public open class AlternatingEngine<T>(
     }
 
     /**
-     *
+     * Next iteration of sampling
      */
     override fun nextIteration() {
         // Change optimizer
