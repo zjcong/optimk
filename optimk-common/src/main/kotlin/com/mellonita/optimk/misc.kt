@@ -15,21 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.benchmark
 
-import com.mellonita.optimk.problem.valueIn
-import kotlin.math.abs
-import kotlin.math.pow
+package com.mellonita.optimk
 
-class SumOfDifferentPowers(d: Int) : Benchmark(d) {
-    override fun decode(keys: DoubleArray): DoubleArray {
-        return keys.map { it.valueIn((-1.0).rangeTo(1.0)) }.toDoubleArray()
-    }
-
-    override fun objective(solution: DoubleArray): Double {
-        return solution.withIndex().sumOf {
-            abs(it.value).pow(it.index + 1)
-        }
-    }
-
+/**
+ *
+ */
+public operator fun DoubleArray.plus(a: DoubleArray): DoubleArray {
+    require(a.size == this.size) { "${this.size} != ${a.size}" }
+    return this.mapIndexed { index, d -> d + a[index] }.toDoubleArray()
 }
+
+/**
+ *
+ */
+public operator fun DoubleArray.minus(a: DoubleArray): DoubleArray =
+    this.mapIndexed { index, d -> d - a[index] }.toDoubleArray()
+
+/**
+ *
+ */
+public operator fun Double.times(a: DoubleArray): DoubleArray = a.map { it * this }.toDoubleArray()
+

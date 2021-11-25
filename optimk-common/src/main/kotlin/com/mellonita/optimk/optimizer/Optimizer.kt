@@ -12,7 +12,6 @@ import kotlin.random.Random
 public interface OpenBorder : Serializable
 
 
-
 /**
  * Optimizer
  * @property d Dimensionality

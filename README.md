@@ -89,10 +89,10 @@ Please contact the author via Telegram [@drzjcong](https://telegram.me/drzjcong)
 needs.
 
 ## TODO
-
++ Debug interface
 + ~~Island Model Engine~~
 + ~~Particle Swamp Optimization~~
 + ~~Differential Evolution~~
-+ Restart Engine
-+ AlternatingEngine
++ ~~Restart Engine~~
++ ~~Alternating Engine~~
 + ~~Engine suspension~~

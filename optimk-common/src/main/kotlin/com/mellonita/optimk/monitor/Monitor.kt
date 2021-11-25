@@ -15,21 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.benchmark
+package com.mellonita.optimk.monitor
 
-import com.mellonita.optimk.problem.valueIn
-import kotlin.math.abs
-import kotlin.math.pow
+import com.mellonita.optimk.engine.Engine
+import java.io.Serializable
 
-class SumOfDifferentPowers(d: Int) : Benchmark(d) {
-    override fun decode(keys: DoubleArray): DoubleArray {
-        return keys.map { it.valueIn((-1.0).rangeTo(1.0)) }.toDoubleArray()
-    }
 
-    override fun objective(solution: DoubleArray): Double {
-        return solution.withIndex().sumOf {
-            abs(it.value).pow(it.index + 1)
-        }
-    }
+/**
+ *
+ */
+public interface Monitor<T> : Serializable {
+
+    public fun stop(engine: Engine<T>): Boolean
+
+    public fun debug(engine: Engine<T>, msg: String): Unit
 
 }

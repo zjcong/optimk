@@ -1,6 +1,6 @@
 package com.mellonita.optimk.example.benchmark
 
-import com.mellonita.optimk.valueIn
+import com.mellonita.optimk.problem.valueIn
 import kotlin.math.pow
 
 class Sphere(d: Int) : Benchmark(d) {

@@ -20,18 +20,18 @@ public class ParticleSwampOptimization(
 
     private val pBest = Array(p) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
     private var gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-    private val velocities = Array(p) { DoubleArray(p) { rng.nextDouble() } }
+    private val velocities = Array(p) { DoubleArray(d) { rng.nextDouble() } }
 
     /**
      *
      */
-    private fun updateVelocities(currentGeneration: Array<DoubleArray>) {
-        currentGeneration.indices.forEach { i ->
+    private fun updateVelocities(population: Array<DoubleArray>) {
+        population.indices.forEach { i ->
             val pb = pBest[i].first
             val v = velocities[i]
             val r1 = rng.nextDouble()
             val r2 = rng.nextDouble()
-            val x = currentGeneration[i]
+            val x = population[i]
             val vn = w * v + c1 * r1 * (pb - x) + c2 * r2 * (gBest.first - x)
             velocities[i] = vn
         }
@@ -51,4 +51,27 @@ public class ParticleSwampOptimization(
         return population.indices.map { i -> population[i] + velocities[i] }.toTypedArray()
     }
 
+    /**
+     *
+     */
+    override fun initialize(): Array<DoubleArray> {
+        val randomPopulation = super.initialize()
+        // Clear history
+        pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
+        gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
+        return randomPopulation
+    }
+
+    /**
+     *
+     */
+    override fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
+        val randomPopulation = super.initialize(init)
+        // Clear history
+        pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
+        gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
+        return randomPopulation
+    }
 }

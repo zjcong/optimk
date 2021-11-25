@@ -18,8 +18,8 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.Monitor
-import com.mellonita.optimk.Problem
+import com.mellonita.optimk.monitor.Monitor
+import com.mellonita.optimk.problem.Problem
 import java.io.*
 
 
@@ -38,23 +38,46 @@ public enum class Goal(private val value: Int) : Serializable {
  */
 public abstract class Engine<T> : Serializable {
 
-    protected abstract val monitor: Monitor<T>
 
     public abstract val problem: Problem<T>
     public abstract val goal: Goal
+    public abstract val monitor: Monitor<T>
+    public abstract val isOpen: Boolean
 
     public var bestSolution: DoubleArray = doubleArrayOf()
+        protected set
     public var bestFitness: Double = Double.MAX_VALUE
+        protected set
 
     public var evaluations: Long = 0L
+        protected set
     public var startTime: Long = System.currentTimeMillis()
+        protected set
     public var iterations: Long = 0
+        protected set
+
+    protected fun debug(msg: String): Unit = monitor.debug(this, msg)
+
+    /**
+     * Single iteration
+     */
+    public abstract fun updateFitness()
+
+    /**
+     *
+     */
+    public abstract fun nextIteration()
+
+
+    /**
+     *
+     */
+    public abstract fun arrival(s: DoubleArray, f: Double): Boolean
 
     /**
      * Perform optimization
      */
     public abstract fun optimize(): T
-
 
     /**
      * Single objective function evaluation
@@ -70,6 +93,7 @@ public abstract class Engine<T> : Serializable {
             Double.MAX_VALUE
     }
 
+
     /**
      * Serialize this engine to file
      */
@@ -79,6 +103,7 @@ public abstract class Engine<T> : Serializable {
         oos.writeObject(this)
         oos.close()
         fos.close()
+        debug("Engine suspended to [${file.name}]")
     }
 
 
@@ -99,27 +124,3 @@ public abstract class Engine<T> : Serializable {
     }
 }
 
-/**
- *
- */
-public abstract class Island<T> : Engine<T>() {
-
-    public abstract val isOpen: Boolean
-
-
-    /**
-     * Single iteration
-     */
-    public abstract fun evaluatePopulation()
-
-    /**
-     *
-     */
-    protected abstract fun nextIteration(current: Array<DoubleArray>): Array<DoubleArray>
-
-
-    /**
-     *
-     */
-    public abstract fun arrival(s: DoubleArray, f: Double): Boolean
-}

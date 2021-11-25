@@ -17,78 +17,89 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.Monitor
-import com.mellonita.optimk.Problem
+import com.mellonita.optimk.monitor.Monitor
 import com.mellonita.optimk.optimizer.OpenBorder
 import com.mellonita.optimk.optimizer.Optimizer
+import com.mellonita.optimk.problem.Problem
 
 
 /**
  * Basic optimization engine
  * @param problem Problem to solve
  * @param goal Goal type, GOAL_MIN or GOAL_MAX
- * @param optimizer Optimizer
  */
 public open class DefaultEngine<T>(
     override val problem: Problem<T>,
     override val goal: Goal,
-    private val optimizer: Optimizer,
     override val monitor: Monitor<T>,
-) : Island<T>() {
+    protected var optimizer: Optimizer
+) : Engine<T>() {
 
-    private var population: Array<DoubleArray> = optimizer.initialize()
-    private var fitness: DoubleArray = doubleArrayOf()
+
+    protected var population: Array<DoubleArray> = optimizer.initialize()
+    protected var fitness: DoubleArray = doubleArrayOf()
     override var isOpen: Boolean = optimizer is OpenBorder
 
     /**
      * Single iteration
      */
-    public override fun evaluatePopulation() {
-        iterations++
+    public override fun updateFitness() {
         fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
         val min = fitness.withIndex().minByOrNull { it.value }!!
         if (min.value < bestFitness) {
             bestFitness = min.value
             bestSolution = population[min.index]
         }
-        monitor.debug(population, fitness)
     }
 
     /**
-     *
+     * On immigrant arrival
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
-        if (!isOpen) return false
-        val worst = this.fitness.withIndex().minByOrNull { it.value }!!.index
-        if (this.fitness[worst] >= f) return false
-        population[worst] = s
-        this.fitness[worst] = f
+        if (!isOpen) {
+            debug("Immigrant arrived but island is closed.")
+            return false
+        }
+        //val targetIndex = (population.indices).random()
+        val targetIndex = this.fitness.withIndex().minByOrNull { it.value }!!.index
+
+
+        if (this.fitness[targetIndex] < f) {
+            debug("Immigrant [$f] arrived but is worse than worst individual [${this.fitness[targetIndex]}].")
+            return false
+        }
+
+
+        population[targetIndex] = s
+        this.fitness[targetIndex] = f
+        debug("Immigrant [$f] is accepted")
         return true
     }
 
     /**
-     *
+     * Generate samples for next iteration
      */
-    override fun nextIteration(current: Array<DoubleArray>): Array<DoubleArray> =
-        optimizer.iterate(population, fitness)
+    override fun nextIteration() {
+        iterations++
+        population = optimizer.iterate(population, fitness)
+        debug("Iteration [$iterations] finished, fitness: [$bestFitness]")
+
+    }
 
     /**
-     *
+     * Start optimization
      */
     override fun optimize(): T {
         this.startTime = System.currentTimeMillis()
+        debug("Engine start at timestamp [$startTime]")
         do {
             // Evaluate population
-            evaluatePopulation()
-
+            updateFitness()
             // Sample next population
-            population = nextIteration(population)
+            nextIteration()
         } while (!monitor.stop(this))
-
         return problem.decode(bestSolution)
     }
-
-
 }
 
 

@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk
+package com.mellonita.optimk.monitor
 
 import com.mellonita.optimk.engine.Engine
-import java.io.Serializable
 
-public interface Monitor<T> : Serializable{
+/**
+ * This class is the default monitor
+ */
+public abstract class DefaultMonitor<T> : Monitor<T> {
 
-    public fun start(): Unit = Unit
-
-    public fun stop(engine: Engine<T>): Boolean
-
-    public fun debug(population: Array<DoubleArray>, fitness: DoubleArray): Unit = Unit
+    override fun debug(engine: Engine<T>, msg: String) {
+        println("${engine.javaClass.simpleName} : $msg")
+    }
 
 }

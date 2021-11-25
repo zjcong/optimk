@@ -7,7 +7,7 @@ import com.mellonita.optimk.plus
 import com.mellonita.optimk.times
 import kotlin.random.Random
 
-public typealias MutationStrategy = (Array<DoubleArray>, DoubleArray, Random) -> Array<DoubleArray>
+public typealias DEStrategy = (Array<DoubleArray>, DoubleArray, Random) -> Array<DoubleArray>
 
 /**
  *
@@ -16,7 +16,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
     d: Int,
     p: Int,
     private val cr: Double = 0.8,
-    private val mutation: MutationStrategy,
+    private val mutation: DEStrategy,
     rng: Random = Random(System.currentTimeMillis())
 ) : Optimizer(d, p, rng), OpenBorder {
 
@@ -51,8 +51,8 @@ public class DifferentialEvolution @JvmOverloads constructor(
             val mutation = m.value
             val jRand = rng.nextInt(0, d)
             DoubleArray(d) { j ->
-                if (rng.nextDouble() >= cr && j != jRand) n[i][j]
-                else mutation[j]
+                if (rng.nextDouble() < cr || j == jRand) mutation[j]
+                else n[i][j]
             }
         }.toTypedArray()
 
@@ -84,7 +84,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/rand/1
          */
-        public fun rand1(f: Double): MutationStrategy =
+        public fun rand1(f: Double): DEStrategy =
             fun(g: Array<DoubleArray>, _: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 3)
                 return Array(g.size) {
@@ -98,7 +98,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/best/1
          */
-        public fun best1(f: Double): MutationStrategy =
+        public fun best1(f: Double): DEStrategy =
             fun(g: Array<DoubleArray>, fit: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 3)
                 val best = g[fit.withIndex().minByOrNull { it.value }!!.index]
@@ -114,7 +114,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/best/2
          */
-        public fun best2(f1: Double, f2: Double): MutationStrategy =
+        public fun best2(f1: Double, f2: Double): DEStrategy =
             fun(g: Array<DoubleArray>, fit: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 5)
                 val best = g[fit.withIndex().minByOrNull { it.value }!!.index]
@@ -130,7 +130,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/current-to-rand/1
          */
-        public fun currentToRand1(f1: Double, f2: Double): MutationStrategy =
+        public fun currentToRand1(f1: Double, f2: Double): DEStrategy =
             fun(g: Array<DoubleArray>, _: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 5)
                 return Array(g.size) { i ->
@@ -144,7 +144,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
         /**
          * DE/current-to-best/1
          */
-        public fun currentToBest1(f1: Double, f2: Double): MutationStrategy =
+        public fun currentToBest1(f1: Double, f2: Double): DEStrategy =
             fun(g: Array<DoubleArray>, fit: DoubleArray, rng: Random): Array<DoubleArray> {
                 require(g.size > 5)
                 val best = g[fit.withIndex().minByOrNull { it.value }!!.index]

@@ -20,8 +20,8 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.Monitor
-import com.mellonita.optimk.Problem
+import com.mellonita.optimk.monitor.Monitor
+import com.mellonita.optimk.problem.Problem
 import kotlin.random.Random
 
 
@@ -31,46 +31,27 @@ import kotlin.random.Random
 public open class IslandEngine<T>(
     override val problem: Problem<T>,
     override val goal: Goal,
-    protected val islands: List<Island<T>>,
+    protected val islands: List<Engine<T>>,
     protected val migrationInterval: Int,
     protected val rng: Random = Random(System.currentTimeMillis()),
     override val monitor: Monitor<T>,
 ) : Engine<T>() {
 
     //Open Island
-    protected val openIslands: List<Island<T>> = islands.filter { it.isOpen }
+    protected val openIslands: List<Engine<T>> = islands.filter { it.isOpen }
+
+    override val isOpen: Boolean = openIslands.isNotEmpty()
 
     /**
      * Perform optimization
      */
     override fun optimize(): T {
         startTime = System.currentTimeMillis()
-
+        debug("Engine start at [$startTime]")
         do {
-            iterations++
-
-            // Evaluate islands
-            islands.parallelStream().forEach { it.evaluatePopulation() }
-
-            val min = islands.minByOrNull { it.bestFitness }!!
-            if (min.bestFitness < bestFitness) {
-                bestFitness = min.bestFitness
-                bestSolution = min.bestSolution
-            }
-
-            // migrate
-            if (iterations != 0L && iterations.rem(migrationInterval) == 0L)
-                migrate()
-
-            val solutions = islands.map { it.bestSolution }.toTypedArray()
-            val fitness = islands.map { it.bestFitness }.toDoubleArray()
-
-            monitor.debug(solutions, fitness)
-
-            islands.parallelStream().forEach { it.evaluatePopulation() }
-
+            updateFitness()
+            nextIteration()
         } while (!monitor.stop(this))
-
         return problem.decode(bestSolution)
     }
 
@@ -86,5 +67,35 @@ public open class IslandEngine<T>(
             if (destination != origin)
                 destination.arrival(origin.bestSolution, bestFitness)
         }
+    }
+
+
+    override fun updateFitness() {
+        val min = islands.minByOrNull { it.bestFitness }!!
+        if (min.bestFitness < bestFitness) {
+            bestFitness = min.bestFitness
+            bestSolution = min.bestSolution
+        }
+        // Evaluate islands
+        evaluations = islands.sumOf { it.evaluations }
+        islands.parallelStream().forEach { it.updateFitness() }
+    }
+
+    override fun nextIteration() {
+        iterations++
+        // migrate
+        if (iterations != 0L && iterations.rem(migrationInterval) == 0L)
+            migrate()
+        islands.parallelStream().forEach { it.nextIteration() }
+        debug("Iteration [$iterations] finished, fitness: [$bestFitness]")
+    }
+
+    /**
+     *
+     */
+    override fun arrival(s: DoubleArray, f: Double): Boolean {
+        if (!isOpen) return false
+        val destination = openIslands[rng.nextInt(openIslands.size)]
+        return destination.arrival(s, f)
     }
 }
