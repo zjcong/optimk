@@ -17,8 +17,9 @@
 
 package com.mellonita.optimk.example
 
-import com.mellonita.optimk.engine.Engine
-import com.mellonita.optimk.engine.Goal
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.Goal
+import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.engine.RestartEngine
 import com.mellonita.optimk.example.benchmark.Rastrigin
 import com.mellonita.optimk.monitor.DefaultMonitor
@@ -42,14 +43,10 @@ fun main() {
         optimizer = ParticleSwampOptimization(d, p, rng = Random(0)),
         threshold = 100,
         //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
-        monitor = object : DefaultMonitor<DoubleArray>() {
+        monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {
                 history.add(engine.bestFitness)
-                if (engine.iterations >= 10_000) {
-                    println("Optimization terminated after ${engine.iterations} iterations with best fitness of ${engine.bestFitness}")
-                    return true
-                }
-                return false
+                return engine.iterations >= 10_000
             }
         }
     )

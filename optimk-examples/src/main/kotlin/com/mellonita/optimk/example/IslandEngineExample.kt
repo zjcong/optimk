@@ -17,9 +17,10 @@
 
 package com.mellonita.optimk.example
 
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.Goal
+import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.engine.Engine
-import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.engine.IslandEngine
 import com.mellonita.optimk.example.benchmark.Rastrigin
 import com.mellonita.optimk.monitor.DefaultMonitor
@@ -37,12 +38,12 @@ fun <T> getEngine(
     return DefaultEngine(
         problem = problem,
         goal = goal,
-        monitor = object : DefaultMonitor<T>() {
+        monitor = object : DefaultMonitor<T>(LogLevel.INFO) {
             override fun stop(engine: Engine<T>): Boolean = false
         },
         optimizer = DifferentialEvolution(
-            d = problem.d,
-            p = p,
+            dimensionality = problem.d,
+            population = p,
             cr = 0.9,
             rng = Random(r),
             mutation = DifferentialEvolution.best1(0.8)
@@ -62,7 +63,7 @@ fun main() {
         goal = Goal.Minimize,
         migrationInterval = 1,
         rng = Random(0),
-        monitor = object : DefaultMonitor<DoubleArray>() {
+        monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {
                 return engine.iterations >= maxIteration
             }

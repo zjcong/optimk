@@ -17,8 +17,10 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.monitor.Monitor
-import com.mellonita.optimk.optimizer.Optimizer
+import com.mellonita.optimk.Goal
+import com.mellonita.optimk.LogLevel
+import com.mellonita.optimk.Monitor
+import com.mellonita.optimk.Optimizer
 import com.mellonita.optimk.problem.Problem
 import kotlin.math.min
 import kotlin.random.Random
@@ -49,7 +51,7 @@ public open class AlternatingEngine<T>(
     init {
         require(optimizers.isNotEmpty()) { "At least one optimizer must be specified" }
         require(threshold > 0) { "Stagnation threshold must be greater than zero" }
-        require(optimizers.all { it.d == optimizers[0].d }) { "Optimizers must have consistent dimensionality" }
+        require(optimizers.all { it.dimensionality == optimizers[0].dimensionality }) { "Optimizers must have consistent dimensionality" }
     }
 
 
@@ -70,14 +72,16 @@ public open class AlternatingEngine<T>(
         // Change optimizer
         if (stagnation > threshold) {
             activeOptimizerIndex++
-            optimizer = optimizers[activeOptimizerIndex.rem(optimizers.size)]
-            debug("Engine alternated to [${optimizer.javaClass.simpleName}]")
+            //optimizer = optimizers[activeOptimizerIndex.rem(optimizers.size)]
+            optimizer = optimizers[rng.nextInt(optimizers.size)]
+            log(LogLevel.DEBUG, "Engine alternated to [${optimizer.javaClass.simpleName}]")
             val pIndices = fitness.withIndex().sortedBy { it.value }.map { it.index }
-            val np = Array(min(optimizer.p, population.size)) { population[pIndices[it]] }
+            val np = Array(min(optimizer.population, population.size)) { population[pIndices[it]] }
             population = optimizer.initialize(np)
             updateFitness()
             stagnation = 0
         }
+
         super.nextIteration()
     }
 

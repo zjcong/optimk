@@ -15,13 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.experiment
+package com.mellonita.optimk.example
 
 import com.formdev.flatlaf.FlatLightLaf
+import com.mellonita.optimk.Goal
 import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.engine.IslandEngine
-import com.mellonita.optimk.example.benchmark.Ackley
+import com.mellonita.optimk.example.benchmark.Sphere
+import com.mellonita.optimk.example.experiment.EngineExperiment
 import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import com.mellonita.optimk.optimizer.ParticleSwampOptimization
 import org.knowm.xchart.SwingWrapper
@@ -33,15 +34,16 @@ import kotlin.random.Random
 
 fun main() {
 
-    val dimensionality = 30
-    val population = 60
-    //val problem = Rastrigin(dimensionality)
-    val problem = Ackley(dimensionality)
-    val maxItr = 5_000L
+    val dimensionality = 400
+    val population = 400
+    val problem = Sphere(dimensionality)
+    //val problem = Ackley(dimensionality)
+    val maxItr = 1_000L
     val islandNumber = 5
 
     val names = setOf(
         "PSO - Default",
+        "GA - Default",
         "PSO+GA Island",
     )
 
@@ -51,8 +53,17 @@ fun main() {
                 problem = problem,
                 goal = Goal.Minimize,
                 optimizer = ParticleSwampOptimization(
-                    d = problem.d,
-                    p = population,
+                    dimensionality = problem.d,
+                    population = population
+                ),
+                monitor = monitor
+            )
+            "GA - Default"-> DefaultEngine(
+                problem = problem,
+                goal = Goal.Minimize,
+                optimizer = BiasedGeneticAlgorithm(
+                    dimensionality = problem.d,
+                    population = population
                 ),
                 monitor = monitor
             )
@@ -68,8 +79,8 @@ fun main() {
                             goal = Goal.Minimize,
                             monitor = monitor,
                             optimizer = ParticleSwampOptimization(
-                                d = problem.d,
-                                p = population / islandNumber + 1,
+                                dimensionality = problem.d,
+                                population = population / islandNumber + 1,
                                 rng = Random(it),
                             )
                         )
@@ -78,8 +89,8 @@ fun main() {
                             goal = Goal.Minimize,
                             monitor = monitor,
                             optimizer = BiasedGeneticAlgorithm(
-                                d = problem.d,
-                                p = population / islandNumber + 1,
+                                dimensionality = problem.d,
+                                population = population / islandNumber + 1,
                                 rng = Random(it)
                             )
                         )
@@ -96,7 +107,7 @@ fun main() {
         XYChartBuilder()
             .width(1024)
             .height(700)
-            .title("Default PSO vs PSO+GA Island on 40D Ackley function (p=100)")
+            .title("Default PSO vs PSO+GA Island on 30D Ackley function (p=100)")
             .xAxisTitle("Iterations")
             .yAxisTitle("Cost")
             .theme(Styler.ChartTheme.GGPlot2)

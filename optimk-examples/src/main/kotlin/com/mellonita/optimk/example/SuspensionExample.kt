@@ -17,9 +17,10 @@
 
 package com.mellonita.optimk.example
 
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.Goal
+import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.engine.Engine
-import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.example.benchmark.SumOfDifferentPowers
 import com.mellonita.optimk.monitor.DefaultMonitor
 import com.mellonita.optimk.optimizer.DifferentialEvolution
@@ -33,18 +34,18 @@ fun main() {
         problem = SumOfDifferentPowers(10),
         goal = Goal.Minimize,
         optimizer = DifferentialEvolution(
-            d = 10,
-            p = 20,
+            dimensionality = 10,
+            population = 20,
             mutation = DifferentialEvolution.rand1(0.7)
         ),
-        monitor = object : DefaultMonitor<DoubleArray>() {
+        monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
+
             override fun stop(engine: Engine<DoubleArray>): Boolean {
                 //Save state every 100 iterations
                 if (engine.iterations.rem(100L) == 0L)
                     engine.suspendTo(File("suspended_engine.bin"))
 
                 if (engine.bestFitness >= 1E-5) return false
-                println("Optimization terminated after ${engine.iterations} iterations with best fitness of ${engine.bestFitness}")
                 return true
             }
         }

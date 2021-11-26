@@ -1,8 +1,6 @@
 package com.mellonita.optimk.optimizer
 
-import com.mellonita.optimk.minus
-import com.mellonita.optimk.plus
-import com.mellonita.optimk.times
+import com.mellonita.optimk.*
 import kotlin.random.Random
 
 
@@ -10,17 +8,17 @@ import kotlin.random.Random
  * Particle swamp optimization
  */
 public class ParticleSwampOptimization(
-    d: Int,
-    p: Int,
+    dimensionality: Int,
+    population: Int,
     private val w: Double = 0.5,
     private val c1: Double = 2.0,
     private val c2: Double = 2.0,
     rng: Random = Random(0)
-) : Optimizer(d, p, rng), OpenBorder {
+) : Optimizer(dimensionality, population, rng), OpenBorder {
 
-    private val pBest = Array(p) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
+    private val pBest = Array(population) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
     private var gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-    private val velocities = Array(p) { DoubleArray(d) { rng.nextDouble() } }
+    private val velocities = Array(population) { DoubleArray(dimensionality) { rng.nextDouble() } }
 
     /**
      *
@@ -59,7 +57,7 @@ public class ParticleSwampOptimization(
         // Clear history
         pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
         gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(dimensionality) { rng.nextDouble() } }
         return randomPopulation
     }
 
@@ -71,7 +69,7 @@ public class ParticleSwampOptimization(
         // Clear history
         pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
         gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(dimensionality) { rng.nextDouble() } }
         return randomPopulation
     }
 }

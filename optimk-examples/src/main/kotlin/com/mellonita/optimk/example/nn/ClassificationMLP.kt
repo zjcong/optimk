@@ -15,19 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.monitor
+package com.mellonita.optimk.example.nn
 
-import com.mellonita.optimk.engine.Engine
-import java.io.Serializable
-
-
-/**
- *
- */
-public interface Monitor<T> : Serializable {
-
-    public fun stop(engine: Engine<T>): Boolean
-
-    public fun debug(engine: Engine<T>, msg: String): Unit
+class ClassificationMLP(nHiddenLayers: Int, nInputs:Int, nOutputs:Int) {
 
 }

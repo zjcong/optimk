@@ -1,6 +1,6 @@
 package com.mellonita.optimk.example.benchmark
 
-import com.mellonita.optimk.problem.valueIn
+import com.mellonita.optimk.valueIn
 import kotlin.math.*
 
 class Ackley(d: Int) : Benchmark(d) {
@@ -12,7 +12,7 @@ class Ackley(d: Int) : Benchmark(d) {
     override fun decode(keys: DoubleArray): DoubleArray =
         keys.map { x -> x.valueIn((-32.7).rangeTo(32.7)) }.toDoubleArray()
 
-    override fun objective(solution: DoubleArray): Double {
+    override fun invoke(solution: DoubleArray): Double {
         var sum1 = 0.0
         var sum2 = 0.0
         for (i in 0 until d) {

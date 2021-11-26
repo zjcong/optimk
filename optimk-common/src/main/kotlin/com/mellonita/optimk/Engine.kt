@@ -16,9 +16,8 @@
  */
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package com.mellonita.optimk.engine
+package com.mellonita.optimk
 
-import com.mellonita.optimk.monitor.Monitor
 import com.mellonita.optimk.problem.Problem
 import java.io.*
 
@@ -53,24 +52,55 @@ public enum class Goal(private val value: Int) : Serializable {
  */
 public abstract class Engine<T> : Serializable, Island {
 
-
+    /**
+     * The problem
+     */
     public abstract val problem: Problem<T>
+
+    /**
+     * Goal type
+     */
     public abstract val goal: Goal
+
+    /**
+     * Monitor
+     */
     public abstract val monitor: Monitor<T>
 
+    /**
+     * Best solution of the current generation
+     */
     public var bestSolution: DoubleArray = doubleArrayOf()
         protected set
+
+    /**
+     * Fitness of the best solutions
+     */
     public var bestFitness: Double = Double.MAX_VALUE
         protected set
 
+    /**
+     * Number of evaluations
+     */
     public var evaluations: Long = 0L
         protected set
+
+    /**
+     * Start time
+     */
     public var startTime: Long = System.currentTimeMillis()
         protected set
+
+    /**
+     * Number of iterations
+     */
     public var iterations: Long = 0
         protected set
 
-    protected fun debug(msg: String): Unit = monitor.debug(this, msg)
+    /**
+     * Wrapper of debug log
+     */
+    protected fun log(level: LogLevel, msg: String): Unit = monitor.log(level, this, msg)
 
     /**
      * Single iteration
@@ -95,10 +125,13 @@ public abstract class Engine<T> : Serializable, Island {
         if (solution.any { it !in (0.0).rangeTo(1.0) })
             return Double.MAX_VALUE
         val actualCandidate = problem.decode(solution)
-        return if (problem.isFeasible(actualCandidate))
-            goal * problem.objective(actualCandidate)
-        else
+        return if (problem.isFeasible(actualCandidate)) {
+            val f = goal * problem(actualCandidate)
+            if (f.isNaN()) throw RuntimeException("Solution: $actualCandidate yields NaN value")
+            f
+        } else {
             Double.MAX_VALUE
+        }
     }
 
     /**
@@ -110,7 +143,7 @@ public abstract class Engine<T> : Serializable, Island {
         oos.writeObject(this)
         oos.close()
         fos.close()
-        debug("Engine suspended to [${file.name}]")
+        log(LogLevel.INFO, "Engine suspended to [${file.name}]")
     }
 
     /**

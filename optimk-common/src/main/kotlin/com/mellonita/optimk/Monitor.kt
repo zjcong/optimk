@@ -15,25 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 package com.mellonita.optimk
 
+import java.io.Serializable
+
+public enum class LogLevel { DEBUG, INFO, WARN, ERROR }
+
 /**
  *
  */
-public operator fun DoubleArray.plus(a: DoubleArray): DoubleArray {
-    require(a.size == this.size) { "${this.size} != ${a.size}" }
-    return this.mapIndexed { index, d -> d + a[index] }.toDoubleArray()
+public interface Monitor<T> : Serializable {
+
+    public fun stop(engine: Engine<T>): Boolean
+
+    public fun log(level: LogLevel, engine: Engine<T>, msg: String)
 }
-
-/**
- *
- */
-public operator fun DoubleArray.minus(a: DoubleArray): DoubleArray =
-    this.mapIndexed { index, d -> d - a[index] }.toDoubleArray()
-
-/**
- *
- */
-public operator fun Double.times(a: DoubleArray): DoubleArray = a.map { it * this }.toDoubleArray()
-

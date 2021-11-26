@@ -17,11 +17,12 @@
 
 package com.mellonita.optimk.example
 
+import com.mellonita.optimk.Goal
 import com.mellonita.optimk.engine.AlternatingEngine
 import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.engine.Goal
-import com.mellonita.optimk.example.benchmark.Rastrigin
+import com.mellonita.optimk.example.benchmark.Schwefel
 import com.mellonita.optimk.example.experiment.EngineExperiment
+import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import com.mellonita.optimk.optimizer.DifferentialEvolution
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
@@ -32,14 +33,15 @@ import org.knowm.xchart.style.markers.SeriesMarkers
 fun main() {
 
     val dimensionality = 30
-    val population = 60
-    val problem = Rastrigin(dimensionality)
+    val population = 30
+    val problem = Schwefel(dimensionality)
     val maxIteration = 10_000L
     val alternatingThreshold = 20L
 
     val names = setOf(
         "DE - CR = 0.8",
         "DE - CR = 0.2",
+        "GA",
         "Alternating",
     )
 
@@ -49,8 +51,8 @@ fun main() {
                 problem = problem,
                 goal = Goal.Minimize,
                 optimizer = DifferentialEvolution(
-                    d = problem.d,
-                    p = population,
+                    dimensionality = problem.d,
+                    population = population,
                     cr = 0.2,
                     mutation = DifferentialEvolution.best1(0.8)
                 ),
@@ -60,11 +62,17 @@ fun main() {
                 problem = problem,
                 goal = Goal.Minimize,
                 optimizer = DifferentialEvolution(
-                    d = problem.d,
-                    p = population,
+                    dimensionality = problem.d,
+                    population = population,
                     cr = 0.8,
                     mutation = DifferentialEvolution.best1(0.8)
                 ),
+                monitor = monitor
+            )
+            "GA" -> DefaultEngine(
+                problem = problem,
+                goal = Goal.Minimize,
+                optimizer = BiasedGeneticAlgorithm(problem.d, population),
                 monitor = monitor
             )
             "Alternating" -> AlternatingEngine(
@@ -72,17 +80,18 @@ fun main() {
                 goal = Goal.Minimize,
                 optimizers = listOf(
                     DifferentialEvolution(
-                        d = problem.d,
-                        p = population,
+                        dimensionality = problem.d,
+                        population = population,
                         cr = 0.8,
                         mutation = DifferentialEvolution.best1(0.8)
                     ),
                     DifferentialEvolution(
-                        d = problem.d,
-                        p = population,
+                        dimensionality = problem.d,
+                        population = population,
                         cr = 0.2,
                         mutation = DifferentialEvolution.best1(0.8)
-                    )
+                    ),
+                    BiasedGeneticAlgorithm(problem.d, population),
                 ),
                 threshold = alternatingThreshold,
                 monitor = monitor
@@ -97,7 +106,7 @@ fun main() {
         XYChartBuilder()
             .width(1024)
             .height(700)
-            .title("Default vs Alternating Engine on 30D Rastrigin function (p=60)")
+            .title("Default vs Alternating Engine on ${dimensionality}D Schwefel function (p=$population)")
             .xAxisTitle("Iterations")
             .yAxisTitle("Cost")
             .theme(Styler.ChartTheme.GGPlot2)
@@ -111,5 +120,4 @@ fun main() {
     SwingWrapper(chart)
         .setTitle("OptimK Experiment Result")
         .displayChart()
-
 }

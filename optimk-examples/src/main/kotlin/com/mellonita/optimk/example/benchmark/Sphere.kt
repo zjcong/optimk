@@ -1,6 +1,6 @@
 package com.mellonita.optimk.example.benchmark
 
-import com.mellonita.optimk.problem.valueIn
+import com.mellonita.optimk.valueIn
 import kotlin.math.pow
 
 class Sphere(d: Int) : Benchmark(d) {
@@ -9,6 +9,6 @@ class Sphere(d: Int) : Benchmark(d) {
         return keys.map { it.valueIn((-5.12).rangeTo(5.12)) }.toDoubleArray()
     }
 
-    override fun objective(solution: DoubleArray): Double = solution.sumOf { it.pow(2) }
+    override fun invoke(solution: DoubleArray): Double = solution.sumOf { it.pow(2) }
 
 }

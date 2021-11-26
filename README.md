@@ -24,7 +24,7 @@ __Problem__ is the interface with which users describe their problems:
 
 ````kotlin
  interface Problem<T> {
-
+    val d: Int
     fun decode(keys: DoubleArray): T
     fun objective(candidate: T): Double
     fun isFeasible(candidate: T): Boolean = true
@@ -33,6 +33,7 @@ __Problem__ is the interface with which users describe their problems:
 ````
 
 + Type parameter __T__ is the actual type of the solution.
++ Property d is the dimensionality of the problem
 + Function __decode__ maps a vector of real number in the interval of [0,1) (a DoubleArray) into an actual solution of
   type T.
 + Function __isFeasible__ checks the feasibility of the decoded solution.
@@ -55,11 +56,10 @@ class Rastrigin(val n: Int) : Problem<DoubleArray> {
 }
 ````
 
-### Engine
-
-TODO
-
 ### Optimizer
+
+
+
 
 TODO
 
@@ -89,6 +89,7 @@ Please contact the author via Telegram [@drzjcong](https://telegram.me/drzjcong)
 needs.
 
 ## TODO
+
 + Debug interface
 + ~~Island Model Engine~~
 + ~~Particle Swamp Optimization~~

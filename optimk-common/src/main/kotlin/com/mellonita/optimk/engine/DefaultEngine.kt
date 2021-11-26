@@ -17,10 +17,11 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.monitor.Monitor
-import com.mellonita.optimk.optimizer.OpenBorder
-import com.mellonita.optimk.optimizer.Optimizer
+import com.mellonita.optimk.*
 import com.mellonita.optimk.problem.Problem
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlin.random.Random
 
 
@@ -34,7 +35,7 @@ public open class DefaultEngine<T>(
     override val goal: Goal,
     override val monitor: Monitor<T>,
     protected var optimizer: Optimizer,
-    private val rng: Random = Random(0)
+    protected val rng: Random = Random(0)
 ) : Engine<T>() {
 
     /**
@@ -69,19 +70,22 @@ public open class DefaultEngine<T>(
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
         if (!isOpen) {
-            debug("Immigrant arrived but island is closed.")
+            log(LogLevel.DEBUG, "Immigrant arrived but island is closed.")
             return false
         }
         val targetIndex = rng.nextInt(population.size)
         //val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index //pick the worst individual
         if (this.fitness[targetIndex] < f) {
-            debug("Immigrant [$f] arrived but is worse than worst individual [${this.fitness[targetIndex]}].")
+            log(
+                LogLevel.DEBUG,
+                "Immigrant [$f] arrived but is worse than worst individual [${this.fitness[targetIndex]}]."
+            )
             return false
         }
 
         population[targetIndex] = s
         this.fitness[targetIndex] = f
-        debug("Immigrant [$f] is accepted")
+        log(LogLevel.DEBUG, "Immigrant [$f] is accepted")
         return true
     }
 
@@ -91,7 +95,7 @@ public open class DefaultEngine<T>(
     override fun nextIteration() {
         iterations++
         population = optimizer.iterate(population, fitness)
-        debug("Iteration [$iterations] finished, fitness: [$bestFitness]")
+        log(LogLevel.DEBUG, "Iteration [$iterations] finished, fitness: [$bestFitness]")
 
     }
 
@@ -100,13 +104,22 @@ public open class DefaultEngine<T>(
      */
     override fun optimize(): T {
         this.startTime = System.currentTimeMillis()
-        debug("Engine start at timestamp [$startTime]")
+        log(
+            LogLevel.INFO,
+            "Engine start at timestamp [${
+                LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(startTime),
+                    ZoneId.systemDefault()
+                )
+            }]"
+        )
         do {
             // Evaluate population
             updateFitness()
             // Sample next population
             nextIteration()
         } while (!monitor.stop(this))
+        log(LogLevel.INFO, "Engine terminated with best fitness [$bestFitness]")
         return problem.decode(bestSolution)
     }
 }

@@ -17,14 +17,15 @@
 
 package com.mellonita.optimk.example.experiment
 
-import com.mellonita.optimk.engine.Engine
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.LogLevel
+import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.monitor.DefaultMonitor
-import com.mellonita.optimk.monitor.Monitor
 
 /**
  *
  */
-private class ExperimentMonitor<T>(private val itr: Long) : DefaultMonitor<T>() {
+private class ExperimentMonitor<T>(private val itr: Long) : DefaultMonitor<T>(LogLevel.DEBUG) {
 
     val history: MutableList<Double> = mutableListOf()
 
@@ -32,7 +33,7 @@ private class ExperimentMonitor<T>(private val itr: Long) : DefaultMonitor<T>() 
 
     override fun stop(engine: Engine<T>): Boolean {
         history.add(engine.bestFitness)
-        return engine.iterations >= itr
+        return (engine.bestFitness < 1E-7 || engine.iterations >= itr)
     }
 }
 

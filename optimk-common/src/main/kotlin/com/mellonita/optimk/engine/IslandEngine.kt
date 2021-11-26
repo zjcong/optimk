@@ -17,8 +17,14 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.monitor.Monitor
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.Goal
+import com.mellonita.optimk.LogLevel
+import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.problem.Problem
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlin.random.Random
 
 
@@ -32,7 +38,7 @@ public open class IslandEngine<T>(
     protected val migrationInterval: Int,
     override val monitor: Monitor<T>,
     protected val rng: Random = Random(0),
-    ) : Engine<T>() {
+) : Engine<T>() {
 
     /**
      * Collection of open islands
@@ -49,7 +55,15 @@ public open class IslandEngine<T>(
      */
     override fun optimize(): T {
         startTime = System.currentTimeMillis()
-        debug("Engine start at [$startTime]")
+        log(
+            LogLevel.INFO,
+            "Engine start at timestamp [${
+                LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(startTime),
+                    ZoneId.systemDefault()
+                )
+            }]"
+        )
         do {
             updateFitness()
             nextIteration()
@@ -95,7 +109,7 @@ public open class IslandEngine<T>(
         if (iterations != 0L && iterations.rem(migrationInterval) == 0L)
             migrate()
         islands.forEach { it.nextIteration() }
-        debug("Iteration [$iterations] finished, fitness: [$bestFitness]")
+        log(LogLevel.DEBUG, "Iteration [$iterations] finished, fitness: [$bestFitness]")
     }
 
     /**

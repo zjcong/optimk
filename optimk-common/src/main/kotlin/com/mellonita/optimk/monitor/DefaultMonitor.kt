@@ -17,15 +17,19 @@
 
 package com.mellonita.optimk.monitor
 
-import com.mellonita.optimk.engine.Engine
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.LogLevel
+import com.mellonita.optimk.Monitor
 
 /**
  * This class is the default monitor
  */
-public abstract class DefaultMonitor<T> : Monitor<T> {
+public abstract class DefaultMonitor<T>(private val level: LogLevel) : Monitor<T> {
 
-    override fun debug(engine: Engine<T>, msg: String) {
-        println("${engine.javaClass.simpleName} : $msg")
+    override fun log(level: LogLevel, engine: Engine<T>, msg: String) {
+        if (level < this.level) {
+            return
+        }
+        println("${level.name} [${engine.javaClass.simpleName}]:  $msg")
     }
-
 }
