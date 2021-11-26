@@ -33,7 +33,7 @@ private class ExperimentMonitor<T>(private val itr: Long) : DefaultMonitor<T>(Lo
 
     override fun stop(engine: Engine<T>): Boolean {
         history.add(engine.bestFitness)
-        return (engine.bestFitness < 1E-7 || engine.iterations >= itr)
+        return (engine.iterations >= itr)
     }
 }
 

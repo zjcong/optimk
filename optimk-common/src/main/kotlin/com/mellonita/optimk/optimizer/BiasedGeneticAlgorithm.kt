@@ -31,18 +31,20 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
     dimensionality: Int,
     population: Int,
     private val bias: Double = 0.70,
-    private val elites: Int = (population * 0.25).roundToInt(),
-    private val mutants: Int = (population * 0.2).roundToInt(),
+    elites: Double = 0.25,
+    mutants: Double = 0.2,
     rng: Random = Random(0)
 ) : Optimizer(dimensionality, population, rng), OpenBorder {
 
+    private val nElites: Int = (population * elites).roundToInt()
+    private val nMutants: Int = (population * mutants).roundToInt()
 
     init {
         require(dimensionality > 0) { "Number of dimensions ($dimensionality) must be greater than zero" }
         require(population > 4) { "Population size ($population) must be greater than 4" }
-        require(elites > 0) { "Elites ($elites) must be greater than 0" }
-        require(mutants > 0) { "Mutant ($mutants) must be greater than 0" }
-        require(elites + mutants < population) { "Sum of elites and mutants exceeds population size" }
+        require(this.nElites > 0) { "Elites ($nElites) must be greater than 0" }
+        require(this.nMutants > 0) { "Mutant ($nMutants) must be greater than 0" }
+        require(this.nElites + this.nMutants < population) { "Sum of elites and mutants exceeds population size" }
     }
 
     /**
@@ -58,15 +60,17 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
             .map { it.index }
 
         // Copy elites
-        (0 until elites).forEach { i -> nextGeneration[i] = population[indicesSorted[i]] }
+        (0 until nElites).forEach { i -> nextGeneration[i] = population[indicesSorted[i]] }
 
         // Generate Mutants
-        (0 until mutants).forEach { i -> nextGeneration[i + elites] = DoubleArray(dimensionality) { rng.nextDouble() } }
+        (0 until nMutants).forEach { i ->
+            nextGeneration[i + nElites] = DoubleArray(dimensionality) { rng.nextDouble() }
+        }
 
         // Crossover
-        ((elites + mutants) until this.population).forEach { s ->
-            val eliteParent = population[indicesSorted.subList(0, elites)[rng.nextInt(0, elites)]]
-            val normalParent = population[rng.nextInt(elites, this.population)]
+        ((nElites + nMutants) until this.population).forEach { s ->
+            val eliteParent = population[indicesSorted.subList(0, nElites)[rng.nextInt(0, nElites)]]
+            val normalParent = population[rng.nextInt(nElites, this.population)]
             val child =
                 DoubleArray(dimensionality) { i -> if (rng.nextDouble() < bias) eliteParent[i] else normalParent[i] }
             nextGeneration[s] = child

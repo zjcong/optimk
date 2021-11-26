@@ -19,11 +19,17 @@ package com.mellonita.optimk.example
 
 import com.formdev.flatlaf.FlatLightLaf
 import com.mellonita.optimk.Goal
+import com.mellonita.optimk.engine.AlternatingEngine
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.IslandEngine
+import com.mellonita.optimk.engine.islandsOf
+import com.mellonita.optimk.example.benchmark.Ackley
+import com.mellonita.optimk.example.benchmark.Michalewicz
+import com.mellonita.optimk.example.benchmark.Rastrigin
 import com.mellonita.optimk.example.benchmark.Sphere
 import com.mellonita.optimk.example.experiment.EngineExperiment
 import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
+import com.mellonita.optimk.optimizer.DifferentialEvolution
 import com.mellonita.optimk.optimizer.ParticleSwampOptimization
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
@@ -34,17 +40,21 @@ import kotlin.random.Random
 
 fun main() {
 
-    val dimensionality = 400
-    val population = 400
-    val problem = Sphere(dimensionality)
-    //val problem = Ackley(dimensionality)
-    val maxItr = 1_000L
-    val islandNumber = 5
+    val dimensionality = 6
+    val population = 30
+    //val problem = Schwefel(dimensionality)
+    val problem = Ackley(dimensionality)
+    val maxItr = 1000L
+    val islandNumber = 3
+    val immigrationInterval: Int = 1
+    val alternatingThreshold = 20L
 
     val names = setOf(
         "PSO - Default",
+        "DE - Default",
         "GA - Default",
-        "PSO+GA Island",
+        "GA+PSO+DE Island",
+        "GA+PSO+DE Alternating"
     )
 
     val engineExperiment = EngineExperiment<DoubleArray>(maxItr, names) { name, monitor ->
@@ -58,44 +68,70 @@ fun main() {
                 ),
                 monitor = monitor
             )
-            "GA - Default"-> DefaultEngine(
+            "DE - Default" -> DefaultEngine(
+                problem = problem,
+                goal = Goal.Minimize,
+                optimizer = DifferentialEvolution(
+                    dimensionality = problem.d,
+                    population = population,
+                    mutation = DifferentialEvolution.rand1(0.7)
+                ),
+                monitor = monitor
+            )
+            "GA - Default" -> DefaultEngine(
                 problem = problem,
                 goal = Goal.Minimize,
                 optimizer = BiasedGeneticAlgorithm(
                     dimensionality = problem.d,
-                    population = population
+                    population = population,
                 ),
                 monitor = monitor
             )
-            "PSO+GA Island" -> IslandEngine(
+            "GA+PSO+DE Island" -> IslandEngine(
                 problem = problem,
                 goal = Goal.Minimize,
-                migrationInterval = 1,
+                migrationInterval = immigrationInterval,
                 monitor = monitor,
-                islands = (0 until islandNumber).map {
-                    when (it.rem(2)) {
-                        0 -> DefaultEngine(
-                            problem = problem,
-                            goal = Goal.Minimize,
-                            monitor = monitor,
-                            optimizer = ParticleSwampOptimization(
-                                dimensionality = problem.d,
-                                population = population / islandNumber + 1,
-                                rng = Random(it),
-                            )
+                islands = islandsOf(
+                    islandNumber, problem, Goal.Minimize, monitor, listOf(
+                        BiasedGeneticAlgorithm(
+                            dimensionality = problem.d,
+                            population = population / islandNumber + 1,
+                            rng = Random(System.currentTimeMillis()),
+                        ),
+                        DifferentialEvolution(
+                            dimensionality = problem.d,
+                            population = population,
+                            mutation = DifferentialEvolution.rand1(0.7)
+                        ),
+                        ParticleSwampOptimization(
+                            dimensionality = problem.d,
+                            population = population,
+                            rng = Random(System.currentTimeMillis()),
                         )
-                        else -> DefaultEngine(
-                            problem = problem,
-                            goal = Goal.Minimize,
-                            monitor = monitor,
-                            optimizer = BiasedGeneticAlgorithm(
-                                dimensionality = problem.d,
-                                population = population / islandNumber + 1,
-                                rng = Random(it)
-                            )
-                        )
-                    }
-                }
+                    )
+                )
+            )
+            "GA+PSO+DE Alternating" -> AlternatingEngine(
+                problem = problem,
+                goal = Goal.Minimize,
+                optimizers = listOf(
+                    BiasedGeneticAlgorithm(
+                        dimensionality = problem.d,
+                        population = population
+                    ),
+                    DifferentialEvolution(
+                        dimensionality = problem.d,
+                        population = population,
+                        mutation = DifferentialEvolution.rand1(0.7)
+                    ),
+                    ParticleSwampOptimization(
+                        dimensionality = problem.d,
+                        population = population
+                    ),
+                ),
+                threshold = alternatingThreshold,
+                monitor = monitor
             )
             else -> throw IllegalStateException("Unknown engine ")
         }
@@ -107,14 +143,16 @@ fun main() {
         XYChartBuilder()
             .width(1024)
             .height(700)
-            .title("Default PSO vs PSO+GA Island on 30D Ackley function (p=100)")
-            .xAxisTitle("Iterations")
-            .yAxisTitle("Cost")
+            .title("Default vs. Island on ${dimensionality}D ${problem.javaClass.simpleName} function (p=$population)")
+            .xAxisTitle("Iterations (x100)")
+            .yAxisTitle("Cost (log axis)")
             .theme(Styler.ChartTheme.GGPlot2)
             .build()
 
     results.forEach { (name, history) ->
-        val series = chart.addSeries(name, history.subList(1, history.size).map { (it) })
+        val series = chart.addSeries(
+            name,
+            history.map { (it) })
         series.marker = SeriesMarkers.NONE
     }
 

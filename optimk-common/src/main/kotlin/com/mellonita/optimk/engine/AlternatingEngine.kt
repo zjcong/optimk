@@ -74,10 +74,15 @@ public open class AlternatingEngine<T>(
             activeOptimizerIndex++
             //optimizer = optimizers[activeOptimizerIndex.rem(optimizers.size)]
             optimizer = optimizers[rng.nextInt(optimizers.size)]
-            log(LogLevel.DEBUG, "Engine alternated to [${optimizer.javaClass.simpleName}]")
             val pIndices = fitness.withIndex().sortedBy { it.value }.map { it.index }
             val np = Array(min(optimizer.population, population.size)) { population[pIndices[it]] }
             population = optimizer.initialize(np)
+
+            log(
+                LogLevel.DEBUG,
+                "Engine alternated to [${optimizer.javaClass.simpleName}] with population of [${np.size}]"
+            )
+
             updateFitness()
             stagnation = 0
         }

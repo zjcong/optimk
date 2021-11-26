@@ -41,7 +41,7 @@ public class ParticleSwampOptimization(
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
         //update pBest and gBest
         fitness.indices.forEach { i ->
-            if (pBest[i].second > fitness[i]) pBest[i] = Pair(population[i], fitness[i])
+            if (pBest[i].second >= fitness[i]) pBest[i] = Pair(population[i], fitness[i])
             if (gBest.second > fitness[i]) gBest = Pair(population[i], fitness[i])
         }
         //update velocities

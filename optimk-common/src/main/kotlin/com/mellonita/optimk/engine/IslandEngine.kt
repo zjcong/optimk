@@ -17,10 +17,7 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.Engine
-import com.mellonita.optimk.Goal
-import com.mellonita.optimk.LogLevel
-import com.mellonita.optimk.Monitor
+import com.mellonita.optimk.*
 import com.mellonita.optimk.problem.Problem
 import java.time.Instant
 import java.time.LocalDateTime
@@ -122,5 +119,25 @@ public open class IslandEngine<T>(
         if (!isOpen) return false
         val destination = openIslands[rng.nextInt(openIslands.size)]
         return destination.arrival(s, f)
+    }
+}
+
+/**
+ *
+ */
+public fun <T> islandsOf(
+    n: Int,
+    problem: Problem<T>,
+    goal: Goal,
+    monitor: Monitor<T>,
+    optimizers: List<Optimizer>
+): List<Engine<T>> {
+    return (0 until n).map {
+        DefaultEngine(
+            goal = goal,
+            problem = problem,
+            optimizer = optimizers[it.rem(optimizers.size)],
+            monitor = monitor
+        )
     }
 }

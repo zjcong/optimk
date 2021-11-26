@@ -24,6 +24,7 @@ import com.mellonita.optimk.example.benchmark.Schwefel
 import com.mellonita.optimk.example.experiment.EngineExperiment
 import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import com.mellonita.optimk.optimizer.DifferentialEvolution
+import com.mellonita.optimk.optimizer.ParticleSwampOptimization
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
@@ -85,11 +86,9 @@ fun main() {
                         cr = 0.8,
                         mutation = DifferentialEvolution.best1(0.8)
                     ),
-                    DifferentialEvolution(
+                    ParticleSwampOptimization(
                         dimensionality = problem.d,
                         population = population,
-                        cr = 0.2,
-                        mutation = DifferentialEvolution.best1(0.8)
                     ),
                     BiasedGeneticAlgorithm(problem.d, population),
                 ),
