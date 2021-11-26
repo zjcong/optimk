@@ -15,7 +15,7 @@ public typealias DEStrategy = (Array<DoubleArray>, DoubleArray, Random) -> Array
 public class DifferentialEvolution @JvmOverloads constructor(
     d: Int,
     p: Int,
-    private val cr: Double = 0.2,
+    private val cr: Double = 0.8,
     private val mutation: DEStrategy,
     rng: Random = Random(0)
 ) : Optimizer(d, p, rng), OpenBorder {

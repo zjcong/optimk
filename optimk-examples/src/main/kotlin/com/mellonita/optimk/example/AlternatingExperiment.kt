@@ -15,12 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.experiment
+package com.mellonita.optimk.example
 
 import com.mellonita.optimk.engine.AlternatingEngine
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.Goal
 import com.mellonita.optimk.example.benchmark.Rastrigin
+import com.mellonita.optimk.example.experiment.EngineExperiment
 import com.mellonita.optimk.optimizer.DifferentialEvolution
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
@@ -31,10 +32,10 @@ import org.knowm.xchart.style.markers.SeriesMarkers
 fun main() {
 
     val dimensionality = 30
-    val population = 10
+    val population = 60
     val problem = Rastrigin(dimensionality)
-    val maxIteration = 5_000L
-    val alternatingThreshold = 100L
+    val maxIteration = 10_000L
+    val alternatingThreshold = 20L
 
     val names = setOf(
         "DE - CR = 0.8",
@@ -73,13 +74,13 @@ fun main() {
                     DifferentialEvolution(
                         d = problem.d,
                         p = population,
-                        cr = 0.2,
+                        cr = 0.8,
                         mutation = DifferentialEvolution.best1(0.8)
                     ),
                     DifferentialEvolution(
                         d = problem.d,
                         p = population,
-                        cr = 0.8,
+                        cr = 0.2,
                         mutation = DifferentialEvolution.best1(0.8)
                     )
                 ),
