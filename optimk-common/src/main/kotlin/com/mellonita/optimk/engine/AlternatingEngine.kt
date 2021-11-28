@@ -20,7 +20,7 @@ package com.mellonita.optimk.engine
 import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Optimizer
-import com.mellonita.optimk.problem.Problem
+import com.mellonita.optimk.Problem
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -31,7 +31,7 @@ import kotlin.random.Random
 public open class AlternatingEngine<T>(
     problem: Problem<T>,
     private val optimizers: List<Optimizer>,
-    private val threshold: Long,
+    private val threshold: Int,
     monitor: Monitor<T>,
     rng: Random = Random(0)
 ) : DefaultEngine<T>(problem, monitor, optimizers[0], rng) {

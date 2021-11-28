@@ -17,21 +17,27 @@
 
 package com.mellonita.optimk.example.benchmark
 
-import kotlin.math.abs
-import kotlin.math.pow
+import kotlin.math.max
+import kotlin.math.min
 
-class SumOfDifferentPowers(d: Int) : Benchmark(d) {
 
-    override val lowerBound: Double = -1.0
-    override val upperBound: Double = 1.0
+class CompoundFunction(dimensions: Int) : Benchmark(dimensions) {
 
-    override val globalOptima: Double = 0.0
+    private val f1 = Schwefel(dimensions)
+    private val f2 = Griewank(dimensions)
+
+    override val upperBound: Double = max(f1.upperBound, f2.upperBound)
+    override val lowerBound: Double = min(f1.lowerBound, f2.lowerBound)
+    override val globalOptima: Double = f1.globalOptima
+
 
     override fun objective(solution: DoubleArray): Double {
-        var sum = 0.0
-        for (i in solution.indices) {
-            sum += abs(solution[i]).pow(i + 2)
-        }
-        return sum
+        return f1.objective(solution) * f2.objective(solution)
     }
 }
+
+fun main() {
+    val b = CompoundFunction(2)
+    b.plot()
+}
+

@@ -15,23 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.benchmark
+package com.mellonita.optimk.problem
 
-import kotlin.math.abs
-import kotlin.math.pow
+import com.mellonita.optimk.Problem
 
-class SumOfDifferentPowers(d: Int) : Benchmark(d) {
 
-    override val lowerBound: Double = -1.0
-    override val upperBound: Double = 1.0
 
-    override val globalOptima: Double = 0.0
+public abstract class SurrogateProblem<T> : Problem<T> {
 
-    override fun objective(solution: DoubleArray): Double {
-        var sum = 0.0
-        for (i in solution.indices) {
-            sum += abs(solution[i]).pow(i + 2)
-        }
-        return sum
-    }
+
 }

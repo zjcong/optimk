@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.problem
+package com.mellonita.optimk
 
 import java.io.Serializable
 
@@ -68,9 +68,17 @@ public interface Problem<T> : Serializable {
     /**
      * Get fitness value of a solution * goal
      */
-    public operator fun invoke(solution: T): Double {
+    public operator fun invoke(keys: DoubleArray): Double {
+        val solution = decode(keys)
         if (!isFeasible(solution)) return Double.MAX_VALUE
         return goal * objective(solution)
+    }
+
+    /**
+     * Get fitness values of a set of solutions
+     */
+    public operator fun invoke(batchKeys: Array<DoubleArray>): DoubleArray {
+        return (batchKeys.indices).map { invoke(batchKeys[it]) }.toDoubleArray()
     }
 }
 

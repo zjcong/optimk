@@ -19,7 +19,6 @@
 
 package com.mellonita.optimk.optimizer
 
-import com.mellonita.optimk.OpenBorder
 import com.mellonita.optimk.Optimizer
 import com.mellonita.optimk.optimizer.cmaes.HipparchusCMAES
 import kotlin.random.Random
@@ -31,12 +30,12 @@ public class CovarianceMatrixAdaption(
     rng: Random = Random(0)
 ) : Optimizer(dimensionality, population, rng) {
 
-    private val actualOptimizer =
+    private var actualOptimizer =
         HipparchusCMAES(
             diagonalOnly = 10,
             lambda = population,
             dimension = dimensionality,
-            random = java.util.Random(rng.nextLong())
+            random = rng
         )
 
 
@@ -44,7 +43,25 @@ public class CovarianceMatrixAdaption(
         return actualOptimizer.iterate(population, fitness)
     }
 
+    override fun initialize(): Array<DoubleArray> {
+        actualOptimizer =
+            HipparchusCMAES(
+                diagonalOnly = 10,
+                lambda = population,
+                dimension = dimensionality,
+                random = rng
+            )
+        return super.initialize()
+    }
+
     override fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
+        actualOptimizer =
+            HipparchusCMAES(
+                diagonalOnly = 10,
+                lambda = population,
+                dimension = dimensionality,
+                random = rng
+            )
         actualOptimizer.iterations = 0
         return super.initialize(init)
     }

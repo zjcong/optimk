@@ -24,7 +24,7 @@ import com.mellonita.optimk.engine.IslandEngine
 import com.mellonita.optimk.example.benchmark.Rastrigin
 import com.mellonita.optimk.monitor.DefaultMonitor
 import com.mellonita.optimk.optimizer.DifferentialEvolution
-import com.mellonita.optimk.problem.Problem
+import com.mellonita.optimk.Problem
 import kotlin.random.Random
 
 

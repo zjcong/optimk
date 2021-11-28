@@ -17,11 +17,7 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.Engine
-import com.mellonita.optimk.LogLevel
-import com.mellonita.optimk.Monitor
-import com.mellonita.optimk.Optimizer
-import com.mellonita.optimk.problem.Problem
+import com.mellonita.optimk.*
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -81,12 +77,24 @@ public open class IslandEngine<T>(
      */
     public open fun migrate() {
         if (openIslands.isEmpty()) return
-        val destination = openIslands[rng.nextInt(openIslands.size)]
-        val origin = islands[rng.nextInt(islands.size)]
-        if (destination != origin)
-            destination.arrival(origin.bestSolution, origin.bestFitness)
+        openIslands.forEach { destination1 ->
+            val origin = islands[rng.nextInt(islands.size)]
+            if (destination1 != origin)
+                destination1.arrival(origin.bestSolution, origin.bestFitness)
+        }
 
-        //destination.arrival(bestSolution, bestFitness)
+
+        /*
+        val destination1 = openIslands[rng.nextInt(openIslands.size)]
+        val origin = islands[rng.nextInt(islands.size)]
+        if (destination1 != origin)
+            destination1.arrival(origin.bestSolution, origin.bestFitness)
+
+        if (rng.nextInt().rem(2) == 0) {
+            val destination2 = openIslands[rng.nextInt(openIslands.size)]
+            destination2.arrival(bestSolution, bestFitness)
+        }
+        */
     }
 
     /**
@@ -96,7 +104,7 @@ public open class IslandEngine<T>(
         // Update number of evaluations
         evaluations = islands.sumOf { it.evaluations }
         // Evaluate islands
-        islands.parallelStream().forEach { it.updateFitness() }
+        islands.forEach { it.updateFitness() }
         // Update best individual
         val min = islands.minByOrNull { it.bestFitness }!!
         if (min.bestFitness < bestFitness) {
@@ -128,22 +136,25 @@ public open class IslandEngine<T>(
         val destination = openIslands[rng.nextInt(openIslands.size)]
         return destination.arrival(s, f)
     }
-}
 
-/**
- *
- */
-public fun <T> islandsOf(
-    n: Int,
-    problem: Problem<T>,
-    monitor: Monitor<T>,
-    optimizers: List<Optimizer>
-): List<Engine<T>> {
-    return (0 until n).map {
-        DefaultEngine(
-            problem = problem,
-            optimizer = optimizers[it.rem(optimizers.size)],
-            monitor = monitor
-        )
+    public companion object {
+
+        /**
+         *
+         */
+        public fun <T> islandsOf(
+            n: Int,
+            problem: Problem<T>,
+            monitor: Monitor<T>,
+            optimizers: List<Optimizer>
+        ): List<Engine<T>> {
+            return (0 until n).map {
+                DefaultEngine(
+                    problem = problem,
+                    optimizer = optimizers[it.rem(optimizers.size)],
+                    monitor = monitor
+                )
+            }
+        }
     }
 }

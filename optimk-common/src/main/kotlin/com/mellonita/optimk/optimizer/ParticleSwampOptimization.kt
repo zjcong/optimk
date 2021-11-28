@@ -1,6 +1,9 @@
 package com.mellonita.optimk.optimizer
 
 import com.mellonita.optimk.*
+import com.mellonita.optimk.math.minus
+import com.mellonita.optimk.math.plus
+import com.mellonita.optimk.math.times
 import kotlin.random.Random
 
 

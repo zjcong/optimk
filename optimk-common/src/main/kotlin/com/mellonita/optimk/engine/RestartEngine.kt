@@ -20,7 +20,7 @@ package com.mellonita.optimk.engine
 import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Optimizer
-import com.mellonita.optimk.problem.Problem
+import com.mellonita.optimk.Problem
 import kotlin.random.Random
 
 /**
@@ -30,7 +30,7 @@ public open class RestartEngine<T>(
     problem: Problem<T>,
     optimizer: Optimizer,
     monitor: Monitor<T>,
-    private val threshold: Long,
+    private val threshold: Int,
     rng: Random = Random(0)
 ) : DefaultEngine<T>(problem, monitor, optimizer, rng) {
 
@@ -55,8 +55,8 @@ public open class RestartEngine<T>(
      *
      */
     override fun nextIteration() {
-        if (stagnation > threshold) {
-            log(LogLevel.DEBUG, "Engine restart at iteration $iterations")
+        if (stagnation > /*threshold*/ iterations / threshold + threshold) {
+            log(LogLevel.INFO, "Engine restart at iteration $iterations")
             population = optimizer.initialize(arrayOf(bestSolution))
             updateFitness()
             stagnation = 0

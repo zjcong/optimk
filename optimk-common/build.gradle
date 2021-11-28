@@ -2,6 +2,8 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.dokka'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+
 }
 
 group 'com.mellonita.optimk'
@@ -25,7 +27,7 @@ test {
 }
 
 kotlin {
-    //explicitApi()
+    explicitApi()
 }
 
 compileKotlin {

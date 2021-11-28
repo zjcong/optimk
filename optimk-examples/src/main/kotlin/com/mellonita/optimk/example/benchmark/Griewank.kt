@@ -22,8 +22,8 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 class Griewank(dimensions: Int) : Benchmark(dimensions) {
-    override val upperBounds: DoubleArray = DoubleArray(dimensions) { 600.0 }
-    override val lowerBounds: DoubleArray = DoubleArray(dimensions) { -600.0 }
+    override val lowerBound: Double = -600.0
+    override val upperBound: Double = 600.0
     override val globalOptima: Double = 0.0
 
     override fun objective(solution: DoubleArray): Double {
@@ -32,7 +32,7 @@ class Griewank(dimensions: Int) : Benchmark(dimensions) {
         var pdt = 1.0
         for (i in 1 until solution.size) {
             sum += solution[i].pow(2) / 4000.0
-            pdt *= cos(solution[i] / sqrt(i.toDouble()))
+            pdt *= cos(solution[i] / sqrt(i + 1.0))
         }
         return sum - pdt + 1.0
     }

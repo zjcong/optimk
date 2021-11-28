@@ -6,16 +6,16 @@ import kotlin.math.sqrt
 
 class Schwefel(d: Int) : Benchmark(d) {
 
-    override val lowerBounds: DoubleArray = DoubleArray(d) { -500.0 }
-    override val globalOptima: Double = 0.0
-    override val upperBounds: DoubleArray = DoubleArray(d) { 500.0 }
+    override val lowerBound: Double = -500.0
+    override val upperBound: Double = 500.0
 
+    override val globalOptima: Double = -1.0 * dimensions * 4.18982887272434686131e+02
 
     override fun objective(solution: DoubleArray): Double {
         var sum = 0.0
         for (i in solution.indices) {
-            sum += -1.0 * solution[i] * sin(sqrt(abs(solution[i])))
+            sum += -solution[i] * sin(sqrt(abs(solution[i])))
         }
-        return (418.982887 * dimensions) + sum
+        return sum + dimensions * 4.18982887272434686131e+02;
     }
 }

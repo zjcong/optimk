@@ -15,23 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.benchmark
+package com.mellonita.optimk.math
 
-import kotlin.math.abs
-import kotlin.math.pow
+internal class Matrix(arrays: Array<DoubleArray>) {
 
-class SumOfDifferentPowers(d: Int) : Benchmark(d) {
+    private val rows: Int
+    private val cols: Int
+    private val isSquare: Boolean
 
-    override val lowerBound: Double = -1.0
-    override val upperBound: Double = 1.0
 
-    override val globalOptima: Double = 0.0
+    init {
+        require(arrays.isNotEmpty()) { "Empty matrix" }
+        require(arrays[0].isNotEmpty()) { "Empty row" }
+        require(arrays.all { it.size == arrays[0].size }) { "Inconsistent rows" }
 
-    override fun objective(solution: DoubleArray): Double {
-        var sum = 0.0
-        for (i in solution.indices) {
-            sum += abs(solution[i]).pow(i + 2)
-        }
-        return sum
+        rows = arrays.size
+        cols = arrays[0].size
+        isSquare = (rows == cols)
+        
     }
+
+
 }

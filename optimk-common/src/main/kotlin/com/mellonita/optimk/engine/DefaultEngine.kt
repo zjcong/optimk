@@ -18,7 +18,6 @@
 package com.mellonita.optimk.engine
 
 import com.mellonita.optimk.*
-import com.mellonita.optimk.problem.Problem
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,7 +27,9 @@ import kotlin.random.Random
 /**
  * Basic optimization engine
  * @param problem Problem to solve
- * @param goal Goal type, GOAL_MIN or GOAL_MAX
+ * @param monitor Monitor
+ * @param optimizer
+ * @param rng Random Number Generator
  */
 public open class DefaultEngine<T>(
     override val problem: Problem<T>,
@@ -51,12 +52,13 @@ public open class DefaultEngine<T>(
      * This engine is open if the optimizer is open border
      */
     override var isOpen: Boolean = optimizer is OpenBorder
+        protected set
 
     /**
      * Update fitness
      */
     public override fun updateFitness() {
-        fitness = population.map { evaluateIndividual(it) }.toDoubleArray()
+        fitness = evaluatePopulation(population)
         val min = fitness.withIndex().minByOrNull { it.value }!!
         if (min.value < bestFitness) {
             bestFitness = min.value
@@ -79,7 +81,7 @@ public open class DefaultEngine<T>(
                 LogLevel.DEBUG,
                 "Immigrant [$f] arrived but is worse than worst individual [${this.fitness[targetIndex]}]."
             )
-            return false
+            //return false
         }
 
         population[targetIndex] = s
@@ -95,7 +97,6 @@ public open class DefaultEngine<T>(
         iterations++
         population = optimizer.iterate(population, fitness)
         log(LogLevel.DEBUG, "Iteration [$iterations] finished, fitness: [$bestFitness]")
-
     }
 
     /**

@@ -20,9 +20,8 @@ package com.mellonita.optimk.example.experiment
 import com.formdev.flatlaf.FlatLightLaf
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.IslandEngine
-import com.mellonita.optimk.engine.islandsOf
+import com.mellonita.optimk.engine.IslandEngine.Companion.islandsOf
 import com.mellonita.optimk.example.benchmark.Benchmark
-import com.mellonita.optimk.example.benchmark.Rosenbrock
 import com.mellonita.optimk.example.benchmark.Schwefel
 import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import com.mellonita.optimk.optimizer.CovarianceMatrixAdaption
@@ -33,7 +32,6 @@ import org.knowm.xchart.XYChart
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
 import org.knowm.xchart.style.markers.SeriesMarkers
-import kotlin.math.abs
 import kotlin.reflect.full.primaryConstructor
 
 
@@ -42,7 +40,6 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
     val maxEval = Int.MAX_VALUE
 
     val islandNumber = 4
-    val immigrationInterval: Int = 1
 
     val names = setOf(
         "PSO",
@@ -51,6 +48,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
         "GA",
         "Islands",
     )
+
 
     val engineExperiment = EngineExperiment<DoubleArray>(maxItr, maxEval, names) { name, monitor ->
         when (name) {
@@ -75,7 +73,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 optimizer = DifferentialEvolution(
                     dimensionality = problem.dimensions,
                     population = population,
-                    mutation = DifferentialEvolution.currentToBest1(0.3, 0.7)
+                    mutation = DifferentialEvolution.best1(0.7)
                 ),
                 monitor = monitor
             )
@@ -89,26 +87,25 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             )
             "Islands" -> IslandEngine(
                 problem = problem,
-                migrationInterval = immigrationInterval,
                 monitor = monitor,
                 islands = islandsOf(
                     islandNumber, problem, monitor, listOf(
                         BiasedGeneticAlgorithm(
                             dimensionality = problem.dimensions,
-                            population = population / islandNumber,
+                            population = population / islandNumber + 1
                         ),
                         DifferentialEvolution(
                             dimensionality = problem.dimensions,
-                            population = population / islandNumber,
-                            mutation = DifferentialEvolution.currentToBest1(0.3, 0.7)
+                            population = population / islandNumber + 1,
+                            mutation = DifferentialEvolution.best1(0.7)
                         ),
                         ParticleSwampOptimization(
                             dimensionality = problem.dimensions,
-                            population = population / islandNumber,
+                            population = population / islandNumber + 1,
                         ),
                         CovarianceMatrixAdaption(
                             dimensionality = problem.dimensions,
-                            population = population / islandNumber,
+                            population = population / islandNumber + 1,
                         ),
                     )
                 )
@@ -125,8 +122,8 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
         XYChartBuilder()
             .width(1024)
             .height(700)
-            .title("Default vs. Island on ${problem.dimensions}D ${problem.javaClass.simpleName} function (p=$population)")
-            .xAxisTitle("Function Evaluation")
+            .title("${problem.dimensions}D ${problem.javaClass.simpleName} (p=$population)")
+            .xAxisTitle("Iterations")
             .yAxisTitle("Cost (log axis)")
             .theme(Styler.ChartTheme.Matlab)
             .build()
@@ -135,9 +132,8 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
         val series = fitnessChart.addSeries(
             name,
             history.map { it.first },
-            history.map { (abs(problem.globalOptima - it.second)) + 1e-20 })
+            history.map { it.second + 1e-20 })
         series.marker = SeriesMarkers.NONE
-        series.isSmooth = true
     }
 
 
@@ -148,12 +144,11 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 
 fun problemExperiments() {
 
-    val dimensionality = 30
-    val population = 150
-    val maxItr = 1_000
+    val dimensionality = 50
+    val population = 100
+    val maxItr = 3_000
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
     val charts = problems.map { experiment(it, population, maxItr) }
-
     FlatLightLaf.setup() //I like it pretty
     SwingWrapper<XYChart>(charts).displayChartMatrix()
 }
@@ -162,8 +157,8 @@ fun problemExperiments() {
 fun populationExperiment() {
 
     val dimensionality = 50
-    val maxItr = 1_000
-    val charts = (50..300 step 50).map { p ->
+    val maxItr = 3_000
+    val charts = (50..450 step 50).map { p ->
         experiment(Schwefel(dimensionality), p, maxItr)
     }
 

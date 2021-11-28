@@ -17,6 +17,7 @@
 
 package com.mellonita.optimk.optimizer.cmaes
 
+import com.mellonita.optimk.math.nextGaussian
 import org.hipparchus.exception.LocalizedCoreFormats
 import org.hipparchus.exception.MathIllegalArgumentException
 import org.hipparchus.linear.Array2DRowRealMatrix
@@ -26,17 +27,17 @@ import org.hipparchus.linear.RealMatrix
 import org.hipparchus.optim.PointValuePair
 import org.hipparchus.util.FastMath
 import java.util.*
+import kotlin.random.Random
 
-class HipparchusCMAES(
+public class HipparchusCMAES(
     private var diagonalOnly: Int,
     private val random: Random,
     private val dimension: Int,
-    private val inputSigma: DoubleArray = DoubleArray(dimension) { 0.3 },
+    private val inputSigma: DoubleArray = DoubleArray(dimension) { 0.5 },
     private val lambda: Int
 ) {
 
 
-    private val checkFeasibleCount: Int = 2
     private val maxIterations = Int.MAX_VALUE
     private val stopFitness = 0.0
     private val isActiveCMA = true
@@ -52,7 +53,7 @@ class HipparchusCMAES(
     private val arx = zeros(dimension, lambda)
 
 
-    fun iterate(p: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
+    public fun iterate(p: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
         if (converged) return p
         if (iterations == 0) {
             val b = fitness.withIndex().minByOrNull { it.value }!!
@@ -128,10 +129,10 @@ class HipparchusCMAES(
         }
 
         val rp = mutableListOf<DoubleArray>()
+
         // generate random offspring
         for (k in 0 until lambda) {
-            var arxk: RealMatrix? = null
-            arxk = if (diagonalOnly <= 0)
+            val arxk: RealMatrix = if (diagonalOnly <= 0)
                 xmean!!.add(BD!!.multiply(arz.getColumnMatrix(k)).scalarMultiply(sigma)) // m + sig * Normal(0,C)
             else
                 xmean!!.add(times(diagD, arz.getColumnMatrix(k)).scalarMultiply(sigma))
@@ -143,7 +144,7 @@ class HipparchusCMAES(
                     else -> it
                 }
             }.toDoubleArray())
-            rp.add(arxk!!.getColumn(0))
+            rp.add(arxk.getColumn(0))
             copyColumn(arxk, 0, arx, k)
         }
         iterations++
@@ -238,7 +239,7 @@ class HipparchusCMAES(
     private var diagC: RealMatrix? = null
 
     /** Number of iterations already performed.  */
-    public var iterations = 0
+    public var iterations: Int = 0
 
     /** History queue of best values.  */
     private var fitnessHistory: DoubleArray = doubleArrayOf()
@@ -263,7 +264,7 @@ class HipparchusCMAES(
             )
         }
         for (i in guess.indices) {
-            sigmaArray[i][0] = inputSigma!![i]
+            sigmaArray[i][0] = inputSigma[i]
         }
         val insigma: RealMatrix = Array2DRowRealMatrix(sigmaArray, false)
         sigma = max(insigma) // overall standard deviation
@@ -562,7 +563,7 @@ class HipparchusCMAES(
         var index: Int
     ) : Comparable<DoubleIndex?> {
         /** {@inheritDoc}  */
-        public override operator fun compareTo(other: DoubleIndex?): Int {
+        override operator fun compareTo(other: DoubleIndex?): Int {
             return value.compareTo(other!!.value)
         }
 

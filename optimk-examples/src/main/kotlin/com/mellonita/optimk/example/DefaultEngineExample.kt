@@ -20,9 +20,12 @@ package com.mellonita.optimk.example
 import com.mellonita.optimk.Engine
 import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.engine.DefaultEngine
+import com.mellonita.optimk.engine.RestartEngine
+import com.mellonita.optimk.example.benchmark.Rastrigin
+import com.mellonita.optimk.example.benchmark.Schwefel
 import com.mellonita.optimk.example.benchmark.Sphere
+import com.mellonita.optimk.example.benchmark.SumOfDifferentPowers
 import com.mellonita.optimk.monitor.DefaultMonitor
-import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import com.mellonita.optimk.optimizer.CovarianceMatrixAdaption
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
@@ -32,26 +35,41 @@ import kotlin.random.Random
 
 
 fun main() {
-    val d = 10
+    val d = 50
     val p = 100
 
-    val problem = Sphere(d)
-    val history = mutableListOf<Double>()
+    val problem = Schwefel(d)
 
-    val engine = DefaultEngine(
+    val restartHistory = mutableListOf<Double>()
+    val defaultHistory = mutableListOf<Double>()
+
+    val restartEngine = RestartEngine(
         problem = problem,
-        optimizer = CovarianceMatrixAdaption(d, p, Random(0)),
+        optimizer = CovarianceMatrixAdaption(d, p),
         //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {
-                history.add(engine.bestFitness)
-                return engine.iterations >= 10_000
+                restartHistory.add(engine.bestFitness)
+                return engine.iterations >= 1000
             }
-        }
+        },
+        threshold = 20
     )
 
-    engine.optimize()
+    val defaultEngine = DefaultEngine(
+        problem = problem,
+        optimizer = CovarianceMatrixAdaption(d, p),
+        //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
+        monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
+            override fun stop(engine: Engine<DoubleArray>): Boolean {
+                defaultHistory.add(engine.bestFitness)
+                return engine.iterations >= 1000
+            }
+        },
+    )
 
+    restartEngine.optimize()
+    defaultEngine.optimize()
 
     val chart =
         XYChartBuilder()
@@ -63,7 +81,10 @@ fun main() {
             .theme(Styler.ChartTheme.GGPlot2)
             .build()
 
-    chart.addSeries("Cost", history).marker = SeriesMarkers.NONE
+    chart.addSeries("Restart", restartHistory).marker = SeriesMarkers.NONE
+    chart.addSeries("Default", defaultHistory).marker = SeriesMarkers.NONE
+
+    chart.styler.isYAxisLogarithmic = true
 
     SwingWrapper(chart).displayChart()
 

@@ -32,8 +32,8 @@ private class ExperimentMonitor<T>(private val itr: Int, private val eval: Int) 
     //override fun debug(engine: Engine<T>, msg: String) = Unit
 
     override fun stop(engine: Engine<T>): Boolean {
-        history.add(Pair(engine.evaluations, engine.bestFitness))
-        return (engine.bestFitness <= 1E-10 || engine.iterations >= itr || engine.evaluations >= eval)
+        history.add(Pair(engine.iterations, engine.bestFitness))
+        return (engine.bestFitness <= 1E-7 || engine.iterations >= itr || engine.evaluations >= eval)
     }
 }
 

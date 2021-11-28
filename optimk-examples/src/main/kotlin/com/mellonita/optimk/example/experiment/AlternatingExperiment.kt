@@ -36,7 +36,7 @@ fun main() {
     val problem = Schwefel(dimensionality)
     val maxIteration = 300_000
     val maxEval = 100_000
-    val alternatingThreshold = 20L
+    val alternatingThreshold = 20
 
     val names = setOf(
         "DE - CR = 0.8",

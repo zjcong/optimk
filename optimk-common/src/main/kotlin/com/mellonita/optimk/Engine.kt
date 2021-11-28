@@ -18,14 +18,13 @@
 
 package com.mellonita.optimk
 
-import com.mellonita.optimk.problem.Problem
 import java.io.*
 
 
 /**
  * Island Interface
  */
-public interface Island {
+public interface Island : Serializable {
     /**
      * If this island is open
      */
@@ -106,14 +105,19 @@ public abstract class Engine<T> : Serializable, Island {
     /**
      * Single objective function evaluation
      */
-    protected open fun evaluateIndividual(solution: DoubleArray): Double {
+    protected open fun evaluateIndividual(keys: DoubleArray): Double {
         evaluations++
-        if (solution.any { it !in (0.0).rangeTo(1.0) }) return Double.MAX_VALUE
-        val actualCandidate = problem.decode(solution)
-        val f = problem(actualCandidate)
-        if (f.isNaN()) throw RuntimeException("Solution: $actualCandidate yields NaN value")
+        if (keys.any { it !in (0.0).rangeTo(1.0) }) return Double.MAX_VALUE
+        val f = problem(keys)
+        if (f.isNaN()) throw RuntimeException("Solution: ${problem.decode(keys)} yields NaN value")
         return f
     }
+
+    /**
+     *
+     */
+    protected open fun evaluatePopulation(batchKeys: Array<DoubleArray>): DoubleArray =
+        batchKeys.indices.map { evaluateIndividual(batchKeys[it]) }.toDoubleArray()
 
     /**
      * Serialize this engine to file

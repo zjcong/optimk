@@ -7,10 +7,9 @@ import kotlin.math.pow
 class Rastrigin(d: Int) : Benchmark(d) {
 
     private val A = 10
-
-    override val lowerBounds: DoubleArray = DoubleArray(d) { -5.12 }
+    override val lowerBound: Double = -5.12
+    override val upperBound: Double = 5.12
     override val globalOptima: Double = 0.0
-    override val upperBounds: DoubleArray = DoubleArray(d) { 5.12 }
 
     override fun objective(solution: DoubleArray): Double {
 
