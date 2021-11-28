@@ -35,3 +35,4 @@ class SumOfDifferentPowers(d: Int) : Benchmark(d) {
         return sum
     }
 }
+

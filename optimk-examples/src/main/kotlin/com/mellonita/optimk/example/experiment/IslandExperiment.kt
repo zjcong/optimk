@@ -36,8 +36,6 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 
     val maxEval = Int.MAX_VALUE
 
-    val islandNumber = 4
-
     val names = setOf(
         "PSO",
         "CMAES",
@@ -47,12 +45,13 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
         "Islands",
     )
 
+    val islandNumber = 5
 
     val engineExperiment = EngineExperiment<DoubleArray>(maxItr, maxEval, names) { name, monitor ->
         when (name) {
             "PSO" -> DefaultEngine(
                 problem = problem,
-                optimizer = RandomSampler(
+                optimizer = ParticleSwampOptimization(
                     d = problem.dimensions,
                     p = population
                 ),
@@ -60,7 +59,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             )
             "RS" -> DefaultEngine(
                 problem = problem,
-                optimizer = CovarianceMatrixAdaption(
+                optimizer = RandomSampler(
                     d = problem.dimensions,
                     p = population,
                 ),
@@ -113,6 +112,10 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                             d = problem.dimensions,
                             p = population / islandNumber + 1,
                         ),
+                        RandomSampler(
+                            d = problem.dimensions,
+                            p = population,
+                        )
                     )
                 )
             )
@@ -152,7 +155,7 @@ fun problemExperiments() {
 
     val dimensionality = 50
     val population = 100
-    val maxItr = 10_000
+    val maxItr = 2_000
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
     val charts = problems.map { experiment(it, population, maxItr) }
     FlatLightLaf.setup() //I like it pretty
@@ -163,7 +166,7 @@ fun problemExperiments() {
 fun populationExperiment() {
 
     val dimensionality = 50
-    val maxItr = 3_000
+    val maxItr = 2_000
     val charts = (50..450 step 50).map { p ->
         experiment(Schwefel(dimensionality), p, maxItr)
     }

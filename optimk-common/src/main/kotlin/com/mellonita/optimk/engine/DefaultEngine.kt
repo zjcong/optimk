@@ -76,17 +76,14 @@ public open class DefaultEngine<T>(
         }
         val targetIndex = rng.nextInt(population.size)
         //val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index //pick the worst individual
-        if (this.fitness[targetIndex] < f) {
-            log(
-                LogLevel.DEBUG,
-                "Immigrant [$f] arrived but is worse than worst individual [${this.fitness[targetIndex]}]."
-            )
+        if (fitness[targetIndex] < f) {
+            log(LogLevel.DEBUG, "Immigrant [$f] arrived and is worse than target individual [${this.fitness[targetIndex]}].")
             //return false
         }
 
         population[targetIndex] = s
-        this.fitness[targetIndex] = f
-        log(LogLevel.DEBUG, "Immigrant [$f] is accepted")
+        fitness[targetIndex] = f
+        log(LogLevel.DEBUG, "Immigrant [$f] is admitted")
         return true
     }
 

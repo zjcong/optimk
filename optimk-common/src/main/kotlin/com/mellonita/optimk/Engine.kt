@@ -117,7 +117,7 @@ public abstract class Engine<T> : Serializable, Island {
      *
      */
     protected open fun evaluatePopulation(batchKeys: Array<DoubleArray>): DoubleArray =
-        batchKeys.indices.map { evaluateIndividual(batchKeys[it]) }.toDoubleArray()
+        batchKeys.toList().parallelStream().mapToDouble { evaluateIndividual(it) }.toArray()
 
     /**
      * Serialize this engine to file
