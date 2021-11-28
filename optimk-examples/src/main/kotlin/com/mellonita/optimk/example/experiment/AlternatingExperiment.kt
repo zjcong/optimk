@@ -15,13 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example
+package com.mellonita.optimk.example.experiment
 
-import com.mellonita.optimk.Goal
 import com.mellonita.optimk.engine.AlternatingEngine
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.example.benchmark.Schwefel
-import com.mellonita.optimk.example.experiment.EngineExperiment
 import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
 import com.mellonita.optimk.optimizer.DifferentialEvolution
 import com.mellonita.optimk.optimizer.ParticleSwampOptimization
@@ -36,7 +34,8 @@ fun main() {
     val dimensionality = 30
     val population = 30
     val problem = Schwefel(dimensionality)
-    val maxIteration = 10_000L
+    val maxIteration = 300_000
+    val maxEval = 100_000
     val alternatingThreshold = 20L
 
     val names = setOf(
@@ -46,13 +45,12 @@ fun main() {
         "Alternating",
     )
 
-    val engineExperiment = EngineExperiment<DoubleArray>(maxIteration, names) { name, monitor ->
+    val engineExperiment = EngineExperiment<DoubleArray>(maxIteration, maxEval, names) { name, monitor ->
         when (name) {
             "DE - CR = 0.2" -> DefaultEngine(
                 problem = problem,
-                goal = Goal.Minimize,
                 optimizer = DifferentialEvolution(
-                    dimensionality = problem.d,
+                    dimensionality = problem.dimensions,
                     population = population,
                     cr = 0.2,
                     mutation = DifferentialEvolution.best1(0.8)
@@ -61,9 +59,8 @@ fun main() {
             )
             "DE - CR = 0.8" -> DefaultEngine(
                 problem = problem,
-                goal = Goal.Minimize,
                 optimizer = DifferentialEvolution(
-                    dimensionality = problem.d,
+                    dimensionality = problem.dimensions,
                     population = population,
                     cr = 0.8,
                     mutation = DifferentialEvolution.best1(0.8)
@@ -72,25 +69,23 @@ fun main() {
             )
             "GA" -> DefaultEngine(
                 problem = problem,
-                goal = Goal.Minimize,
-                optimizer = BiasedGeneticAlgorithm(problem.d, population),
+                optimizer = BiasedGeneticAlgorithm(problem.dimensions, population),
                 monitor = monitor
             )
             "Alternating" -> AlternatingEngine(
                 problem = problem,
-                goal = Goal.Minimize,
                 optimizers = listOf(
                     DifferentialEvolution(
-                        dimensionality = problem.d,
+                        dimensionality = problem.dimensions,
                         population = population,
                         cr = 0.8,
                         mutation = DifferentialEvolution.best1(0.8)
                     ),
                     ParticleSwampOptimization(
-                        dimensionality = problem.d,
+                        dimensionality = problem.dimensions,
                         population = population,
                     ),
-                    BiasedGeneticAlgorithm(problem.d, population),
+                    BiasedGeneticAlgorithm(problem.dimensions, population),
                 ),
                 threshold = alternatingThreshold,
                 monitor = monitor
@@ -112,7 +107,7 @@ fun main() {
             .build()
 
     results.forEach { (name, history) ->
-        val series = chart.addSeries(name, history)
+        val series = chart.addSeries(name, history.map { it.second })
         series.marker = SeriesMarkers.NONE
     }
 

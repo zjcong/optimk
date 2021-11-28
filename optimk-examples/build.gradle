@@ -13,8 +13,7 @@ repositories {
 dependencies {
     implementation project(":optimk-common")
     implementation 'com.formdev:flatlaf:1.6.4'
-    implementation 'com.formdev:flatlaf-extras:1.6.4'
-    implementation 'org.ojalgo:ojalgo:49.2.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.0"
 
     implementation 'org.knowm.xchart:xchart:3.8.1'
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0'

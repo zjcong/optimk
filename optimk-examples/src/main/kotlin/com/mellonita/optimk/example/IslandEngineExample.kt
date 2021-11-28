@@ -18,7 +18,6 @@
 package com.mellonita.optimk.example
 
 import com.mellonita.optimk.Engine
-import com.mellonita.optimk.Goal
 import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.engine.IslandEngine
@@ -31,18 +30,16 @@ import kotlin.random.Random
 
 fun <T> getEngine(
     r: Int,
-    goal: Goal,
     p: Int,
     problem: Problem<T>
 ): Engine<T> {
     return DefaultEngine(
         problem = problem,
-        goal = goal,
         monitor = object : DefaultMonitor<T>(LogLevel.INFO) {
             override fun stop(engine: Engine<T>): Boolean = false
         },
         optimizer = DifferentialEvolution(
-            dimensionality = problem.d,
+            dimensionality = problem.dimensions,
             population = p,
             cr = 0.9,
             rng = Random(r),
@@ -60,7 +57,6 @@ fun main() {
 
     val engine = IslandEngine(
         problem = problem,
-        goal = Goal.Minimize,
         migrationInterval = 1,
         rng = Random(0),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
@@ -68,7 +64,7 @@ fun main() {
                 return engine.iterations >= maxIteration
             }
         },
-        islands = (0 until islandNumber).map { getEngine(it, Goal.Minimize, (population / islandNumber), problem) }
+        islands = (0 until islandNumber).map { getEngine(it, (population / islandNumber), problem) }
     )
 
     engine.optimize()

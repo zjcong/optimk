@@ -85,15 +85,3 @@ Unless explicitly stated otherwise, every module of this software is licensed un
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ````
 
-Please contact the author via Telegram [@drzjcong](https://telegram.me/drzjcong) if this license does not meet your
-needs.
-
-## TODO
-
-+ Debug interface
-+ ~~Island Model Engine~~
-+ ~~Particle Swamp Optimization~~
-+ ~~Differential Evolution~~
-+ ~~Restart Engine~~
-+ ~~Alternating Engine~~
-+ ~~Engine suspension~~

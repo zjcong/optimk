@@ -15,8 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.nn
+package com.mellonita.optimk.example.benchmark
 
-class ClassificationMLP(nHiddenLayers: Int, nInputs:Int, nOutputs:Int) {
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sqrt
 
+class Griewank(dimensions: Int) : Benchmark(dimensions) {
+    override val upperBounds: DoubleArray = DoubleArray(dimensions) { 600.0 }
+    override val lowerBounds: DoubleArray = DoubleArray(dimensions) { -600.0 }
+    override val globalOptima: Double = 0.0
+
+    override fun objective(solution: DoubleArray): Double {
+
+        var sum = 0.0
+        var pdt = 1.0
+        for (i in 1 until solution.size) {
+            sum += solution[i].pow(2) / 4000.0
+            pdt *= cos(solution[i] / sqrt(i.toDouble()))
+        }
+        return sum - pdt + 1.0
+    }
 }

@@ -17,7 +17,10 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.*
+import com.mellonita.optimk.Engine
+import com.mellonita.optimk.LogLevel
+import com.mellonita.optimk.Monitor
+import com.mellonita.optimk.Optimizer
 import com.mellonita.optimk.problem.Problem
 import java.time.Instant
 import java.time.LocalDateTime
@@ -30,11 +33,10 @@ import kotlin.random.Random
  */
 public open class IslandEngine<T>(
     override val problem: Problem<T>,
-    override val goal: Goal,
     protected val islands: List<Engine<T>>,
-    protected val migrationInterval: Int,
+    protected val migrationInterval: Int = 1,
     override val monitor: Monitor<T>,
-    protected val rng: Random = Random(0),
+    protected val rng: Random = Random(0)
 ) : Engine<T>() {
 
     /**
@@ -65,6 +67,10 @@ public open class IslandEngine<T>(
             updateFitness()
             nextIteration()
         } while (!monitor.stop(this))
+        log(
+            LogLevel.INFO,
+            "Engine terminated with best fitness [$bestFitness] after [${System.currentTimeMillis() - startTime}]ms"
+        )
         return problem.decode(bestSolution)
     }
 
@@ -78,7 +84,9 @@ public open class IslandEngine<T>(
         val destination = openIslands[rng.nextInt(openIslands.size)]
         val origin = islands[rng.nextInt(islands.size)]
         if (destination != origin)
-            destination.arrival(origin.bestSolution, bestFitness)
+            destination.arrival(origin.bestSolution, origin.bestFitness)
+
+        //destination.arrival(bestSolution, bestFitness)
     }
 
     /**
@@ -88,7 +96,7 @@ public open class IslandEngine<T>(
         // Update number of evaluations
         evaluations = islands.sumOf { it.evaluations }
         // Evaluate islands
-        islands.forEach { it.updateFitness() }
+        islands.parallelStream().forEach { it.updateFitness() }
         // Update best individual
         val min = islands.minByOrNull { it.bestFitness }!!
         if (min.bestFitness < bestFitness) {
@@ -105,7 +113,7 @@ public open class IslandEngine<T>(
         // migrate
         if (iterations != 0L && iterations.rem(migrationInterval) == 0L)
             migrate()
-        islands.forEach { it.nextIteration() }
+        islands.parallelStream().forEach { it.nextIteration() }
         log(LogLevel.DEBUG, "Iteration [$iterations] finished, fitness: [$bestFitness]")
     }
 
@@ -128,13 +136,11 @@ public open class IslandEngine<T>(
 public fun <T> islandsOf(
     n: Int,
     problem: Problem<T>,
-    goal: Goal,
     monitor: Monitor<T>,
     optimizers: List<Optimizer>
 ): List<Engine<T>> {
     return (0 until n).map {
         DefaultEngine(
-            goal = goal,
             problem = problem,
             optimizer = optimizers[it.rem(optimizers.size)],
             monitor = monitor

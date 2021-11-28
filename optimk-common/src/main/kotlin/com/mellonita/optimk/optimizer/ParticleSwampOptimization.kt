@@ -24,6 +24,7 @@ public class ParticleSwampOptimization(
      *
      */
     private fun updateVelocities(population: Array<DoubleArray>) {
+
         population.indices.forEach { i ->
             val pb = pBest[i].first
             val v = velocities[i]
@@ -42,7 +43,7 @@ public class ParticleSwampOptimization(
         //update pBest and gBest
         fitness.indices.forEach { i ->
             if (pBest[i].second >= fitness[i]) pBest[i] = Pair(population[i], fitness[i])
-            if (gBest.second > fitness[i]) gBest = Pair(population[i], fitness[i])
+            if (gBest.second >= fitness[i]) gBest = Pair(population[i], fitness[i])
         }
         //update velocities
         updateVelocities(population)

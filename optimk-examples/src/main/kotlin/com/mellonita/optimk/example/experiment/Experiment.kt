@@ -25,15 +25,15 @@ import com.mellonita.optimk.monitor.DefaultMonitor
 /**
  *
  */
-private class ExperimentMonitor<T>(private val itr: Long) : DefaultMonitor<T>(LogLevel.DEBUG) {
+private class ExperimentMonitor<T>(private val itr: Int, private val eval: Int) : DefaultMonitor<T>(LogLevel.INFO) {
 
-    val history: MutableList<Double> = mutableListOf()
+    val history: MutableList<Pair<Long, Double>> = mutableListOf()
 
     //override fun debug(engine: Engine<T>, msg: String) = Unit
 
     override fun stop(engine: Engine<T>): Boolean {
-        history.add(engine.bestFitness)
-        return (engine.iterations >= itr)
+        history.add(Pair(engine.evaluations, engine.bestFitness))
+        return (engine.bestFitness <= 1E-10 || engine.iterations >= itr || engine.evaluations >= eval)
     }
 }
 
@@ -42,7 +42,8 @@ private class ExperimentMonitor<T>(private val itr: Long) : DefaultMonitor<T>(Lo
  *
  */
 class EngineExperiment<T>(
-    private val maxIterations: Long,
+    private val maxIterations: Int,
+    private val maxEval: Int,
     names: Set<String>,
     enginesOf: (name: String, monitor: Monitor<T>) -> Engine<T>
 ) {
@@ -52,10 +53,10 @@ class EngineExperiment<T>(
 
     init {
         require(names.isNotEmpty())
-        engines = names.associateWith { enginesOf(it, ExperimentMonitor(maxIterations)) }
+        engines = names.associateWith { enginesOf(it, ExperimentMonitor(maxIterations, maxEval)) }
     }
 
-    fun start(): Map<String, MutableList<Double>> {
+    fun start(): Map<String, MutableList<Pair<Long, Double>>> {
         startTime = System.currentTimeMillis()
 
         val results = engines.map { (t, u) ->

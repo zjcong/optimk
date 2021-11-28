@@ -32,7 +32,6 @@ import kotlin.random.Random
  */
 public open class DefaultEngine<T>(
     override val problem: Problem<T>,
-    override val goal: Goal,
     override val monitor: Monitor<T>,
     protected var optimizer: Optimizer,
     protected val rng: Random = Random(0)
@@ -119,7 +118,10 @@ public open class DefaultEngine<T>(
             // Sample next population
             nextIteration()
         } while (!monitor.stop(this))
-        log(LogLevel.INFO, "Engine terminated with best fitness [$bestFitness]")
+        log(
+            LogLevel.INFO,
+            "Engine terminated with best fitness [$bestFitness] after [${System.currentTimeMillis() - startTime}]ms"
+        )
         return problem.decode(bestSolution)
     }
 }

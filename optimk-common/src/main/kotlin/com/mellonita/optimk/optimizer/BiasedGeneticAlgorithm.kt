@@ -71,11 +71,11 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
         ((nElites + nMutants) until this.population).forEach { s ->
             val eliteParent = population[indicesSorted.subList(0, nElites)[rng.nextInt(0, nElites)]]
             val normalParent = population[rng.nextInt(nElites, this.population)]
-            val child =
-                DoubleArray(dimensionality) { i -> if (rng.nextDouble() < bias) eliteParent[i] else normalParent[i] }
+            val child = DoubleArray(dimensionality) { i ->
+                if (rng.nextDouble() < bias) eliteParent[i] else normalParent[i]
+            }
             nextGeneration[s] = child
         }
-
         return nextGeneration
     }
 

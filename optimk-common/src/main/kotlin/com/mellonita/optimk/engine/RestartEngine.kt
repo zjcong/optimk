@@ -17,7 +17,6 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.Goal
 import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Optimizer
@@ -29,12 +28,11 @@ import kotlin.random.Random
  */
 public open class RestartEngine<T>(
     problem: Problem<T>,
-    goal: Goal,
     optimizer: Optimizer,
     monitor: Monitor<T>,
     private val threshold: Long,
     rng: Random = Random(0)
-) : DefaultEngine<T>(problem, goal, monitor, optimizer, rng) {
+) : DefaultEngine<T>(problem, monitor, optimizer, rng) {
 
     private var stagnation: Int = 0
     private var totalStagnation: Int = 0

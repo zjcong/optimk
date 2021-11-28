@@ -17,7 +17,6 @@
 
 package com.mellonita.optimk.engine
 
-import com.mellonita.optimk.Goal
 import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.Monitor
 import com.mellonita.optimk.Optimizer
@@ -31,12 +30,11 @@ import kotlin.random.Random
  */
 public open class AlternatingEngine<T>(
     problem: Problem<T>,
-    goal: Goal,
     private val optimizers: List<Optimizer>,
     private val threshold: Long,
     monitor: Monitor<T>,
     rng: Random = Random(0)
-) : DefaultEngine<T>(problem, goal, monitor, optimizers[0], rng) {
+) : DefaultEngine<T>(problem, monitor, optimizers[0], rng) {
 
     /**
      * Number of iterations of unchanged best fitness
@@ -79,10 +77,9 @@ public open class AlternatingEngine<T>(
             population = optimizer.initialize(np)
 
             log(
-                LogLevel.DEBUG,
+                LogLevel.INFO,
                 "Engine alternated to [${optimizer.javaClass.simpleName}] with population of [${np.size}]"
             )
-
             updateFitness()
             stagnation = 0
         }

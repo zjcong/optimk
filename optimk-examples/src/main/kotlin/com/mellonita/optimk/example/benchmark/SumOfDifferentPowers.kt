@@ -17,19 +17,20 @@
 
 package com.mellonita.optimk.example.benchmark
 
-import com.mellonita.optimk.valueIn
 import kotlin.math.abs
 import kotlin.math.pow
 
 class SumOfDifferentPowers(d: Int) : Benchmark(d) {
-    override fun decode(keys: DoubleArray): DoubleArray {
-        return keys.map { it.valueIn((-1.0).rangeTo(1.0)) }.toDoubleArray()
-    }
 
-    override fun invoke(solution: DoubleArray): Double {
-        return solution.withIndex().sumOf {
-            abs(it.value).pow(it.index + 1)
+    override val lowerBounds: DoubleArray = DoubleArray(d) { -1.0 }
+    override val globalOptima: Double = 0.0
+    override val upperBounds: DoubleArray = DoubleArray(d) { 1.0 }
+
+    override fun objective(solution: DoubleArray): Double {
+        var sum = 0.0
+        for (i in solution.indices) {
+            sum += abs(solution[i]).pow(i + 1)
         }
+        return sum
     }
-
 }

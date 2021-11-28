@@ -18,30 +18,29 @@
 package com.mellonita.optimk.example
 
 import com.mellonita.optimk.Engine
-import com.mellonita.optimk.Goal
 import com.mellonita.optimk.LogLevel
-import com.mellonita.optimk.engine.RestartEngine
-import com.mellonita.optimk.example.benchmark.Rastrigin
+import com.mellonita.optimk.engine.DefaultEngine
+import com.mellonita.optimk.example.benchmark.Sphere
 import com.mellonita.optimk.monitor.DefaultMonitor
-import com.mellonita.optimk.optimizer.ParticleSwampOptimization
+import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
+import com.mellonita.optimk.optimizer.CovarianceMatrixAdaption
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
+import org.knowm.xchart.style.markers.SeriesMarkers
 import kotlin.random.Random
 
 
 fun main() {
-    val d = 50
+    val d = 10
     val p = 100
 
-    val problem = Rastrigin(d)
+    val problem = Sphere(d)
     val history = mutableListOf<Double>()
 
-    val engine = RestartEngine(
+    val engine = DefaultEngine(
         problem = problem,
-        goal = Goal.Minimize,
-        optimizer = ParticleSwampOptimization(d, p, rng = Random(0)),
-        threshold = 100,
+        optimizer = CovarianceMatrixAdaption(d, p, Random(0)),
         //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {
@@ -51,7 +50,7 @@ fun main() {
         }
     )
 
-    val results = engine.optimize()
+    engine.optimize()
 
 
     val chart =
@@ -64,7 +63,7 @@ fun main() {
             .theme(Styler.ChartTheme.GGPlot2)
             .build()
 
-    chart.addSeries("Cost", history.withIndex().filter { it.index.rem(100) == 0 }.map { it.value })
+    chart.addSeries("Cost", history).marker = SeriesMarkers.NONE
 
     SwingWrapper(chart).displayChart()
 

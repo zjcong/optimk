@@ -21,12 +21,15 @@ package com.mellonita.optimk
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
+
+
+
 /**
  * Vector plus
  */
 public operator fun DoubleArray.plus(a: DoubleArray): DoubleArray {
     require(a.size == this.size) { "${this.size} != ${a.size}" }
-    return this.mapIndexed { index, d -> d + a[index] }.toDoubleArray()
+    return DoubleArray(a.size) { this[it] + a[it] }
 }
 
 /**
@@ -34,13 +37,13 @@ public operator fun DoubleArray.plus(a: DoubleArray): DoubleArray {
  */
 public operator fun DoubleArray.minus(a: DoubleArray): DoubleArray {
     require(a.size == this.size) { "${this.size} != ${a.size}" }
-    return this.mapIndexed { index, d -> d - a[index] }.toDoubleArray()
+    return DoubleArray(a.size) { this[it] - a[it] }
 }
 
 /**
  * Scalar multiply vector
  */
-public operator fun Double.times(a: DoubleArray): DoubleArray = a.map { it * this }.toDoubleArray()
+public operator fun Double.times(a: DoubleArray): DoubleArray = DoubleArray(a.size) { a[it] * this }
 
 
 /**

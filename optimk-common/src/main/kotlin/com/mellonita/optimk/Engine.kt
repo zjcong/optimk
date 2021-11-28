@@ -37,15 +37,6 @@ public interface Island {
     public fun arrival(s: DoubleArray, f: Double): Boolean
 }
 
-/**
- * Goal Type
- */
-public enum class Goal(private val value: Int) : Serializable {
-    Maximize(-1),
-    Minimize(1);
-
-    public operator fun times(d: Double): Double = this.value.toDouble() * d
-}
 
 /**
  * Engine
@@ -56,11 +47,6 @@ public abstract class Engine<T> : Serializable, Island {
      * The problem
      */
     public abstract val problem: Problem<T>
-
-    /**
-     * Goal type
-     */
-    public abstract val goal: Goal
 
     /**
      * Monitor
@@ -122,16 +108,11 @@ public abstract class Engine<T> : Serializable, Island {
      */
     protected open fun evaluateIndividual(solution: DoubleArray): Double {
         evaluations++
-        if (solution.any { it !in (0.0).rangeTo(1.0) })
-            return Double.MAX_VALUE
+        if (solution.any { it !in (0.0).rangeTo(1.0) }) return Double.MAX_VALUE
         val actualCandidate = problem.decode(solution)
-        return if (problem.isFeasible(actualCandidate)) {
-            val f = goal * problem(actualCandidate)
-            if (f.isNaN()) throw RuntimeException("Solution: $actualCandidate yields NaN value")
-            f
-        } else {
-            Double.MAX_VALUE
-        }
+        val f = problem(actualCandidate)
+        if (f.isNaN()) throw RuntimeException("Solution: $actualCandidate yields NaN value")
+        return f
     }
 
     /**

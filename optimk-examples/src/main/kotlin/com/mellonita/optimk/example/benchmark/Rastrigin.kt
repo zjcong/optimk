@@ -1,18 +1,23 @@
 package com.mellonita.optimk.example.benchmark
 
-import com.mellonita.optimk.valueIn
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.pow
 
 class Rastrigin(d: Int) : Benchmark(d) {
-    private val A = 5
 
-    override fun decode(keys: DoubleArray): DoubleArray {
-        return keys.map { it.valueIn((-5.12).rangeTo(5.12)) }.toDoubleArray()
-    }
+    private val A = 10
 
-    override fun invoke(solution: DoubleArray): Double {
-        return A * d + solution.sumOf { x -> x.pow(2) - A * cos(2 * PI * x) }
+    override val lowerBounds: DoubleArray = DoubleArray(d) { -5.12 }
+    override val globalOptima: Double = 0.0
+    override val upperBounds: DoubleArray = DoubleArray(d) { 5.12 }
+
+    override fun objective(solution: DoubleArray): Double {
+
+        var sum = 0.0
+        for (i in solution.indices) {
+            sum += solution[i].pow(2) - A * cos(2.0 * PI * solution[i])
+        }
+        return A * dimensions + sum
     }
 }

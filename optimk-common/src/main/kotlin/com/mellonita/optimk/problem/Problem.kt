@@ -18,9 +18,13 @@
 package com.mellonita.optimk.problem
 
 import java.io.Serializable
-import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
+
+public enum class Goal(public val value: Double) {
+    Maximize(-1.0), Minimize(1.0);
+
+    public operator fun times(fitness: Double): Double = value * fitness
+}
 
 /**
  * Problem Interface
@@ -28,7 +32,23 @@ import kotlin.math.roundToLong
  */
 public interface Problem<T> : Serializable {
 
-    public val d: Int
+    /**
+     * Number of dimensions of this problem
+     */
+    public val dimensions: Int
+
+    /**
+     * Goal of this problem
+     */
+    public val goal: Goal
+
+    /**
+     * Objective function
+     *
+     * @param solution Candidate solution
+     * @return Fitness of the candidate
+     */
+    public fun objective(solution: T): Double
 
     /**
      * Decode a vector of random keys into actual solution
@@ -39,19 +59,18 @@ public interface Problem<T> : Serializable {
     public fun decode(keys: DoubleArray): T
 
     /**
-     * Objective function
-     *
-     * @param solution Candidate solution
-     * @return Fitness of the candidate
-     */
-    public operator fun invoke(solution: T): Double
-
-    /**
      * If a given solution is feasible
      * @param solution Candidate solution
      * @return Is feasible
      */
     public fun isFeasible(solution: T): Boolean = true
 
+    /**
+     * Get fitness value of a solution * goal
+     */
+    public operator fun invoke(solution: T): Double {
+        if (!isFeasible(solution)) return Double.MAX_VALUE
+        return goal * objective(solution)
+    }
 }
 

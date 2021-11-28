@@ -18,7 +18,6 @@
 package com.mellonita.optimk.example
 
 import com.mellonita.optimk.Engine
-import com.mellonita.optimk.Goal
 import com.mellonita.optimk.LogLevel
 import com.mellonita.optimk.engine.DefaultEngine
 import com.mellonita.optimk.example.benchmark.SumOfDifferentPowers
@@ -32,7 +31,6 @@ fun main() {
 
     val engine = DefaultEngine(
         problem = SumOfDifferentPowers(10),
-        goal = Goal.Minimize,
         optimizer = DifferentialEvolution(
             dimensionality = 10,
             population = 20,

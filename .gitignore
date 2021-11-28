@@ -117,3 +117,9 @@ gradle-app.setting
 /island_default_history.csv
 /suspended_engine.bin
 /suspended_engine/
+/outcmaesaxlen.dat
+/outcmaesdisp.dat
+/outcmaesfit.dat
+/outcmaesstddev.dat
+/outcmaesxmean.dat
+/outcmaesxrecentbest.dat
