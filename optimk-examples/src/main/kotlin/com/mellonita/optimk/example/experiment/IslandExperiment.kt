@@ -146,7 +146,7 @@ fun problemExperiments() {
 
     val dimensionality = 50
     val population = 100
-    val maxItr = 3_000
+    val maxItr = 10_000
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
     val charts = problems.map { experiment(it, population, maxItr) }
     FlatLightLaf.setup() //I like it pretty

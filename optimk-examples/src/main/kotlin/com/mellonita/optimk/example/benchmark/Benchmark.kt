@@ -16,6 +16,7 @@ import org.jzy3d.plot3d.builder.concrete.OrthonormalGrid
 import org.jzy3d.plot3d.primitives.Shape
 import org.jzy3d.plot3d.rendering.canvas.Quality
 import kotlin.math.abs
+import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
 
@@ -45,11 +46,11 @@ sealed class Benchmark(final override val dimensions: Int) : Problem<DoubleArray
     }
 }
 
-fun Benchmark.plot() {
+fun KClass<out Benchmark>.plot() {
 
-    val instance = this::class.primaryConstructor!!.call(2)
+    val instance = this.primaryConstructor!!.call(2)
 
-    val range = Range(lowerBound.toFloat(), upperBound.toFloat())
+    val range = Range(instance.lowerBound.toFloat(), instance.upperBound.toFloat())
     val steps = 100
 
     val surface: Shape = Builder.buildOrthonormal(OrthonormalGrid(range, steps), instance)
@@ -61,10 +62,5 @@ fun Benchmark.plot() {
     val chart: Chart = AWTChart(Quality.Advanced)
     chart.add(surface)
     chart.addController(AWTCameraMouseController())
-    chart.open(this.javaClass.simpleName, 600, 600)
-}
-
-fun main() {
-    val ack = Ackley(100)
-    ack.plot()
+    chart.open(this.simpleName, 600, 600)
 }
