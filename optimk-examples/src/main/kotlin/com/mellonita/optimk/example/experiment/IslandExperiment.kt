@@ -23,10 +23,7 @@ import com.mellonita.optimk.engine.IslandEngine
 import com.mellonita.optimk.engine.IslandEngine.Companion.islandsOf
 import com.mellonita.optimk.example.benchmark.Benchmark
 import com.mellonita.optimk.example.benchmark.Schwefel
-import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
-import com.mellonita.optimk.optimizer.CovarianceMatrixAdaption
-import com.mellonita.optimk.optimizer.DifferentialEvolution
-import com.mellonita.optimk.optimizer.ParticleSwampOptimization
+import com.mellonita.optimk.optimizer.*
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChart
 import org.knowm.xchart.XYChartBuilder
@@ -46,6 +43,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
         "CMAES",
         "DE",
         "GA",
+        "RS",
         "Islands",
     )
 
@@ -54,25 +52,33 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
         when (name) {
             "PSO" -> DefaultEngine(
                 problem = problem,
-                optimizer = ParticleSwampOptimization(
-                    dimensionality = problem.dimensions,
-                    population = population
+                optimizer = RandomSampler(
+                    d = problem.dimensions,
+                    p = population
+                ),
+                monitor = monitor
+            )
+            "RS" -> DefaultEngine(
+                problem = problem,
+                optimizer = CovarianceMatrixAdaption(
+                    d = problem.dimensions,
+                    p = population,
                 ),
                 monitor = monitor
             )
             "CMAES" -> DefaultEngine(
                 problem = problem,
                 optimizer = CovarianceMatrixAdaption(
-                    dimensionality = problem.dimensions,
-                    population = population,
+                    d = problem.dimensions,
+                    p = population,
                 ),
                 monitor = monitor
             )
             "DE" -> DefaultEngine(
                 problem = problem,
                 optimizer = DifferentialEvolution(
-                    dimensionality = problem.dimensions,
-                    population = population,
+                    d = problem.dimensions,
+                    p = population,
                     mutation = DifferentialEvolution.best1(0.7)
                 ),
                 monitor = monitor
@@ -80,8 +86,8 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             "GA" -> DefaultEngine(
                 problem = problem,
                 optimizer = BiasedGeneticAlgorithm(
-                    dimensionality = problem.dimensions,
-                    population = population,
+                    d = problem.dimensions,
+                    p = population,
                 ),
                 monitor = monitor
             )
@@ -91,21 +97,21 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 islands = islandsOf(
                     islandNumber, problem, monitor, listOf(
                         BiasedGeneticAlgorithm(
-                            dimensionality = problem.dimensions,
-                            population = population / islandNumber + 1
+                            d = problem.dimensions,
+                            p = population / islandNumber + 1
                         ),
                         DifferentialEvolution(
-                            dimensionality = problem.dimensions,
-                            population = population / islandNumber + 1,
+                            d = problem.dimensions,
+                            p = population / islandNumber + 1,
                             mutation = DifferentialEvolution.best1(0.7)
                         ),
                         ParticleSwampOptimization(
-                            dimensionality = problem.dimensions,
-                            population = population / islandNumber + 1,
+                            d = problem.dimensions,
+                            p = population / islandNumber + 1,
                         ),
                         CovarianceMatrixAdaption(
-                            dimensionality = problem.dimensions,
-                            population = population / islandNumber + 1,
+                            d = problem.dimensions,
+                            p = population / islandNumber + 1,
                         ),
                     )
                 )

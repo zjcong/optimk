@@ -50,8 +50,8 @@ fun main() {
             "DE - CR = 0.2" -> DefaultEngine(
                 problem = problem,
                 optimizer = DifferentialEvolution(
-                    dimensionality = problem.dimensions,
-                    population = population,
+                    d = problem.dimensions,
+                    p = population,
                     cr = 0.2,
                     mutation = DifferentialEvolution.best1(0.8)
                 ),
@@ -60,8 +60,8 @@ fun main() {
             "DE - CR = 0.8" -> DefaultEngine(
                 problem = problem,
                 optimizer = DifferentialEvolution(
-                    dimensionality = problem.dimensions,
-                    population = population,
+                    d = problem.dimensions,
+                    p = population,
                     cr = 0.8,
                     mutation = DifferentialEvolution.best1(0.8)
                 ),
@@ -76,14 +76,14 @@ fun main() {
                 problem = problem,
                 optimizers = listOf(
                     DifferentialEvolution(
-                        dimensionality = problem.dimensions,
-                        population = population,
+                        d = problem.dimensions,
+                        p = population,
                         cr = 0.8,
                         mutation = DifferentialEvolution.best1(0.8)
                     ),
                     ParticleSwampOptimization(
-                        dimensionality = problem.dimensions,
-                        population = population,
+                        d = problem.dimensions,
+                        p = population,
                     ),
                     BiasedGeneticAlgorithm(problem.dimensions, population),
                 ),

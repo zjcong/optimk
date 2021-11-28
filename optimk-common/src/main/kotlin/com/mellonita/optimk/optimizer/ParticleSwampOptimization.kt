@@ -1,6 +1,7 @@
 package com.mellonita.optimk.optimizer
 
-import com.mellonita.optimk.*
+import com.mellonita.optimk.OpenBorder
+import com.mellonita.optimk.Optimizer
 import com.mellonita.optimk.math.minus
 import com.mellonita.optimk.math.plus
 import com.mellonita.optimk.math.times
@@ -11,17 +12,17 @@ import kotlin.random.Random
  * Particle swamp optimization
  */
 public class ParticleSwampOptimization(
-    dimensionality: Int,
-    population: Int,
+    d: Int,
+    p: Int,
     private val w: Double = 0.5,
     private val c1: Double = 2.0,
     private val c2: Double = 2.0,
     rng: Random = Random(0)
-) : Optimizer(dimensionality, population, rng), OpenBorder {
+) : Optimizer(d, p, rng), OpenBorder {
 
-    private val pBest = Array(population) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
+    private val pBest = Array(p) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
     private var gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-    private val velocities = Array(population) { DoubleArray(dimensionality) { rng.nextDouble() } }
+    private val velocities = Array(p) { DoubleArray(d) { rng.nextDouble() } }
 
     /**
      *
@@ -61,7 +62,7 @@ public class ParticleSwampOptimization(
         // Clear history
         pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
         gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-        velocities.indices.forEach { i -> velocities[i] = DoubleArray(dimensionality) { rng.nextDouble() } }
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
         return randomPopulation
     }
 
@@ -73,7 +74,7 @@ public class ParticleSwampOptimization(
         // Clear history
         pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
         gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-        velocities.indices.forEach { i -> velocities[i] = DoubleArray(dimensionality) { rng.nextDouble() } }
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
         return randomPopulation
     }
 }

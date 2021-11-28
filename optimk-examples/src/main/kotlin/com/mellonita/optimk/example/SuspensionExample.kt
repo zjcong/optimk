@@ -32,8 +32,8 @@ fun main() {
     val engine = DefaultEngine(
         problem = SumOfDifferentPowers(10),
         optimizer = DifferentialEvolution(
-            dimensionality = 10,
-            population = 20,
+            d = 10,
+            p = 20,
             mutation = DifferentialEvolution.rand1(0.7)
         ),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {

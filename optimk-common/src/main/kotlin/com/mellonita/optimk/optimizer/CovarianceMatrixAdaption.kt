@@ -25,16 +25,16 @@ import kotlin.random.Random
 
 
 public class CovarianceMatrixAdaption(
-    dimensionality: Int,
-    population: Int,
+    d: Int,
+    p: Int,
     rng: Random = Random(0)
-) : Optimizer(dimensionality, population, rng) {
+) : Optimizer(d, p, rng) {
 
     private var actualOptimizer =
         HipparchusCMAES(
             diagonalOnly = 10,
-            lambda = population,
-            dimension = dimensionality,
+            lambda = p,
+            dimension = d,
             random = rng
         )
 
@@ -47,8 +47,8 @@ public class CovarianceMatrixAdaption(
         actualOptimizer =
             HipparchusCMAES(
                 diagonalOnly = 10,
-                lambda = population,
-                dimension = dimensionality,
+                lambda = p,
+                dimension = d,
                 random = rng
             )
         return super.initialize()
@@ -58,8 +58,8 @@ public class CovarianceMatrixAdaption(
         actualOptimizer =
             HipparchusCMAES(
                 diagonalOnly = 10,
-                lambda = population,
-                dimension = dimensionality,
+                lambda = p,
+                dimension = d,
                 random = rng
             )
         actualOptimizer.iterations = 0

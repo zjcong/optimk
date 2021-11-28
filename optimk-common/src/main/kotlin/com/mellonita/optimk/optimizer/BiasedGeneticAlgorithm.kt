@@ -28,23 +28,23 @@ import kotlin.random.Random
  *
  */
 public class BiasedGeneticAlgorithm @JvmOverloads constructor(
-    dimensionality: Int,
-    population: Int,
+    d: Int,
+    p: Int,
     private val bias: Double = 0.70,
     elites: Double = 0.25,
     mutants: Double = 0.2,
     rng: Random = Random(0)
-) : Optimizer(dimensionality, population, rng), OpenBorder {
+) : Optimizer(d, p, rng), OpenBorder {
 
-    private val nElites: Int = (population * elites).roundToInt()
-    private val nMutants: Int = (population * mutants).roundToInt()
+    private val nElites: Int = (p * elites).roundToInt()
+    private val nMutants: Int = (p * mutants).roundToInt()
 
     init {
-        require(dimensionality > 0) { "Number of dimensions ($dimensionality) must be greater than zero" }
-        require(population > 4) { "Population size ($population) must be greater than 4" }
+        require(d > 0) { "Number of dimensions ($d) must be greater than zero" }
+        require(p > 4) { "Population size ($p) must be greater than 4" }
         require(this.nElites > 0) { "Elites ($nElites) must be greater than 0" }
         require(this.nMutants > 0) { "Mutant ($nMutants) must be greater than 0" }
-        require(this.nElites + this.nMutants < population) { "Sum of elites and mutants exceeds population size" }
+        require(this.nElites + this.nMutants < p) { "Sum of elites and mutants exceeds population size" }
     }
 
     /**
@@ -52,7 +52,7 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
      */
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
 
-        val nextGeneration: Array<DoubleArray> = Array(this.population) { DoubleArray(0) }
+        val nextGeneration: Array<DoubleArray> = Array(this.p) { DoubleArray(0) }
 
         val indicesSorted = fitness
             .withIndex()
@@ -64,14 +64,14 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
 
         // Generate Mutants
         (0 until nMutants).forEach { i ->
-            nextGeneration[i + nElites] = DoubleArray(dimensionality) { rng.nextDouble() }
+            nextGeneration[i + nElites] = DoubleArray(d) { rng.nextDouble() }
         }
 
         // Crossover
-        ((nElites + nMutants) until this.population).forEach { s ->
+        ((nElites + nMutants) until this.p).forEach { s ->
             val eliteParent = population[indicesSorted.subList(0, nElites)[rng.nextInt(0, nElites)]]
-            val normalParent = population[rng.nextInt(nElites, this.population)]
-            val child = DoubleArray(dimensionality) { i ->
+            val normalParent = population[rng.nextInt(nElites, this.p)]
+            val child = DoubleArray(d) { i ->
                 if (rng.nextDouble() < bias) eliteParent[i] else normalParent[i]
             }
             nextGeneration[s] = child

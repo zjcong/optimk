@@ -31,19 +31,19 @@ public interface OpenBorder : Serializable
 
 /**
  * Optimizer
- * @property dimensionality Dimensionality
- * @property population Size of population
+ * @property d Dimensionality
+ * @property p Size of population
  * @property rng Random number generator
  */
 public abstract class Optimizer(
-    public val dimensionality: Int,
-    public val population: Int,
+    public val d: Int,
+    public val p: Int,
     public val rng: Random
 ) : Serializable {
 
     init {
-        require(dimensionality > 1) { "Dimensions (d) must be greater than 1" }
-        require(population > 1) { "Population (p) must be greater than 1" }
+        require(d > 1) { "Dimensions (d) must be greater than 1" }
+        require(p > 1) { "Population (p) must be greater than 1" }
     }
 
     /**
@@ -59,7 +59,7 @@ public abstract class Optimizer(
      * @return an initial population
      */
     public open fun initialize(): Array<DoubleArray> {
-        return Array(population) { DoubleArray(dimensionality) { rng.nextDouble() } }
+        return Array(p) { DoubleArray(d) { rng.nextDouble() } }
     }
 
 
@@ -69,10 +69,10 @@ public abstract class Optimizer(
      * @return an initial population
      */
     public open fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
-        if (init.size >= population) return init.sliceArray(0 until population)
-        return Array(population) {
+        if (init.size >= p) return init.sliceArray(0 until p)
+        return Array(p) {
             if (it < init.size) init[it]
-            else DoubleArray(dimensionality) { rng.nextDouble() }
+            else DoubleArray(d) { rng.nextDouble() }
         }
     }
 }
