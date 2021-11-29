@@ -33,6 +33,8 @@ public class RandomSampler(
     rng: Random = Random(0)
 ) : Optimizer(d, p, rng), OpenBorder {
 
+    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 1E-10, rng)
+
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
         var bi = 0
         var wi = 0

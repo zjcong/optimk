@@ -40,6 +40,7 @@ public open class IslandEngine<T>(
      */
     private val openIslands: List<Engine<T>> = islands.filter { it.isOpen }
 
+
     /**
      * If this engine is open
      */
@@ -77,6 +78,8 @@ public open class IslandEngine<T>(
      */
     public open fun migrate() {
         if (openIslands.isEmpty()) return
+
+
         openIslands.forEach { destination1 ->
             val origin = islands[rng.nextInt(islands.size)]
             if (destination1 != origin)

@@ -50,7 +50,7 @@ fun main() {
             "DE - CR = 0.2" -> DefaultEngine(
                 problem = problem,
                 optimizer = DifferentialEvolution(
-                    d = problem.dimensions,
+                    d = problem.d,
                     p = population,
                     cr = 0.2,
                     mutation = DifferentialEvolution.best1(0.8)
@@ -60,7 +60,7 @@ fun main() {
             "DE - CR = 0.8" -> DefaultEngine(
                 problem = problem,
                 optimizer = DifferentialEvolution(
-                    d = problem.dimensions,
+                    d = problem.d,
                     p = population,
                     cr = 0.8,
                     mutation = DifferentialEvolution.best1(0.8)
@@ -69,23 +69,23 @@ fun main() {
             )
             "GA" -> DefaultEngine(
                 problem = problem,
-                optimizer = BiasedGeneticAlgorithm(problem.dimensions, population),
+                optimizer = BiasedGeneticAlgorithm(problem.d, population),
                 monitor = monitor
             )
             "Alternating" -> AlternatingEngine(
                 problem = problem,
                 optimizers = listOf(
                     DifferentialEvolution(
-                        d = problem.dimensions,
+                        d = problem.d,
                         p = population,
                         cr = 0.8,
                         mutation = DifferentialEvolution.best1(0.8)
                     ),
                     ParticleSwampOptimization(
-                        d = problem.dimensions,
+                        d = problem.d,
                         p = population,
                     ),
-                    BiasedGeneticAlgorithm(problem.dimensions, population),
+                    BiasedGeneticAlgorithm(problem.d, population),
                 ),
                 threshold = alternatingThreshold,
                 monitor = monitor

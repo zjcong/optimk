@@ -24,6 +24,9 @@ public class ParticleSwampOptimization(
     private var gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
     private val velocities = Array(p) { DoubleArray(d) { rng.nextDouble() } }
 
+
+    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.5, 2.0, 2.0, rng)
+
     /**
      *
      */

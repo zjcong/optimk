@@ -14,9 +14,9 @@ class Schwefel(d: Int) : Benchmark(d) {
 
     override fun objective(solution: DoubleArray): Double {
         var sum = 0.0
-        for (i in 0 until dimensions) {
+        for (i in 0 until d) {
             sum += -solution[i] * sin(sqrt(abs(solution[i])))
         }
-        return sum + dimensions * 4.18982887272434686131e+02
+        return sum + d * 4.18982887272434686131e+02
     }
 }

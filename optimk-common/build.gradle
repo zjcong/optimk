@@ -14,11 +14,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.hipparchus:hipparchus-optim:2.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
-
     implementation 'org.hipparchus:hipparchus-optim:2.0'
-
     testImplementation 'io.kotest:kotest-runner-junit5-jvm:4.6.3'
 }
 
@@ -28,13 +25,4 @@ test {
 
 kotlin {
     explicitApi()
-}
-
-compileKotlin {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-
-    kotlinOptions {
-        jvmTarget = '11'
-    }
 }

@@ -39,7 +39,7 @@ fun <T> getEngine(
             override fun stop(engine: Engine<T>): Boolean = false
         },
         optimizer = DifferentialEvolution(
-            d = problem.dimensions,
+            d = problem.d,
             p = p,
             cr = 0.9,
             rng = Random(r),

@@ -47,6 +47,8 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
         require(this.nElites + this.nMutants < p) { "Sum of elites and mutants exceeds population size" }
     }
 
+    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.7, 0.25, 0.20, rng)
+
     /**
      *
      */

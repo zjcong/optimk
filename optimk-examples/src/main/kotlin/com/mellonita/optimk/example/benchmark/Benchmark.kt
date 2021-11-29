@@ -20,7 +20,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
 
-sealed class Benchmark(final override val dimensions: Int) : Problem<DoubleArray>, Mapper() {
+sealed class Benchmark(final override val d: Int) : Problem<DoubleArray>, Mapper() {
 
     override val goal: Goal = Goal.Minimize
 
@@ -35,13 +35,13 @@ sealed class Benchmark(final override val dimensions: Int) : Problem<DoubleArray
     }
 
     override fun decode(keys: DoubleArray): DoubleArray {
-        return DoubleArray(dimensions) { i ->
+        return DoubleArray(d) { i ->
             keys[i].valueIn(lowerBound.rangeTo(upperBound))
         }
     }
 
     override fun f(p0: Double, p1: Double): Double {
-        require(dimensions == 2) { "Can only plot 2D functions" }
+        require(d == 2) { "Can only plot 2D functions" }
         return objective(doubleArrayOf(p0, p1))
     }
 }

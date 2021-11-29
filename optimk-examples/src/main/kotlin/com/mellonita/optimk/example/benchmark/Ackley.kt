@@ -15,11 +15,11 @@ class Ackley(d: Int) : Benchmark(d) {
     override fun objective(solution: DoubleArray): Double {
         var sum1 = 0.0
         var sum2 = 0.0
-        for (i in 0 until dimensions) {
+        for (i in 0 until d) {
             sum1 += solution[i].pow(2.0)
             sum2 += cos(c * solution[i])
         }
-        return -20.0 * exp(-0.2 * sqrt(sum1 / dimensions.toDouble())) + 20.0 - exp(sum2 / dimensions.toDouble()) + exp(1.0)
+        return -20.0 * exp(-0.2 * sqrt(sum1 / d.toDouble())) + 20.0 - exp(sum2 / d.toDouble()) + exp(1.0)
     }
 
 }

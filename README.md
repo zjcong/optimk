@@ -25,6 +25,7 @@ __Problem__ is the interface with which users describe their problems:
 ````kotlin
  interface Problem<T> {
     val d: Int
+    val goal: Goal
     fun decode(keys: DoubleArray): T
     fun objective(candidate: T): Double
     fun isFeasible(candidate: T): Boolean = true
@@ -33,7 +34,8 @@ __Problem__ is the interface with which users describe their problems:
 ````
 
 + Type parameter __T__ is the actual type of the solution.
-+ Property d is the dimensionality of the problem
++ Property __d__ is the dimensionality of the problem
++ Property __goal__ is the goal of this problem, either Goal.Minimize or Goal.Maximize
 + Function __decode__ maps a vector of real number in the interval of [0,1) (a DoubleArray) into an actual solution of
   type T.
 + Function __isFeasible__ checks the feasibility of the decoded solution.
@@ -45,18 +47,25 @@ __Example__ : A n-dimensional Rastrigin function would be implemented as:
 class Rastrigin(val n: Int) : Problem<DoubleArray> {
 
     private val A = 10
+    
+    private val goal = Goal.Minimize
 
     override fun decode(keys: DoubleArray): DoubleArray {
         return keys.map { it.valueIn((-5.12).rangeTo(5.12)) }.toDoubleArray()
     }
 
-    override fun objective(candidate: DoubleArray): Double {
-        return A * n + candidate.sumOf { x -> x.pow(2) - A * cos(2 * PI * x) }
+    override fun objective(solution: DoubleArray): Double {
+      var sum = 0.0
+      for (i in solution.indices) {
+        sum += solution[i].pow(2) - A * cos(2.0 * PI * solution[i])
+      }
+      return A * d + sum
     }
 }
 ````
 
 ### Optimizer
+
 
 
 

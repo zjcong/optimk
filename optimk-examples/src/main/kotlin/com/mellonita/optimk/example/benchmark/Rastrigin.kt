@@ -17,6 +17,6 @@ class Rastrigin(d: Int) : Benchmark(d) {
         for (i in solution.indices) {
             sum += solution[i].pow(2) - A * cos(2.0 * PI * solution[i])
         }
-        return A * dimensions + sum
+        return A * d + sum
     }
 }

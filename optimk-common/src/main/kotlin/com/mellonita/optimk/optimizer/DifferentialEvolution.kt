@@ -2,7 +2,8 @@
 
 package com.mellonita.optimk.optimizer
 
-import com.mellonita.optimk.*
+import com.mellonita.optimk.OpenBorder
+import com.mellonita.optimk.Optimizer
 import com.mellonita.optimk.math.minus
 import com.mellonita.optimk.math.plus
 import com.mellonita.optimk.math.times
@@ -21,6 +22,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
     rng: Random = Random(0)
 ) : Optimizer(d, p, rng), OpenBorder {
 
+    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.8, mutation = DifferentialEvolution.best1(0.7), rng)
 
     /**
      *

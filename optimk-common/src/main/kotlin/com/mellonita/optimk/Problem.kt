@@ -35,7 +35,7 @@ public interface Problem<T> : Serializable {
     /**
      * Number of dimensions of this problem
      */
-    public val dimensions: Int
+    public val d: Int
 
     /**
      * Goal of this problem
