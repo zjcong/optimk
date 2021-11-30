@@ -15,7 +15,6 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
-    implementation 'org.hipparchus:hipparchus-optim:2.0'
     testImplementation 'io.kotest:kotest-runner-junit5-jvm:4.6.3'
 }
 
