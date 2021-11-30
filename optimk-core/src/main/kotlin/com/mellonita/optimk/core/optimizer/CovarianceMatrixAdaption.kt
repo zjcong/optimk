@@ -20,30 +20,40 @@
 package com.mellonita.optimk.core.optimizer
 
 import com.mellonita.optimk.core.Optimizer
-import com.mellonita.optimk.core.optimizer.cmaes.InriaCMAES
+import fr.inria.optimization.cmaes.CMAEvolutionStrategy
 import kotlin.random.Random
 
 
-public class CovarianceMatrixAdaption(
-    d: Int,
-    p: Int,
-    rng: Random = Random(0)
-) : Optimizer(d, p, rng) {
+public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Optimizer(d, p, rng) {
 
-
-    private var inriaCMAES = InriaCMAES(d, p, rng)
+    private val cma: CMAEvolutionStrategy = CMAEvolutionStrategy()
 
 
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
-        return inriaCMAES.iterate(population, fitness)
+        if ((cma.stopConditions.number != 0)) return population
+        cma.updateDistribution(fitness)
+        return cma.samplePopulation()
+    }
+
+    private fun inriaCMAESInit() {
+        cma.dimension = d
+        cma.setInitialX(0.5)
+        cma.setInitialStandardDeviation(0.05)
+        cma.parameters.populationSize = p
+        cma.options.stopTolFunHist = 1e-13
+        cma.seed = rng.nextLong()
     }
 
     override fun initialize(): Array<DoubleArray> {
-        return inriaCMAES.initialize()
+        inriaCMAESInit()
+        cma.init()
+        return cma.samplePopulation()
     }
 
     override fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
-        return inriaCMAES.initialize()
+        inriaCMAESInit()
+        cma.initialX = init[0]
+        cma.init()
+        return cma.samplePopulation()
     }
 }
-

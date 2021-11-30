@@ -150,7 +150,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 
 fun problemExperiments() {
 
-    val dimensionality = 10
+    val dimensionality = 30
     val population = 100
     val maxItr = 500
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
