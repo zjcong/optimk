@@ -1,6 +1,5 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
-    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 group 'com.mellonita.optimk'
@@ -14,15 +13,8 @@ repositories {
 }
 
 
-shadowJar {
-    //noinspection GroovyAssignabilityCheck
-    manifest {
-        attributes 'Main-Class': 'com.mellonita.optimk.example.experiment.IslandExperimentKt'
-    }
-}
-
 dependencies {
-    implementation project(":optimk-common")
+    implementation project(":optimk-core")
 
     implementation 'com.formdev:flatlaf:1.6.4'
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.0"
@@ -33,12 +25,3 @@ dependencies {
 
 }
 
-
-compileKotlin {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-
-    kotlinOptions {
-        jvmTarget = '11'
-    }
-}

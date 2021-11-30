@@ -17,24 +17,26 @@
 
 package com.mellonita.optimk.example
 
-import com.mellonita.optimk.Engine
-import com.mellonita.optimk.LogLevel
-import com.mellonita.optimk.engine.DefaultEngine
+import com.mellonita.optimk.core.Engine
+import com.mellonita.optimk.core.LogLevel
+import com.mellonita.optimk.core.engine.DefaultEngine
+import com.mellonita.optimk.core.monitor.DefaultMonitor
+import com.mellonita.optimk.core.optimizer.DifferentialEvolution
 import com.mellonita.optimk.example.benchmark.SumOfDifferentPowers
-import com.mellonita.optimk.monitor.DefaultMonitor
-import com.mellonita.optimk.optimizer.DifferentialEvolution
 import java.io.File
+import kotlin.random.Random
 
 
 fun main() {
 
 
     val engine = DefaultEngine(
+        name = "Default DE",
         problem = SumOfDifferentPowers(10),
         optimizer = DifferentialEvolution(
             d = 10,
             p = 20,
-            mutation = DifferentialEvolution.rand1(0.7)
+            rng = Random(0)
         ),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
 
@@ -52,7 +54,8 @@ fun main() {
     val result1 = engine.optimize()
 
     // resume from the saved state
-    val resumedEngine = Engine.resumeFrom<DefaultEngine<DoubleArray>>(File("suspended_engine.bin"))
+    val resumedEngine =
+        Engine.resumeFrom<DoubleArray>(File("suspended_engine.bin"))
     val result2 = resumedEngine.optimize()
 
     assert(result1.contentEquals(result2))

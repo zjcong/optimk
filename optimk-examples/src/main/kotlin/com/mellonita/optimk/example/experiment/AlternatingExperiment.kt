@@ -17,12 +17,12 @@
 
 package com.mellonita.optimk.example.experiment
 
-import com.mellonita.optimk.engine.AlternatingEngine
-import com.mellonita.optimk.engine.DefaultEngine
+import com.mellonita.optimk.core.engine.AlternatingEngine
+import com.mellonita.optimk.core.engine.DefaultEngine
+import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.optimizer.DifferentialEvolution
+import com.mellonita.optimk.core.optimizer.ParticleSwampOptimization
 import com.mellonita.optimk.example.benchmark.Schwefel
-import com.mellonita.optimk.optimizer.BiasedGeneticAlgorithm
-import com.mellonita.optimk.optimizer.DifferentialEvolution
-import com.mellonita.optimk.optimizer.ParticleSwampOptimization
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
@@ -32,11 +32,11 @@ import org.knowm.xchart.style.markers.SeriesMarkers
 fun main() {
 
     val dimensionality = 30
-    val population = 30
+    val population = 100
     val problem = Schwefel(dimensionality)
-    val maxIteration = 300_000
-    val maxEval = 100_000
-    val alternatingThreshold = 20
+    val maxIteration = 3000
+    val maxEval = Int.MAX_VALUE
+    val alternatingThreshold = 10
 
     val names = setOf(
         "DE - CR = 0.8",
@@ -48,6 +48,7 @@ fun main() {
     val engineExperiment = EngineExperiment<DoubleArray>(maxIteration, maxEval, names) { name, monitor ->
         when (name) {
             "DE - CR = 0.2" -> DefaultEngine(
+                name = name,
                 problem = problem,
                 optimizer = DifferentialEvolution(
                     d = problem.d,
@@ -58,6 +59,7 @@ fun main() {
                 monitor = monitor
             )
             "DE - CR = 0.8" -> DefaultEngine(
+                name = name,
                 problem = problem,
                 optimizer = DifferentialEvolution(
                     d = problem.d,
@@ -68,11 +70,13 @@ fun main() {
                 monitor = monitor
             )
             "GA" -> DefaultEngine(
+                name = name,
                 problem = problem,
                 optimizer = BiasedGeneticAlgorithm(problem.d, population),
                 monitor = monitor
             )
             "Alternating" -> AlternatingEngine(
+                name = name,
                 problem = problem,
                 optimizers = listOf(
                     DifferentialEvolution(

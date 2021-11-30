@@ -18,12 +18,16 @@
 package com.mellonita.optimk.example.experiment
 
 import com.formdev.flatlaf.FlatLightLaf
-import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.engine.IslandEngine
-import com.mellonita.optimk.engine.IslandEngine.Companion.islandsOf
+import com.mellonita.optimk.core.Monitor
+import com.mellonita.optimk.core.engine.DefaultEngine
+import com.mellonita.optimk.core.engine.IslandEngine
+import com.mellonita.optimk.core.engine.IslandEngine.Companion.islandsOf
+import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.optimizer.CovarianceMatrixAdaption
+import com.mellonita.optimk.core.optimizer.DifferentialEvolution
+import com.mellonita.optimk.core.optimizer.ParticleSwampOptimization
 import com.mellonita.optimk.example.benchmark.Benchmark
-import com.mellonita.optimk.example.benchmark.Schwefel
-import com.mellonita.optimk.optimizer.*
+import com.mellonita.optimk.example.benchmark.Rastrigin
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChart
 import org.knowm.xchart.XYChartBuilder
@@ -40,16 +44,16 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
     val names = setOf(
         "PSO",
         "CMAES",
-        "DE",
         "GA",
         "Islands",
     )
 
-    val islandNumber = 5
+    val islandNumber = 4
 
-    val engineExperiment = EngineExperiment<DoubleArray>(maxItr, maxEval, names) { name, monitor ->
+    val engineExperiment = EngineExperiment(maxItr, maxEval, names) { name, monitor: Monitor<DoubleArray> ->
         when (name) {
             "PSO" -> DefaultEngine(
+                name = name,
                 problem = problem,
                 optimizer = ParticleSwampOptimization(
                     d = problem.d,
@@ -59,6 +63,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 monitor = monitor
             )
             "CMAES" -> DefaultEngine(
+                name = name,
                 problem = problem,
                 optimizer = CovarianceMatrixAdaption(
                     d = problem.d,
@@ -68,16 +73,8 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 ),
                 monitor = monitor
             )
-            "DE" -> DefaultEngine(
-                problem = problem,
-                optimizer = DifferentialEvolution(
-                    d = problem.d,
-                    p = population,
-                    rng = Random(System.nanoTime())
-                ),
-                monitor = monitor
-            )
             "GA" -> DefaultEngine(
+                name = name,
                 problem = problem,
                 optimizer = BiasedGeneticAlgorithm(
                     d = problem.d,
@@ -88,6 +85,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 monitor = monitor
             )
             "Islands" -> IslandEngine(
+                name = name,
                 problem = problem,
                 monitor = monitor,
                 islands = islandsOf(
@@ -96,12 +94,10 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                             d = problem.d,
                             p = population / islandNumber + 1,
                             rng = Random(System.nanoTime())
-
                         ),
                         DifferentialEvolution(
                             d = problem.d,
                             p = population / islandNumber + 1,
-                            mutation = DifferentialEvolution.best1(0.7),
                             rng = Random(System.nanoTime())
 
                         ),
@@ -154,9 +150,9 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 
 fun problemExperiments() {
 
-    val dimensionality = 30
-    val population = 60
-    val maxItr = 1000
+    val dimensionality = 10
+    val population = 100
+    val maxItr = 500
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
     val charts = problems.map { experiment(it, population, maxItr) }
     FlatLightLaf.setup() //I like it pretty
@@ -167,9 +163,9 @@ fun problemExperiments() {
 fun populationExperiment() {
 
     val dimensionality = 50
-    val maxItr = 4_000
-    val charts = (50..450 step 50).map { p ->
-        experiment(Schwefel(dimensionality), p, maxItr)
+    val maxItr = 8_000
+    val charts = (50..500 step 50).map { p ->
+        experiment(Rastrigin(dimensionality), p, maxItr)
     }
 
     FlatLightLaf.setup() //I like it pretty

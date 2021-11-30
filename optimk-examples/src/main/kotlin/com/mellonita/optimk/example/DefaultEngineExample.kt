@@ -17,13 +17,14 @@
 
 package com.mellonita.optimk.example
 
-import com.mellonita.optimk.Engine
-import com.mellonita.optimk.LogLevel
-import com.mellonita.optimk.engine.DefaultEngine
+import com.mellonita.optimk.core.Engine
+import com.mellonita.optimk.core.LogLevel
+import com.mellonita.optimk.core.engine.DefaultEngine
+import com.mellonita.optimk.core.monitor.DefaultMonitor
+import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.optimizer.CovarianceMatrixAdaption
 import com.mellonita.optimk.example.benchmark.Rastrigin
 import com.mellonita.optimk.example.benchmark.Sphere
-import com.mellonita.optimk.monitor.DefaultMonitor
-import com.mellonita.optimk.optimizer.RandomSampler
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
@@ -33,14 +34,15 @@ import org.knowm.xchart.style.markers.SeriesMarkers
 fun main() {
     val d = 10
     val p = 1_000
-    val problem = Sphere(d)
+    val problem = Rastrigin(d)
     val maxItr = 2_000
     val defaultHistory = mutableListOf<Double>()
 
 
     val defaultEngine = DefaultEngine(
+        name = "Island-RS",
         problem = problem,
-        optimizer = RandomSampler(d, p),
+        optimizer = BiasedGeneticAlgorithm(d, p),
         //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {

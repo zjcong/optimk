@@ -17,23 +17,22 @@
 
 package com.mellonita.optimk.example.experiment
 
-import com.mellonita.optimk.Engine
-import com.mellonita.optimk.LogLevel
-import com.mellonita.optimk.Monitor
-import com.mellonita.optimk.monitor.DefaultMonitor
+import com.mellonita.optimk.core.LogLevel
+import com.mellonita.optimk.core.Monitor
+import com.mellonita.optimk.core.monitor.DefaultMonitor
 
 /**
  *
  */
-private class ExperimentMonitor<T>(private val itr: Int, private val eval: Int) : DefaultMonitor<T>(LogLevel.INFO) {
+private class ExperimentMonitor<T>(private val itr: Int, private val eval: Int) : DefaultMonitor<T>(LogLevel.DEBUG) {
 
     val history: MutableList<Pair<Long, Double>> = mutableListOf()
 
     //override fun debug(engine: Engine<T>, msg: String) = Unit
 
-    override fun stop(engine: Engine<T>): Boolean {
+    override fun stop(engine: com.mellonita.optimk.core.Engine<T>): Boolean {
         history.add(Pair(engine.iterations, engine.bestFitness))
-        return (engine.bestFitness <= 1E-7 || engine.iterations >= itr || engine.evaluations >= eval)
+        return (engine.bestFitness <= 1E-9 || engine.iterations >= itr || engine.evaluations >= eval)
     }
 }
 
@@ -45,10 +44,10 @@ class EngineExperiment<T>(
     private val maxIterations: Int,
     private val maxEval: Int,
     names: Set<String>,
-    enginesOf: (name: String, monitor: Monitor<T>) -> Engine<T>
+    enginesOf: (name: String, monitor: Monitor<T>) -> com.mellonita.optimk.core.Engine<T>
 ) {
 
-    private val engines: Map<String, Engine<T>>
+    private val engines: Map<String, com.mellonita.optimk.core.Engine<T>>
     private var startTime: Long = 0L
 
     init {

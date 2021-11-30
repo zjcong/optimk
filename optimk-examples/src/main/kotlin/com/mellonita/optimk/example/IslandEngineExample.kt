@@ -17,33 +17,35 @@
 
 package com.mellonita.optimk.example
 
-import com.mellonita.optimk.Engine
-import com.mellonita.optimk.LogLevel
-import com.mellonita.optimk.engine.DefaultEngine
-import com.mellonita.optimk.engine.IslandEngine
+import com.mellonita.optimk.core.Engine
+import com.mellonita.optimk.core.LogLevel
+import com.mellonita.optimk.core.Problem
+import com.mellonita.optimk.core.engine.DefaultEngine
+import com.mellonita.optimk.core.engine.IslandEngine
+import com.mellonita.optimk.core.monitor.DefaultMonitor
+import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.optimizer.CovarianceMatrixAdaption
+import com.mellonita.optimk.core.optimizer.DifferentialEvolution
 import com.mellonita.optimk.example.benchmark.Rastrigin
-import com.mellonita.optimk.monitor.DefaultMonitor
-import com.mellonita.optimk.optimizer.DifferentialEvolution
-import com.mellonita.optimk.Problem
 import kotlin.random.Random
 
 
 fun <T> getEngine(
+    name: String,
     r: Int,
     p: Int,
     problem: Problem<T>
 ): Engine<T> {
     return DefaultEngine(
+        name = name,
         problem = problem,
         monitor = object : DefaultMonitor<T>(LogLevel.INFO) {
             override fun stop(engine: Engine<T>): Boolean = false
         },
-        optimizer = DifferentialEvolution(
+        optimizer = CovarianceMatrixAdaption(
             d = problem.d,
             p = p,
-            cr = 0.9,
             rng = Random(r),
-            mutation = DifferentialEvolution.best1(0.8)
         )
     )
 }
@@ -56,16 +58,15 @@ fun main() {
     val islandNumber = 4
 
     val engine = IslandEngine(
+        name = "Island",
         problem = problem,
-        migrationInterval = 1,
         rng = Random(0),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {
                 return engine.iterations >= maxIteration
             }
         },
-        islands = (0 until islandNumber).map { getEngine(it, (population / islandNumber), problem) }
+        islands = (0 until islandNumber).map { getEngine("Island-$it", it, (population / islandNumber), problem) }
     )
-
     engine.optimize()
 }
