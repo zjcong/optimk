@@ -23,9 +23,7 @@ import com.mellonita.optimk.core.Problem
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.engine.IslandEngine
 import com.mellonita.optimk.core.monitor.DefaultMonitor
-import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
-import com.mellonita.optimk.core.optimizer.CovarianceMatrixAdaption
-import com.mellonita.optimk.core.optimizer.DifferentialEvolution
+import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
 import com.mellonita.optimk.example.benchmark.Rastrigin
 import kotlin.random.Random
 

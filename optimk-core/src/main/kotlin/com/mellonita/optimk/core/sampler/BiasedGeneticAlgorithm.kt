@@ -16,7 +16,7 @@
  */
 
 
-package com.mellonita.optimk.core.optimizer
+package com.mellonita.optimk.core.sampler
 
 import com.mellonita.optimk.core.*
 

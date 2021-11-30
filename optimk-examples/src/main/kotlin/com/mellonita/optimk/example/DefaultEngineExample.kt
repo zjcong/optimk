@@ -21,10 +21,8 @@ import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.monitor.DefaultMonitor
-import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
-import com.mellonita.optimk.core.optimizer.CovarianceMatrixAdaption
+import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
 import com.mellonita.optimk.example.benchmark.Rastrigin
-import com.mellonita.optimk.example.benchmark.Sphere
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler

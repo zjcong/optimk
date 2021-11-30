@@ -21,7 +21,7 @@ import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.monitor.DefaultMonitor
-import com.mellonita.optimk.core.optimizer.DifferentialEvolution
+import com.mellonita.optimk.core.sampler.DifferentialEvolution
 import com.mellonita.optimk.example.benchmark.SumOfDifferentPowers
 import java.io.File
 import kotlin.random.Random

@@ -19,9 +19,9 @@ package com.mellonita.optimk.example.experiment
 
 import com.mellonita.optimk.core.engine.AlternatingEngine
 import com.mellonita.optimk.core.engine.DefaultEngine
-import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
-import com.mellonita.optimk.core.optimizer.DifferentialEvolution
-import com.mellonita.optimk.core.optimizer.ParticleSwampOptimization
+import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.sampler.DifferentialEvolution
+import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
 import com.mellonita.optimk.example.benchmark.Schwefel
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder

@@ -22,10 +22,10 @@ import com.mellonita.optimk.core.Monitor
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.engine.IslandEngine
 import com.mellonita.optimk.core.engine.IslandEngine.Companion.islandsOf
-import com.mellonita.optimk.core.optimizer.BiasedGeneticAlgorithm
-import com.mellonita.optimk.core.optimizer.CovarianceMatrixAdaption
-import com.mellonita.optimk.core.optimizer.DifferentialEvolution
-import com.mellonita.optimk.core.optimizer.ParticleSwampOptimization
+import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
+import com.mellonita.optimk.core.sampler.DifferentialEvolution
+import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
 import com.mellonita.optimk.example.benchmark.Benchmark
 import com.mellonita.optimk.example.benchmark.Rastrigin
 import org.knowm.xchart.SwingWrapper
@@ -150,9 +150,9 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 
 fun problemExperiments() {
 
-    val dimensionality = 30
+    val dimensionality = 50
     val population = 100
-    val maxItr = 500
+    val maxItr = 3000
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
     val charts = problems.map { experiment(it, population, maxItr) }
     FlatLightLaf.setup() //I like it pretty
