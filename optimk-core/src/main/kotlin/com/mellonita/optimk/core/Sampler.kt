@@ -35,7 +35,7 @@ public interface OpenBorder : Serializable
  * @property p Size of population
  * @property rng Random number generator
  */
-public abstract class Optimizer(
+public abstract class Sampler(
     public val d: Int,
     public val p: Int,
     public val rng: Random
@@ -44,6 +44,15 @@ public abstract class Optimizer(
     init {
         require(d > 1) { "Dimensions (d) must be greater than 1" }
         require(p > 1) { "Population (p) must be greater than 1" }
+        //Check constructor
+        val constructors = this.javaClass.constructors
+        val requiredConstructor = constructors.any {
+            val parameters = it.parameters
+            return@any (parameters.size == 3)
+                    && parameters.map { p -> p.type.toString() }
+                .containsAll(listOf("int", "int", "class kotlin.random.Random"))
+        }
+        require(requiredConstructor) { "Ill implementation of sampler: ${this.javaClass.simpleName}" }
     }
 
     /**

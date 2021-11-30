@@ -17,6 +17,7 @@
 
 package com.mellonita.optimk.core.monitor
 
+import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.Monitor
 
@@ -24,9 +25,11 @@ import com.mellonita.optimk.core.Monitor
 /**
  * This class is the default monitor
  */
-public abstract class DefaultMonitor<T>(private val level: LogLevel) : Monitor<T> {
+public abstract class DefaultMonitor<T>(private val level: LogLevel = LogLevel.INFO) : Monitor<T> {
 
-    override fun log(level: LogLevel, engine: com.mellonita.optimk.core.Engine<T>, msg: String) {
+    override fun onIteration(engine: Engine<T>): Unit = Unit
+
+    override fun log(level: LogLevel, engine: Engine<T>, msg: String) {
         if (level < this.level) {
             return
         }

@@ -110,7 +110,8 @@ public open class IslandEngine<T>(
         // migrate
         migrate()
         islands.forEach { it.nextIteration() }
-        log(LogLevel.DEBUG, "Iteration [$iterations] finished, fitness: [$bestFitness]")
+        debug("Iteration [$iterations] finished, fitness: [$bestFitness]")
+        monitor.onIteration(this)
     }
 
     /**
@@ -134,13 +135,13 @@ public open class IslandEngine<T>(
             n: Int,
             problem: Problem<T>,
             monitor: Monitor<T>,
-            optimizers: List<Optimizer>
+            samplers: List<Sampler>
         ): List<Engine<T>> {
             return (0 until n).map {
                 DefaultEngine(
-                    name = "Island-${optimizers[it.rem(optimizers.size)].javaClass.simpleName}",
+                    name = "Island-${samplers[it.rem(samplers.size)].javaClass.simpleName}",
                     problem = problem,
-                    optimizer = optimizers[it.rem(optimizers.size)],
+                    sampler = samplers[it.rem(samplers.size)],
                     monitor = monitor
                 )
             }

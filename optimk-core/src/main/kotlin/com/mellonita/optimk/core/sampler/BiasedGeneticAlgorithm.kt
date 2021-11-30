@@ -34,7 +34,7 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
     elites: Double = 0.25,
     mutants: Double = 0.2,
     rng: Random = Random(0)
-) : Optimizer(d, p, rng), OpenBorder {
+) : Sampler(d, p, rng), OpenBorder {
 
     private val nElites: Int = (p * elites).roundToInt()
     private val nMutants: Int = (p * mutants).roundToInt()

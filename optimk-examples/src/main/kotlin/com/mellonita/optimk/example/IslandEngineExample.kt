@@ -40,7 +40,7 @@ fun <T> getEngine(
         monitor = object : DefaultMonitor<T>(LogLevel.INFO) {
             override fun stop(engine: Engine<T>): Boolean = false
         },
-        optimizer = CovarianceMatrixAdaption(
+        sampler = CovarianceMatrixAdaption(
             d = problem.d,
             p = p,
             rng = Random(r),

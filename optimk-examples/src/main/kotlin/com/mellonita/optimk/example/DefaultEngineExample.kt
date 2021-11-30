@@ -41,7 +41,7 @@ fun main() {
     val defaultEngine = DefaultEngine(
         name = "Island-RS",
         problem = problem,
-        optimizer = CovarianceMatrixAdaption(d, p, rng = Random(0)),
+        sampler = CovarianceMatrixAdaption(d, p, rng = Random(0)),
         //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {

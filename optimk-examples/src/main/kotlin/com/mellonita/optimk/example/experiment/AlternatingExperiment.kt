@@ -20,6 +20,7 @@ package com.mellonita.optimk.example.experiment
 import com.mellonita.optimk.core.engine.AlternatingEngine
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
 import com.mellonita.optimk.core.sampler.DifferentialEvolution
 import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
 import com.mellonita.optimk.example.benchmark.Schwefel
@@ -27,68 +28,38 @@ import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
 import org.knowm.xchart.style.markers.SeriesMarkers
+import kotlin.random.Random
 
 
 fun main() {
 
-    val dimensionality = 30
-    val population = 100
+    val dimensionality = 100
+    val population = 30
     val problem = Schwefel(dimensionality)
     val maxIteration = 3000
     val maxEval = Int.MAX_VALUE
     val alternatingThreshold = 10
 
     val names = setOf(
-        "DE - CR = 0.8",
-        "DE - CR = 0.2",
-        "GA",
+        "CMAES",
         "Alternating",
     )
 
     val engineExperiment = EngineExperiment<DoubleArray>(maxIteration, maxEval, names) { name, monitor ->
         when (name) {
-            "DE - CR = 0.2" -> DefaultEngine(
+            "CMAES" -> DefaultEngine(
                 name = name,
                 problem = problem,
-                optimizer = DifferentialEvolution(
-                    d = problem.d,
-                    p = population,
-                    cr = 0.2,
-                    mutation = DifferentialEvolution.best1(0.8)
-                ),
-                monitor = monitor
-            )
-            "DE - CR = 0.8" -> DefaultEngine(
-                name = name,
-                problem = problem,
-                optimizer = DifferentialEvolution(
-                    d = problem.d,
-                    p = population,
-                    cr = 0.8,
-                    mutation = DifferentialEvolution.best1(0.8)
-                ),
-                monitor = monitor
-            )
-            "GA" -> DefaultEngine(
-                name = name,
-                problem = problem,
-                optimizer = BiasedGeneticAlgorithm(problem.d, population),
+                sampler = CovarianceMatrixAdaption(problem.d, population, rng = Random(0)),
                 monitor = monitor
             )
             "Alternating" -> AlternatingEngine(
                 name = name,
                 problem = problem,
-                optimizers = listOf(
-                    DifferentialEvolution(
-                        d = problem.d,
-                        p = population,
-                        cr = 0.8,
-                        mutation = DifferentialEvolution.best1(0.8)
-                    ),
-                    ParticleSwampOptimization(
-                        d = problem.d,
-                        p = population,
-                    ),
+                samplers = listOf(
+                    CovarianceMatrixAdaption(problem.d, population, Random(0)),
+                    DifferentialEvolution(problem.d, population, Random(0)),
+                    ParticleSwampOptimization(problem.d, population),
                     BiasedGeneticAlgorithm(problem.d, population),
                 ),
                 threshold = alternatingThreshold,

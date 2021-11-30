@@ -18,7 +18,7 @@
 package com.mellonita.optimk.core.sampler
 
 import com.mellonita.optimk.core.OpenBorder
-import com.mellonita.optimk.core.Optimizer
+import com.mellonita.optimk.core.Sampler
 import com.mellonita.optimk.core.math.minus
 import com.mellonita.optimk.core.math.plus
 import com.mellonita.optimk.core.math.times
@@ -35,7 +35,7 @@ public class ParticleSwampOptimization(
     private val c1: Double = 2.0,
     private val c2: Double = 2.0,
     rng: Random = Random(0)
-) : Optimizer(d, p, rng), OpenBorder {
+) : Sampler(d, p, rng), OpenBorder {
 
     private val pBest = Array(p) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
     private var gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)

@@ -17,10 +17,9 @@
 
 package com.mellonita.optimk.core.engine
 
-import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.Monitor
-import com.mellonita.optimk.core.Optimizer
 import com.mellonita.optimk.core.Problem
+import com.mellonita.optimk.core.Sampler
 import kotlin.random.Random
 
 /**
@@ -29,11 +28,11 @@ import kotlin.random.Random
 public open class RestartEngine<T>(
     override val name: String,
     problem: Problem<T>,
-    optimizer: Optimizer,
+    sampler: Sampler,
     monitor: Monitor<T>,
     private val threshold: Int,
     rng: Random = Random(0)
-) : DefaultEngine<T>(name, problem, monitor, optimizer, rng) {
+) : DefaultEngine<T>(name, problem, monitor, sampler, rng) {
 
     private var stagnation: Int = 0
     private var totalStagnation: Int = 0
@@ -53,15 +52,23 @@ public open class RestartEngine<T>(
     }
 
     /**
-     *
+     * Restart engine
      */
-    override fun nextIteration() {
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun restart() {
         if (stagnation > /*threshold*/ iterations / threshold + threshold) {
-            log(LogLevel.INFO, "Engine restart at iteration $iterations")
-            population = optimizer.initialize(arrayOf(bestSolution))
+            info("Engine restart at iteration [$iterations], threshold: ${iterations / threshold + threshold}")
+            population = sampler.initialize(arrayOf(bestSolution))
             updateFitness()
             stagnation = 0
         }
+    }
+
+    /**
+     *
+     */
+    override fun nextIteration() {
+        restart()
         super.nextIteration()
     }
 }

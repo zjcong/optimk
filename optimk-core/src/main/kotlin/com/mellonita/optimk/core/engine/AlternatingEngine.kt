@@ -20,8 +20,8 @@ package com.mellonita.optimk.core.engine
 
 import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.Monitor
-import com.mellonita.optimk.core.Optimizer
 import com.mellonita.optimk.core.Problem
+import com.mellonita.optimk.core.Sampler
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -32,26 +32,28 @@ import kotlin.random.Random
 public open class AlternatingEngine<T>(
     override val name: String,
     problem: Problem<T>,
-    private val optimizers: List<Optimizer>,
+    private val samplers: List<Sampler>,
     private val threshold: Int,
     monitor: Monitor<T>,
     rng: Random = Random(0)
-) : DefaultEngine<T>(name, problem, monitor, optimizers[0], rng) {
+) : DefaultEngine<T>(name, problem, monitor, samplers[0], rng) {
 
     /**
      * Number of iterations of unchanged best fitness
      */
-    private var stagnation: Int = 0
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected var stagnation: Int = 0
 
     /**
      * Index of active optimizer in optimizers list
      */
-    private var activeOptimizerIndex: Int = 0
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected var activeOptimizerIndex: Int = 0
 
     init {
-        require(optimizers.isNotEmpty()) { "At least one optimizer must be specified" }
+        require(samplers.isNotEmpty()) { "At least one optimizer must be specified" }
         require(threshold > 0) { "Stagnation threshold must be greater than zero" }
-        require(optimizers.all { it.d == optimizers[0].d }) { "Optimizers must have consistent dimensionality" }
+        require(samplers.all { it.d == samplers[0].d }) { "Optimizers must have consistent dimensionality" }
     }
 
 
@@ -65,27 +67,35 @@ public open class AlternatingEngine<T>(
         else stagnation++
     }
 
+
     /**
-     * Next iteration of sampling
+     * Alternation policy
      */
-    override fun nextIteration() {
+    @Suppress("MemberVisibilityCanBePrivate")
+    protected fun alternate() {
         // Change optimizer
-        if (stagnation > threshold) {
+        if (stagnation > iterations / threshold + threshold) {
             activeOptimizerIndex++
             //optimizer = optimizers[activeOptimizerIndex.rem(optimizers.size)]
-            optimizer = optimizers[rng.nextInt(optimizers.size)]
+            sampler = samplers[rng.nextInt(samplers.size)]
             val pIndices = fitness.withIndex().sortedBy { it.value }.map { it.index }
-            val np = Array(min(optimizer.p, population.size)) { population[pIndices[it]] }
-            population = optimizer.initialize(np)
+            val np = Array(min(sampler.p, population.size)) { population[pIndices[it]] }
+            population = sampler.initialize(np)
 
             log(
                 LogLevel.INFO,
-                "Engine alternated to [${optimizer.javaClass.simpleName}] with population of [${np.size}]"
+                "Engine alternated to [${sampler.javaClass.simpleName}] with population of [${np.size}]"
             )
             updateFitness()
             stagnation = 0
         }
+    }
 
+    /**
+     * Next iteration of sampling
+     */
+    override fun nextIteration() {
+        alternate()
         super.nextIteration()
     }
 

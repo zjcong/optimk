@@ -19,14 +19,14 @@
 
 package com.mellonita.optimk.core.sampler
 
-import com.mellonita.optimk.core.Optimizer
+import com.mellonita.optimk.core.Sampler
 import fr.inria.optimization.cmaes.CMAEvolutionStrategy
 import kotlin.random.Random
 
 
-public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Optimizer(d, p, rng) {
+public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Sampler(d, p, rng) {
 
-    private val cma: CMAEvolutionStrategy = CMAEvolutionStrategy()
+    private var cma: CMAEvolutionStrategy = CMAEvolutionStrategy()
 
 
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
@@ -36,6 +36,7 @@ public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Optimizer(d
     }
 
     private fun inriaCMAESInit() {
+        cma = CMAEvolutionStrategy()
         cma.dimension = d
         cma.setInitialX(0.5)
         cma.setInitialStandardDeviation(0.05)

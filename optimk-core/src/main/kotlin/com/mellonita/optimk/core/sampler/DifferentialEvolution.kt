@@ -20,7 +20,7 @@
 package com.mellonita.optimk.core.sampler
 
 import com.mellonita.optimk.core.OpenBorder
-import com.mellonita.optimk.core.Optimizer
+import com.mellonita.optimk.core.Sampler
 import com.mellonita.optimk.core.math.minus
 import com.mellonita.optimk.core.math.plus
 import com.mellonita.optimk.core.math.times
@@ -37,7 +37,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
     private val cr: Double = 0.8,
     private val mutation: MutationStrategy,
     rng: Random = Random(0)
-) : Optimizer(d, p, rng), OpenBorder {
+) : Sampler(d, p, rng), OpenBorder {
 
     public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.8, mutation = best2(0.3,0.7), rng)
 

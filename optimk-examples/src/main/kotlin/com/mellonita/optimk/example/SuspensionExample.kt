@@ -33,7 +33,7 @@ fun main() {
     val engine = DefaultEngine(
         name = "Default DE",
         problem = SumOfDifferentPowers(10),
-        optimizer = DifferentialEvolution(
+        sampler = DifferentialEvolution(
             d = 10,
             p = 20,
             rng = Random(0)
@@ -41,8 +41,8 @@ fun main() {
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
 
             override fun stop(engine: Engine<DoubleArray>): Boolean {
-                //Save state every 100 iterations
-                if (engine.iterations.rem(100L) == 0L)
+                //Save state every 5 iterations
+                if (engine.iterations.rem(5L) == 0L)
                     engine.suspendTo(File("suspended_engine.bin"))
 
                 if (engine.bestFitness >= 1E-5) return false

@@ -26,6 +26,8 @@ public enum class LogLevel { DEBUG, INFO, WARN, ERROR }
  */
 public interface Monitor<T> : Serializable {
 
+    public fun onIteration(engine: Engine<T>)
+
     public fun stop(engine: Engine<T>): Boolean
 
     public fun log(level: LogLevel, engine: Engine<T>, msg: String)

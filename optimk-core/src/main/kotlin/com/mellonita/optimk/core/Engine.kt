@@ -85,9 +85,13 @@ public abstract class Engine<T> : Serializable, Island {
         protected set
 
     /**
-     * Wrapper of debug log
+     * Wrapper of log
      */
     protected fun log(level: LogLevel, msg: String): Unit = monitor.log(level, this, msg)
+    protected fun debug(msg: String): Unit = log(LogLevel.DEBUG, msg)
+    protected fun info(msg: String): Unit = log(LogLevel.INFO, msg)
+    protected fun warn(msg: String): Unit = log(LogLevel.WARN, msg)
+    protected fun error(msg: String): Unit = log(LogLevel.ERROR, msg)
 
     /**
      * Single iteration
@@ -118,8 +122,17 @@ public abstract class Engine<T> : Serializable, Island {
     /**
      *
      */
-    protected open fun evaluatePopulation(batchKeys: Array<DoubleArray>): DoubleArray =
-        batchKeys.toList().parallelStream().mapToDouble { evaluateIndividual(it) }.toArray()
+    protected open fun evaluatePopulation(batchKeys: Array<DoubleArray>): DoubleArray {
+        evaluations += batchKeys.size
+        val fs = problem(batchKeys)
+        fs.withIndex().forEach {
+            if (it.value.isNaN())
+                throw RuntimeException(
+                    "Solution: ${problem.decode(batchKeys[it.index])} yields NaN, please check objective function."
+                )
+        }
+        return fs
+    }
 
     /**
      * Serialize this engine to file
@@ -130,7 +143,7 @@ public abstract class Engine<T> : Serializable, Island {
         oos.writeObject(this)
         oos.close()
         fos.close()
-        log(LogLevel.INFO, "Engine suspended to [${file.name}]")
+        info("Engine suspended to [${file.name}]")
     }
 
     /**

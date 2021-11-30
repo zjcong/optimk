@@ -18,7 +18,7 @@
 package com.mellonita.optimk.core.sampler
 
 import com.mellonita.optimk.core.OpenBorder
-import com.mellonita.optimk.core.Optimizer
+import com.mellonita.optimk.core.Sampler
 import com.mellonita.optimk.core.math.nextGaussian
 import com.mellonita.optimk.core.math.plus
 import kotlin.math.sqrt
@@ -30,7 +30,7 @@ public class RandomSampler(
     p: Int,
     private val sigma: Double = 1E-10,
     rng: Random = Random(0)
-) : Optimizer(d, p, rng), OpenBorder {
+) : Sampler(d, p, rng), OpenBorder {
 
     public constructor(d: Int, p: Int, rng: Random) : this(d, p, 1E-10, rng)
 

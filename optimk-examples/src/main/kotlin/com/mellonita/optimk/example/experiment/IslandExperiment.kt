@@ -56,7 +56,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             "DE" -> DefaultEngine(
                 name = name,
                 problem = problem,
-                optimizer = DifferentialEvolution(
+                sampler = DifferentialEvolution(
                     problem.d,
                     population / islandNumber + 1,
                     Random(System.nanoTime())
@@ -66,7 +66,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             "PSO" -> DefaultEngine(
                 name = name,
                 problem = problem,
-                optimizer = ParticleSwampOptimization(
+                sampler = ParticleSwampOptimization(
                     problem.d,
                     population / islandNumber + 1,
                     Random(System.nanoTime())
@@ -76,7 +76,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             "CMAES" -> DefaultEngine(
                 name = name,
                 problem = problem,
-                optimizer = CovarianceMatrixAdaption(
+                sampler = CovarianceMatrixAdaption(
                     problem.d,
                     population / islandNumber + 1,
                     Random(System.nanoTime())
@@ -87,7 +87,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             "GA" -> DefaultEngine(
                 name = name,
                 problem = problem,
-                optimizer = BiasedGeneticAlgorithm(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
+                sampler = BiasedGeneticAlgorithm(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
                 monitor = monitor
             )
             "Islands" -> IslandEngine(
@@ -112,7 +112,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 
 
     //Fitness Chart
-    val fitnessChart =
+    val convergenceChart =
         XYChartBuilder()
             .width(1024)
             .height(700)
@@ -123,25 +123,23 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
             .build()
 
     results.forEach { (name, history) ->
-        val series = fitnessChart.addSeries(
+        val series = convergenceChart.addSeries(
             name,
             history.map { it.first },
             history.map { it.second + 1e-20 })
         series.marker = SeriesMarkers.NONE
     }
-
-
-    fitnessChart.styler.isYAxisLogarithmic = true
-
-    return fitnessChart
+    convergenceChart.styler.isYAxisLogarithmic = true
+    convergenceChart.styler.xAxisTickMarkSpacingHint = 99
+    return convergenceChart
 }
 
 fun problemExperiments() {
 
-    val dimensionality = 50
+    val dimensions = 50
     val population = 150
     val maxItr = 3000
-    val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
+    val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensions) }
     val charts = problems.map { experiment(it, population, maxItr) }
     FlatLightLaf.setup() //I like it pretty
     SwingWrapper<XYChart>(charts).displayChartMatrix()
@@ -150,10 +148,10 @@ fun problemExperiments() {
 
 fun populationExperiment() {
 
-    val dimensionality = 50
+    val dimensions = 50
     val maxItr = 8_000
     val charts = (50..500 step 50).map { p ->
-        experiment(Rastrigin(dimensionality), p, maxItr)
+        experiment(Rastrigin(dimensions), p, maxItr)
     }
 
     FlatLightLaf.setup() //I like it pretty

@@ -17,7 +17,10 @@
 
 package com.mellonita.optimk.core.engine
 
-import com.mellonita.optimk.core.*
+import com.mellonita.optimk.core.Monitor
+import com.mellonita.optimk.core.OpenBorder
+import com.mellonita.optimk.core.Problem
+import com.mellonita.optimk.core.Sampler
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -28,21 +31,21 @@ import kotlin.random.Random
  * Basic optimization engine
  * @param problem Problem to solve
  * @param monitor Monitor
- * @param optimizer
+ * @param sampler
  * @param rng Random Number Generator
  */
 public open class DefaultEngine<T>(
     override val name: String,
     override val problem: Problem<T>,
     override val monitor: Monitor<T>,
-    protected var optimizer: Optimizer,
+    protected var sampler: Sampler,
     protected val rng: Random = Random(0)
 ) : com.mellonita.optimk.core.Engine<T>() {
 
     /**
      * Individuals
      */
-    protected var population: Array<DoubleArray> = optimizer.initialize()
+    protected var population: Array<DoubleArray> = sampler.initialize()
 
     /**
      * Fitness values of current population
@@ -52,7 +55,7 @@ public open class DefaultEngine<T>(
     /**
      * This engine is open if the optimizer is open border
      */
-    override var isOpen: Boolean = optimizer is OpenBorder
+    override var isOpen: Boolean = sampler is OpenBorder
         protected set
 
     /**
@@ -65,6 +68,7 @@ public open class DefaultEngine<T>(
             bestFitness = min.value
             bestSolution = population[min.index]
         }
+        monitor.onIteration(this)
     }
 
     /**
@@ -72,22 +76,19 @@ public open class DefaultEngine<T>(
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
         if (!isOpen) {
-            log(LogLevel.DEBUG, "Immigrant arrived but island is closed.")
+            debug("Immigrant arrived but island is closed.")
             return false
         }
         val targetIndex = rng.nextInt(population.size)
         //val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index //pick the worst individual
         if (fitness[targetIndex] < f) {
-            log(
-                LogLevel.DEBUG,
-                "Immigrant [$f] arrived and is worse than target individual [${this.fitness[targetIndex]}]."
-            )
+            debug("Immigrant [$f] is worse than target individual [${this.fitness[targetIndex]}].")
             //return false
         }
 
         population[targetIndex] = s
         fitness[targetIndex] = f
-        log(LogLevel.DEBUG, "Immigrant [$f] is admitted")
+        debug("Immigrant [$f] is admitted")
         return true
     }
 
@@ -96,8 +97,8 @@ public open class DefaultEngine<T>(
      */
     override fun nextIteration() {
         iterations++
-        population = optimizer.iterate(population, fitness)
-        log(LogLevel.DEBUG, "Iteration [$iterations] finished, fitness: [$bestFitness]")
+        population = sampler.iterate(population, fitness)
+        debug("Iteration [$iterations] finished, fitness: [$bestFitness]")
     }
 
     /**
@@ -105,8 +106,7 @@ public open class DefaultEngine<T>(
      */
     override fun optimize(): T {
         this.startTime = System.currentTimeMillis()
-        log(
-            LogLevel.INFO,
+        info(
             "Engine start at timestamp [${
                 LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(startTime),
@@ -120,10 +120,7 @@ public open class DefaultEngine<T>(
             // Sample next population
             nextIteration()
         } while (!monitor.stop(this))
-        log(
-            LogLevel.INFO,
-            "Engine terminated with best fitness [$bestFitness] after [${System.currentTimeMillis() - startTime}]ms"
-        )
+        info("Engine terminated with best fitness [$bestFitness] after [${System.currentTimeMillis() - startTime}]ms")
         return problem.decode(bestSolution)
     }
 }
