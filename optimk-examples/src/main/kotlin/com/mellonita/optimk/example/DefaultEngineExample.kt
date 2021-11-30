@@ -31,8 +31,8 @@ import kotlin.random.Random
 
 
 fun main() {
-    val d = 10
-    val p = 10
+    val d = 100
+    val p = 3000
     val problem = Rastrigin(d)
     val maxItr = 100
     val defaultHistory = mutableListOf<Double>()

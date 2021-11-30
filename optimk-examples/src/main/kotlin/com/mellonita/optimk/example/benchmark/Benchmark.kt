@@ -18,8 +18,8 @@
 package com.mellonita.optimk.example.benchmark
 
 import com.mellonita.optimk.core.Goal
-import com.mellonita.optimk.core.Problem
 import com.mellonita.optimk.core.math.valueIn
+import com.mellonita.optimk.core.problem.ParallelProblem
 import org.jzy3d.chart.AWTChart
 import org.jzy3d.chart.Chart
 import org.jzy3d.chart.controllers.mouse.camera.AWTCameraMouseController
@@ -37,7 +37,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
 
-sealed class Benchmark(final override val d: Int) : Problem<DoubleArray>, Mapper() {
+sealed class Benchmark(final override val d: Int) : ParallelProblem<DoubleArray>, Mapper() {
 
     override val goal: Goal = Goal.Minimize
 

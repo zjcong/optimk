@@ -19,9 +19,9 @@ package com.mellonita.optimk.core.problem
 
 import com.mellonita.optimk.core.Problem
 
+public interface ParallelProblem<T> : Problem<T> {
 
-
-public abstract class SurrogateProblem<T> : Problem<T> {
-
-
+    public override operator fun invoke(batchKeys: Array<DoubleArray>): DoubleArray {
+        return (batchKeys.indices).toList().parallelStream().mapToDouble { invoke(batchKeys[it]) }.toArray()
+    }
 }
