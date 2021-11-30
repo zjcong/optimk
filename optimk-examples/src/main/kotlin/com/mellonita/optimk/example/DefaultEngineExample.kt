@@ -21,26 +21,27 @@ import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.monitor.DefaultMonitor
-import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
+import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
 import com.mellonita.optimk.example.benchmark.Rastrigin
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
 import org.knowm.xchart.style.markers.SeriesMarkers
+import kotlin.random.Random
 
 
 fun main() {
     val d = 10
-    val p = 1_000
+    val p = 10
     val problem = Rastrigin(d)
-    val maxItr = 2_000
+    val maxItr = 100
     val defaultHistory = mutableListOf<Double>()
 
 
     val defaultEngine = DefaultEngine(
         name = "Island-RS",
         problem = problem,
-        optimizer = BiasedGeneticAlgorithm(d, p),
+        optimizer = CovarianceMatrixAdaption(d, p, rng = Random(0)),
         //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
         monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
             override fun stop(engine: Engine<DoubleArray>): Boolean {
@@ -64,7 +65,7 @@ fun main() {
 
     chart.addSeries("Default", defaultHistory).marker = SeriesMarkers.NONE
 
-    chart.styler.isYAxisLogarithmic = true
+    //chart.styler.isYAxisLogarithmic = true
 
     SwingWrapper(chart).displayChart()
 

@@ -44,21 +44,32 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
     val names = setOf(
         "PSO",
         "CMAES",
+        "DE",
         "GA",
         "Islands",
     )
 
-    val islandNumber = 4
+    val islandNumber = 5
 
     val engineExperiment = EngineExperiment(maxItr, maxEval, names) { name, monitor: Monitor<DoubleArray> ->
         when (name) {
+            "DE" -> DefaultEngine(
+                name = name,
+                problem = problem,
+                optimizer = DifferentialEvolution(
+                    problem.d,
+                    population / islandNumber + 1,
+                    Random(System.nanoTime())
+                ),
+                monitor = monitor
+            )
             "PSO" -> DefaultEngine(
                 name = name,
                 problem = problem,
                 optimizer = ParticleSwampOptimization(
-                    d = problem.d,
-                    p = population,
-                    rng = Random(System.nanoTime())
+                    problem.d,
+                    population / islandNumber + 1,
+                    Random(System.nanoTime())
                 ),
                 monitor = monitor
             )
@@ -66,22 +77,17 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 name = name,
                 problem = problem,
                 optimizer = CovarianceMatrixAdaption(
-                    d = problem.d,
-                    p = population,
-                    rng = Random(System.nanoTime())
-
+                    problem.d,
+                    population / islandNumber + 1,
+                    Random(System.nanoTime())
                 ),
                 monitor = monitor
             )
+
             "GA" -> DefaultEngine(
                 name = name,
                 problem = problem,
-                optimizer = BiasedGeneticAlgorithm(
-                    d = problem.d,
-                    p = population,
-                    rng = Random(System.nanoTime())
-
-                ),
+                optimizer = BiasedGeneticAlgorithm(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
                 monitor = monitor
             )
             "Islands" -> IslandEngine(
@@ -90,29 +96,11 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 monitor = monitor,
                 islands = islandsOf(
                     islandNumber, problem, monitor, listOf(
-                        BiasedGeneticAlgorithm(
-                            d = problem.d,
-                            p = population / islandNumber + 1,
-                            rng = Random(System.nanoTime())
-                        ),
-                        DifferentialEvolution(
-                            d = problem.d,
-                            p = population / islandNumber + 1,
-                            rng = Random(System.nanoTime())
-
-                        ),
-                        ParticleSwampOptimization(
-                            d = problem.d,
-                            p = population / islandNumber + 1,
-                            rng = Random(System.nanoTime())
-
-                        ),
-                        CovarianceMatrixAdaption(
-                            d = problem.d,
-                            p = population / islandNumber + 1,
-                            rng = Random(System.nanoTime())
-
-                        ),
+                        BiasedGeneticAlgorithm(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
+                        DifferentialEvolution(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
+                        ParticleSwampOptimization(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
+                        CovarianceMatrixAdaption(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
+                        DifferentialEvolution(problem.d, population / islandNumber + 1, Random(System.nanoTime()))
                     )
                 )
             )
@@ -151,7 +139,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 fun problemExperiments() {
 
     val dimensionality = 50
-    val population = 100
+    val population = 150
     val maxItr = 3000
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensionality) }
     val charts = problems.map { experiment(it, population, maxItr) }

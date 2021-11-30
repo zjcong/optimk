@@ -42,6 +42,7 @@ public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Optimizer(d
         cma.parameters.populationSize = p
         cma.options.stopTolFunHist = 1e-13
         cma.seed = rng.nextLong()
+        cma.options.verbosity = -2
     }
 
     override fun initialize(): Array<DoubleArray> {

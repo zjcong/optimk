@@ -39,7 +39,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
     rng: Random = Random(0)
 ) : Optimizer(d, p, rng), OpenBorder {
 
-    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.8, mutation = DifferentialEvolution.best1(0.7), rng)
+    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.8, mutation = best2(0.3,0.7), rng)
 
     /**
      *
