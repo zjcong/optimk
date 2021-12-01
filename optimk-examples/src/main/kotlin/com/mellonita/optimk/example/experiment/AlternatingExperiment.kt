@@ -23,7 +23,9 @@ import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
 import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
 import com.mellonita.optimk.core.sampler.DifferentialEvolution
 import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
+import com.mellonita.optimk.example.benchmark.Rastrigin
 import com.mellonita.optimk.example.benchmark.Schwefel
+import com.mellonita.optimk.example.benchmark.Sphere
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
@@ -36,9 +38,9 @@ fun main() {
     val dimensionality = 100
     val population = 30
     val problem = Schwefel(dimensionality)
-    val maxIteration = 3000
+    val maxIteration = 10_000
     val maxEval = Int.MAX_VALUE
-    val alternatingThreshold = 10
+    val alternatingThreshold = 30
 
     val names = setOf(
         "CMAES",

@@ -15,30 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.example.benchmark
+package com.mellonita.optimk.example.tsp
 
-import kotlin.math.max
-import kotlin.math.min
+class DANTZIG42:TSP(42) {
+    override val distanceMatrix: Array<IntArray>
+    override val globalMinima: Long = 699
 
-
-class CompoundFunction1(dimensions: Int) : Benchmark(dimensions) {
-
-    private val f1 = Ackley(dimensions)
-    private val f2 = Griewank(dimensions)
-
-    private val f1Scale = 30
-
-    override val upperBound: Double = max(f1.upperBound, f2.upperBound)
-    override val lowerBound: Double = min(f1.lowerBound, f2.lowerBound)
-    override val globalOptima: Double = f1.globalOptima * f1Scale + f2.globalOptima
-
-
-    override fun objective(solution: DoubleArray): Double {
-        return f1.objective(solution) * f1Scale + f2.objective(solution)
+    init {
+        val contents = javaClass.getResource("/tsp/dantzig42_d.txt")!!.readText().trim()
+        val rows = contents.split("\n")
+        distanceMatrix = Array(d) { r ->
+            rows[r].trim().split(regex = "\\s+".toRegex()).map { it.toInt() }.toIntArray()
+        }
     }
-}
-
-fun main() {
-    CompoundFunction1::class.plot()
-
 }

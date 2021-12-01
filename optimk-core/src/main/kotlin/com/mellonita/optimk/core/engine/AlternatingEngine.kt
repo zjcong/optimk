@@ -18,7 +18,6 @@
 package com.mellonita.optimk.core.engine
 
 
-import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.Monitor
 import com.mellonita.optimk.core.Problem
 import com.mellonita.optimk.core.Sampler
@@ -73,19 +72,14 @@ public open class AlternatingEngine<T>(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     protected fun alternate() {
-        // Change optimizer
-        if (stagnation > iterations / threshold + threshold) {
+        // Change sampler
+        if (stagnation > threshold) {
             activeOptimizerIndex++
-            //optimizer = optimizers[activeOptimizerIndex.rem(optimizers.size)]
-            sampler = samplers[rng.nextInt(samplers.size)]
+            sampler = samplers[activeOptimizerIndex.rem(samplers.size)]
             val pIndices = fitness.withIndex().sortedBy { it.value }.map { it.index }
             val np = Array(min(sampler.p, population.size)) { population[pIndices[it]] }
             population = sampler.initialize(np)
-
-            log(
-                LogLevel.INFO,
-                "Engine alternated to [${sampler.javaClass.simpleName}] with population of [${np.size}]"
-            )
+            info("Engine alternated to [${sampler.javaClass.simpleName}] with population of [${np.size}]]")
             updateFitness()
             stagnation = 0
         }

@@ -30,7 +30,7 @@ public open class RestartEngine<T>(
     problem: Problem<T>,
     sampler: Sampler,
     monitor: Monitor<T>,
-    private val threshold: Int,
+    @Suppress("MemberVisibilityCanBePrivate") public val threshold: Int,
     rng: Random = Random(0)
 ) : DefaultEngine<T>(name, problem, monitor, sampler, rng) {
 
@@ -56,8 +56,8 @@ public open class RestartEngine<T>(
      */
     @Suppress("MemberVisibilityCanBePrivate")
     protected fun restart() {
-        if (stagnation > /*threshold*/ iterations / threshold + threshold) {
-            info("Engine restart at iteration [$iterations], threshold: ${iterations / threshold + threshold}")
+        if (stagnation > threshold) {
+            info("Engine restart at iteration [$iterations]")
             population = sampler.initialize(arrayOf(bestSolution))
             updateFitness()
             stagnation = 0

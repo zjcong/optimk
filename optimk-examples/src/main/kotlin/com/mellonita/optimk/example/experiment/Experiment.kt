@@ -24,7 +24,7 @@ import com.mellonita.optimk.core.monitor.DefaultMonitor
 /**
  *
  */
-private class ExperimentMonitor<T>(private val itr: Int, private val eval: Int) : DefaultMonitor<T>(LogLevel.DEBUG) {
+private class ExperimentMonitor<T>(private val itr: Int, private val eval: Int) : DefaultMonitor<T>(LogLevel.INFO) {
 
     val history: MutableList<Pair<Long, Double>> = mutableListOf()
 

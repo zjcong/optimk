@@ -21,8 +21,11 @@ import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.monitor.DefaultMonitor
+import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
 import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
-import com.mellonita.optimk.example.benchmark.Rastrigin
+import com.mellonita.optimk.core.sampler.DifferentialEvolution
+import com.mellonita.optimk.example.tsp.ATT48
+import com.mellonita.optimk.example.tsp.DANTZIG42
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.Styler
@@ -31,20 +34,19 @@ import kotlin.random.Random
 
 
 fun main() {
-    val d = 100
-    val p = 3000
-    val problem = Rastrigin(d)
-    val maxItr = 100
+    val p = 30
+    val problem = DANTZIG42()
+    val maxItr = 1000
     val defaultHistory = mutableListOf<Double>()
 
 
     val defaultEngine = DefaultEngine(
-        name = "Island-RS",
+        name = "TSP Example",
         problem = problem,
-        sampler = CovarianceMatrixAdaption(d, p, rng = Random(0)),
+        sampler = BiasedGeneticAlgorithm(problem.d, p, rng = Random(0)),
         //optimizer = BiasedGeneticAlgorithm(d, p, rng = Random(0)),
-        monitor = object : DefaultMonitor<DoubleArray>(LogLevel.INFO) {
-            override fun stop(engine: Engine<DoubleArray>): Boolean {
+        monitor = object : DefaultMonitor<IntArray>(LogLevel.DEBUG) {
+            override fun stop(engine: Engine<IntArray>): Boolean {
                 defaultHistory.add(engine.bestFitness)
                 return engine.iterations >= maxItr
             }
@@ -57,9 +59,9 @@ fun main() {
         XYChartBuilder()
             .width(1024)
             .height(700)
-            .title("Default Engine Example")
+            .title("TSP - Default Engine Example")
             .xAxisTitle("Iterations")
-            .yAxisTitle("Cost")
+            .yAxisTitle("Distance")
             .theme(Styler.ChartTheme.GGPlot2)
             .build()
 

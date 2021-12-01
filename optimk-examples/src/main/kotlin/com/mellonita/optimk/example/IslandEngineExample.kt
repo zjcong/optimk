@@ -49,9 +49,8 @@ fun <T> getEngine(
 }
 
 fun main() {
-    val dimensionality = 30
     val population = 60
-    val problem = Rastrigin(dimensionality)
+    val problem = Rastrigin(30)
     val maxIteration = 5_000L
     val islandNumber = 4
 

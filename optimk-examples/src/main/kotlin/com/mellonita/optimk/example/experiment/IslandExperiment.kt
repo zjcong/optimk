@@ -19,6 +19,7 @@ package com.mellonita.optimk.example.experiment
 
 import com.formdev.flatlaf.FlatLightLaf
 import com.mellonita.optimk.core.Monitor
+import com.mellonita.optimk.core.Problem
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.engine.IslandEngine
 import com.mellonita.optimk.core.engine.IslandEngine.Companion.islandsOf
@@ -28,6 +29,8 @@ import com.mellonita.optimk.core.sampler.DifferentialEvolution
 import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
 import com.mellonita.optimk.example.benchmark.Benchmark
 import com.mellonita.optimk.example.benchmark.Rastrigin
+import com.mellonita.optimk.example.tsp.ATT48
+import com.mellonita.optimk.example.tsp.DANTZIG42
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChart
 import org.knowm.xchart.XYChartBuilder
@@ -37,7 +40,7 @@ import kotlin.random.Random
 import kotlin.reflect.full.primaryConstructor
 
 
-fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
+fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? {
 
     val maxEval = Int.MAX_VALUE
 
@@ -51,7 +54,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
 
     val islandNumber = 5
 
-    val engineExperiment = EngineExperiment(maxItr, maxEval, names) { name, monitor: Monitor<DoubleArray> ->
+    val engineExperiment = EngineExperiment(maxItr, maxEval, names) { name, monitor: Monitor<T> ->
         when (name) {
             "DE" -> DefaultEngine(
                 name = name,
@@ -83,7 +86,6 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
                 ),
                 monitor = monitor
             )
-
             "GA" -> DefaultEngine(
                 name = name,
                 problem = problem,
@@ -134,8 +136,7 @@ fun experiment(problem: Benchmark, population: Int, maxItr: Int): XYChart? {
     return convergenceChart
 }
 
-fun problemExperiments() {
-
+fun continuousBenchmarkProblems() {
     val dimensions = 50
     val population = 150
     val maxItr = 3000
@@ -147,18 +148,27 @@ fun problemExperiments() {
 
 
 fun populationExperiment() {
-
     val dimensions = 50
     val maxItr = 8_000
     val charts = (50..500 step 50).map { p ->
         experiment(Rastrigin(dimensions), p, maxItr)
     }
-
     FlatLightLaf.setup() //I like it pretty
     SwingWrapper<XYChart>(charts).displayChartMatrix()
 }
 
+fun tspWithVariousSamplers() {
+    val tsp = DANTZIG42()
+    val maxItr = 30_000
+    val population: Int = 90
+    val chart = experiment(tsp, population, maxItr)
+
+    FlatLightLaf.setup() //I like it pretty
+    SwingWrapper<XYChart>(chart).displayChart()
+}
+
 fun main() {
     //populationExperiment()
-    problemExperiments()
+    //continuousBenchmarkProblems()
+    tspWithVariousSamplers()
 }

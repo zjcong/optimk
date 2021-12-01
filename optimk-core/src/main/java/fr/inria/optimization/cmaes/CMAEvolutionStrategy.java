@@ -377,7 +377,7 @@ public class CMAEvolutionStrategy implements java.io.Serializable {
         /* Flat Fitness, Test if function values are identical */
         if (getCountIter() > 1 || (getCountIter() == 1 && state >= 3))
             if (fit.fitness[0].val == fit.fitness[Math.min(sp.getLambda() - 1, sp.getLambda() / 2 + 1) - 1].val) {
-                warning("flat fitness landscape, consider reformulation of fitness, step-size increased");
+                //warning("flat fitness landscape, consider reformulation of fitness, step-size increased");
                 sigma *= Math.exp(0.2 + sp.getCs() / sp.getDamps());
             }
 
