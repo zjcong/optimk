@@ -148,7 +148,7 @@ fun continuousBenchmarkProblems() {
 
 
 fun populationExperiment() {
-    val dimensions = 50
+    val dimensions = 10
     val maxItr = 8_000
     val charts = (50..500 step 50).map { p ->
         experiment(Rastrigin(dimensions), p, maxItr)
@@ -169,6 +169,6 @@ fun tspWithVariousSamplers() {
 
 fun main() {
     //populationExperiment()
-    //continuousBenchmarkProblems()
-    tspWithVariousSamplers()
+    continuousBenchmarkProblems()
+    //tspWithVariousSamplers()
 }

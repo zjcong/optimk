@@ -1,7 +1,6 @@
 package fr.inria.optimization.cmaes;
-import fr.inria.optimization.cmaes.ISolutionPoint;
 
-/** solution point in search space. Rather plain implementation of the interface ISolutionPoint. 
+/** solution point in search space. Rather plain implementation of the interface ISolutionPoint.
  * 
  * @see ISolutionPoint
  * */
