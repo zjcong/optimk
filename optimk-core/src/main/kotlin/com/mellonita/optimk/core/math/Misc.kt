@@ -24,7 +24,7 @@ import kotlin.math.roundToLong
 /**
  * Vector plus
  */
-public operator fun DoubleArray.plus(a: DoubleArray): DoubleArray {
+public fun DoubleArray.vectorPlus(a: DoubleArray): DoubleArray {
     require(a.size == this.size) { "${this.size} != ${a.size}" }
     return DoubleArray(a.size) { this[it] + a[it] }
 }
@@ -32,7 +32,7 @@ public operator fun DoubleArray.plus(a: DoubleArray): DoubleArray {
 /**
  * Vector minus
  */
-public operator fun DoubleArray.minus(a: DoubleArray): DoubleArray {
+public fun DoubleArray.vectorMinus(a: DoubleArray): DoubleArray {
     require(a.size == this.size) { "${this.size} != ${a.size}" }
     return DoubleArray(a.size) { this[it] - a[it] }
 }

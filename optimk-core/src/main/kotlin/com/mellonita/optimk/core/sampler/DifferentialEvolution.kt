@@ -21,9 +21,9 @@ package com.mellonita.optimk.core.sampler
 
 import com.mellonita.optimk.core.Sampler
 import com.mellonita.optimk.core.Stateless
-import com.mellonita.optimk.core.math.minus
-import com.mellonita.optimk.core.math.plus
+import com.mellonita.optimk.core.math.vectorMinus
 import com.mellonita.optimk.core.math.times
+import com.mellonita.optimk.core.math.vectorPlus
 import kotlin.random.Random
 
 public typealias MutationStrategy = (Array<DoubleArray>, DoubleArray, Random) -> Array<DoubleArray>
@@ -95,9 +95,10 @@ public class DifferentialEvolution @JvmOverloads constructor(
                     val parentIndices = mutableSetOf<Int>()
                     while (parentIndices.size < 3) parentIndices.add(rng.nextInt(0, g.size))
                     val parents = parentIndices.map { g[it] }
-                    parents[0] + f * (parents[1] - parents[2])
+                    parents[0].vectorPlus(f * (parents[1].vectorMinus(parents[2])))
                 }
             }
+
 
         /**
          * DE/best/1
@@ -110,7 +111,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
                     val parentIndices = mutableSetOf<Int>()
                     while (parentIndices.size < 2) parentIndices.add(rng.nextInt(0, g.size))
                     val parents = parentIndices.map { g[it] }
-                    best + f * (parents[0] - parents[1])
+                    best.vectorPlus(f * (parents[0].vectorMinus(parents[1])))
                 }
             }
 
@@ -126,7 +127,9 @@ public class DifferentialEvolution @JvmOverloads constructor(
                     val parentIndices = mutableSetOf<Int>()
                     while (parentIndices.size < 4) parentIndices.add(rng.nextInt(0, g.size))
                     val parents = parentIndices.map { g[it] }
-                    best + f1 * (parents[0] - parents[1]) + f2 * (parents[2] - parents[3])
+                    best.vectorPlus(f1 * (parents[0].vectorMinus(parents[1]))).vectorPlus(f2 * (parents[2].vectorMinus(
+                        parents[3]
+                    )))
                 }
             }
 
@@ -141,7 +144,9 @@ public class DifferentialEvolution @JvmOverloads constructor(
                     val parentIndices = mutableSetOf<Int>()
                     while (parentIndices.size < 4) parentIndices.add(rng.nextInt(0, g.size))
                     val parents = parentIndices.map { g[it] }
-                    g[i] + f1 * (parents[0] - parents[1]) + f2 * (parents[2] - parents[3])
+                    g[i].vectorPlus(f1 * (parents[0].vectorMinus(parents[1]))).vectorPlus(f2 * (parents[2].vectorMinus(
+                        parents[3]
+                    )))
                 }
             }
 
@@ -156,7 +161,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
                     val parentIndices = mutableSetOf<Int>()
                     while (parentIndices.size < 4) parentIndices.add(rng.nextInt(0, g.size))
                     val parents = parentIndices.map { g[it] }
-                    g[i] + f1 * (best - parents[1]) + f2 * (parents[2] - parents[3])
+                    g[i].vectorPlus(f1 * (best.vectorMinus(parents[1]))).vectorPlus(f2 * (parents[2].vectorMinus(parents[3])))
                 }
             }
     }

@@ -25,11 +25,10 @@ import com.mellonita.optimk.core.Monitor
 import com.mellonita.optimk.core.math.valueIn
 import com.mellonita.optimk.core.monitor.DefaultMonitor
 
-
 /**
  * A wrapper class of COCO Problem
  */
-internal class SingleObjCOCOProblem(private val cocoProblem: Problem) :
+internal class SingleObjCOCOMixIntProblem(private val cocoProblem: Problem) :
     com.mellonita.optimk.core.Problem<DoubleArray> {
     override val d: Int = cocoProblem.dimension
     override val goal: Goal = Goal.Minimize
@@ -39,16 +38,33 @@ internal class SingleObjCOCOProblem(private val cocoProblem: Problem) :
     }
 
     override fun decode(keys: DoubleArray): DoubleArray {
-        return keys.indices.map {
-            keys[it].valueIn(
-                (cocoProblem.smallestValuesOfInterest[it]).rangeTo(cocoProblem.largestValuesOfInterest[it])
-            )
-        }.toDoubleArray()
+        require(keys.size.rem(5) == 0)
+
+        val solution = DoubleArray(keys.size)
+        val p = keys.size / 5
+
+        (0 until 5).forEach { pi ->
+
+            (0 until p).forEach {
+                val si = pi * p + it
+                val v = when (pi) {
+                    0 -> keys[si].valueIn(0..1).toDouble()
+                    1 -> keys[si].valueIn(0..3).toDouble()
+                    2 -> keys[si].valueIn(0..7).toDouble()
+                    3 -> keys[si].valueIn(0..15).toDouble()
+                    4 -> keys[si].valueIn((-5.0).rangeTo(5.0))
+                    else -> {
+                        throw RuntimeException("This should not happen")
+                    }
+                }
+                solution[si] = v
+            }
+        }
+        return solution
     }
 
     fun getMonitor(): Monitor<DoubleArray> {
         return object : DefaultMonitor<DoubleArray>(LogLevel.WARN) {
-
             override fun stop(engine: Engine<DoubleArray>): Boolean {
                 if (cocoProblem.isFinalTargetHit) print("@")
                 return (engine.iterations >= maxItr || cocoProblem.isFinalTargetHit)

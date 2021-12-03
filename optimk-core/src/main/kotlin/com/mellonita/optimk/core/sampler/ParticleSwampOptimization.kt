@@ -17,11 +17,11 @@
 
 package com.mellonita.optimk.core.sampler
 
-import com.mellonita.optimk.core.Stateless
 import com.mellonita.optimk.core.Sampler
-import com.mellonita.optimk.core.math.minus
-import com.mellonita.optimk.core.math.plus
+import com.mellonita.optimk.core.Stateless
 import com.mellonita.optimk.core.math.times
+import com.mellonita.optimk.core.math.vectorMinus
+import com.mellonita.optimk.core.math.vectorPlus
 import kotlin.random.Random
 
 
@@ -55,7 +55,8 @@ public class ParticleSwampOptimization(
             val r1 = rng.nextDouble()
             val r2 = rng.nextDouble()
             val x = population[i]
-            val vn = w * v + c1 * r1 * (pb - x) + c2 * r2 * (gBest.first - x)
+            val vn =
+                (w * v).vectorPlus(c1 * r1 * (pb.vectorMinus(x))).vectorPlus(c2 * r2 * (gBest.first.vectorMinus(x)))
             velocities[i] = vn
         }
     }
@@ -71,7 +72,7 @@ public class ParticleSwampOptimization(
         }
         //update velocities
         updateVelocities(population)
-        return population.indices.map { i -> population[i] + velocities[i] }.toTypedArray()
+        return population.indices.map { i -> population[i].vectorPlus(velocities[i]) }.toTypedArray()
     }
 
     /**

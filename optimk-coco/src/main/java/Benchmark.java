@@ -34,8 +34,7 @@ public class Benchmark {
 	/**
 	 * Function that returns the next problem in the suite. When it comes to the end of the suite, 
 	 * it returns null.
-	 * @return the next problem in the suite or null when there is no next problem  
-	 * @throws Exception 
+	 * @return the next problem in the suite or null when there is no next problem
 	 */
 	public Problem getNextProblem() throws Exception {
 		
@@ -54,7 +53,6 @@ public class Benchmark {
 	/**
 	 * Finalizes the observer and suite. This method needs to be explicitly called in order to log 
 	 * the last results.
-	 * @throws Exception 
 	 */
 	public void finalizeBenchmark() throws Exception {
 		

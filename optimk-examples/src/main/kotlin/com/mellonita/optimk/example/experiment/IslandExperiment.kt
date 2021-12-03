@@ -126,7 +126,7 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int, maxEval: I
                         BiasedGeneticAlgorithm(problem.d, population / islandNumber, Random(System.nanoTime())),
                         ParticleSwampOptimization(problem.d, population / islandNumber, Random(System.nanoTime())),
                         DifferentialEvolution(problem.d, population / islandNumber, Random(System.nanoTime()))
-                    ).shuffled()
+                    )
                 ),
             )
             else -> throw IllegalStateException("Unexpected engine $name")

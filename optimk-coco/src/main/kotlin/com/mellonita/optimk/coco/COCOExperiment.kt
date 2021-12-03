@@ -33,8 +33,10 @@ import com.mellonita.optimk.core.sampler.DifferentialEvolution
 import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
 import kotlin.random.Random
 
-const val restartMultiplier = 30
-const val islandNumber = 4
+val restartMultiplier = 30
+val islandNumber = 4
+
+val maxItr = 3_000
 
 /**
  *
@@ -51,7 +53,7 @@ fun <T> islandsOf(
         CovarianceMatrixAdaption(problem.d, islandPopulation, Random(seed)),
         BiasedGeneticAlgorithm(problem.d, islandPopulation, Random(seed)),
         ParticleSwampOptimization(problem.d, islandPopulation, Random(seed)),
-        DifferentialEvolution(problem.d, islandPopulation/2, Random(seed))
+        DifferentialEvolution(problem.d, islandPopulation / 2, Random(seed))
     )
 
     val restartIsland: List<Engine<T>> = (0 until n).map {
@@ -188,17 +190,86 @@ fun singleSamplerExperiment(suiteName: String, observerName: String, samplerName
 /**
  *
  */
+fun singleSamplerMixIntExperiment(suiteName: String, observerName: String, samplerName: String) {
+
+    val observerOptions = ("result_folder: OptimK${samplerName}_on_" + suiteName + " "
+            + "algorithm_name: OptimK${samplerName} "
+            + "algorithm_info: \"OptimK${samplerName}\"")
+
+    val suite = Suite(suiteName, "", "")
+    val observer = Observer(observerName, observerOptions)
+    val benchmark = Benchmark(suite, observer)
+    var problem: Problem? = benchmark.nextProblem
+
+    while (problem != null) {
+
+        /* Initialize timing */
+        val timing = Timing()
+        val actualProblem = SingleObjCOCOProblem(problem)
+        val population = islandNumber * actualProblem.d * 8
+        val engine = engineOf(samplerName, actualProblem, population, 0)
+        engine.optimize()
+
+
+        /* Keep track of time */
+        timing.timeProblem(problem)
+
+        problem = benchmark.nextProblem
+    }
+    benchmark.finalizeBenchmark()
+}
+
+/**
+ *
+ */
+fun islandMixIntExperiment(suiteName: String, observerName: String) {
+
+    val observerOptions = ("result_folder: OptimKIsland_on_" + suiteName + " "
+            + "algorithm_name: OptimKIsland "
+            + "algorithm_info: \"Multi algorithm islands with CMAES, BRKGA, PSO and DE\"")
+
+    val suite = Suite(suiteName, "", "")
+    val observer = Observer(observerName, observerOptions)
+    val benchmark = Benchmark(suite, observer)
+    var problem: Problem? = benchmark.nextProblem
+
+    while (problem != null) {
+        /* Initialize timing */
+        val timing = Timing()
+
+        val actualProblem = SingleObjCOCOMixIntProblem(problem)
+
+        val islandPopulation = (actualProblem.d * 10)
+        val engine = IslandEngine(
+            name = "COCO Island",
+            problem = actualProblem,
+            monitor = actualProblem.getMonitor(),
+            islands = islandsOf(islandNumber, actualProblem, actualProblem.getMonitor(), islandPopulation, 0),
+        )
+        engine.optimize()
+        timing.timeProblem(problem)
+        problem = benchmark.nextProblem
+    }
+    benchmark.finalizeBenchmark()
+}
+
+
+/**
+ *
+ */
 fun main(args: Array<String>) {
-
-    require(args[0] in setOf<String>("CMAES", "PSO", "DE", "GA", "Island"))
+    if (args.size != 1) {
+        println("Please specify algorithm: CMAES/PSO/DE/GA/Island")
+        error(-1)
+    }
+    require(args[0] in setOf("CMAES", "PSO", "DE", "GA", "Island"))
     println("${args[0]}=============================\r\n\r\n")
-    val name = args[0]
 
-
+    val name = "Island"
 
     if (name == "Island") {
-        islandExperiment("bbob", "bbob")
+        islandMixIntExperiment("bbob-mixint", "bbob-mixint")
         return
     } else
-        singleSamplerExperiment("bbob", "bbob", name)
+        singleSamplerExperiment("bbob-mixint", "bbob-mixint", name)
 }

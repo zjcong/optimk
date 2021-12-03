@@ -17,17 +17,13 @@
 
 public class Suite {
 	
-	private long pointer; // Pointer to the coco_suite_t object
-	private String name;
+	private final long pointer; // Pointer to the coco_suite_t object
+	private final String name;
 
 	/**
 	 * Constructs the suite from the given suiteName, suiteInstance and suiteOptions.
 	 * See http://numbbo.github.io/coco-doc/C/#suite-parameters for more information on 
 	 * valid suite parameters.
-	 * @param suiteName
-	 * @param suiteInstance
-	 * @param suiteOptions
-	 * @throws Exception
 	 */
 	public Suite(String suiteName, String suiteInstance, String suiteOptions) throws Exception {
 
@@ -36,7 +32,7 @@ public class Suite {
 			this.pointer = CocoJNI.cocoGetSuite(suiteName, suiteInstance, suiteOptions);
 			this.name = suiteName;
 		} catch (Exception e) {
-			throw new Exception("Suite constructor failed.\n" + e.toString());
+			throw new Exception("Suite constructor failed.\n" + e);
 		}
 	}
 
@@ -48,7 +44,7 @@ public class Suite {
 		try {
 			CocoJNI.cocoFinalizeSuite(this.pointer);
 		} catch (Exception e) {
-			throw new Exception("Suite finalization failed.\n" + e.toString());
+			throw new Exception("Suite finalization failed.\n" + e);
 		}
 	}
 
