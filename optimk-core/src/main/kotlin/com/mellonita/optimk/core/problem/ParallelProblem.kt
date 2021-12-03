@@ -19,6 +19,10 @@ package com.mellonita.optimk.core.problem
 
 import com.mellonita.optimk.core.Problem
 
+
+/**
+ *
+ */
 public interface ParallelProblem<T> : Problem<T> {
 
     public override operator fun invoke(batchKeys: Array<DoubleArray>): DoubleArray {
@@ -27,7 +31,11 @@ public interface ParallelProblem<T> : Problem<T> {
             .parallelStream()
             .mapToDouble {
                 if (batchKeys[it].any { di -> di < 0.0 || di > 1.0 }) Double.MAX_VALUE
-                else invoke(batchKeys[it])
+                else {
+                    val solution = decode(batchKeys[it])
+                    if (!isFeasible(solution)) Double.MAX_VALUE
+                    else goal * objective(solution)
+                }
             }
             .toArray()
     }

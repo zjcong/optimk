@@ -17,7 +17,10 @@
 
 package com.mellonita.optimk.core.engine
 
-import com.mellonita.optimk.core.*
+import com.mellonita.optimk.core.Engine
+import com.mellonita.optimk.core.LogLevel
+import com.mellonita.optimk.core.Monitor
+import com.mellonita.optimk.core.Problem
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -69,14 +72,9 @@ public open class IslandEngine<T>(
     public open fun migrate() {
         if (iterations.rem(threshold) != 0L) return
         val destination = islands[rng.nextInt(islands.size)]
-        //islands.forEach { destination ->
         val origin = islands[rng.nextInt(islands.size)]
-        //islands.forEach { origin ->
         if (destination != origin)
             destination.arrival(origin.bestSolution, origin.bestFitness)
-
-        //}
-        //}
     }
 
     /**

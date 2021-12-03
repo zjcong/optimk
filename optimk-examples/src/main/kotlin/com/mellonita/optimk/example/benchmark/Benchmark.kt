@@ -63,6 +63,7 @@ sealed class Benchmark(final override val d: Int) : ParallelProblem<DoubleArray>
     }
 }
 
+
 fun KClass<out Benchmark>.plot() {
 
     val instance = this.primaryConstructor!!.call(2)

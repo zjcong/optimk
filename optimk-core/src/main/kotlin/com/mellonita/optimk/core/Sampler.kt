@@ -32,7 +32,7 @@ public interface Stateless : Serializable
 /**
  * Optimizer
  * @property dimensions Dimensionality
- * @property populationSize Size of population
+ * @property populationSize Size of population, this is merely a suggestion
  * @property rng Random number generator
  */
 public abstract class Sampler(
@@ -70,7 +70,6 @@ public abstract class Sampler(
     public open fun initialize(): Array<DoubleArray> {
         return Array(populationSize) { DoubleArray(dimensions) { rng.nextDouble() } }
     }
-
 
     /**
      * Initialize with guess

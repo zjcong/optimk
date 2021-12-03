@@ -79,7 +79,7 @@ public open class AlternatingEngine<T>(
             val pIndices = fitness.withIndex().sortedBy { it.value }.map { it.index }
             val np = Array(min(sampler.populationSize, population.size)) { population[pIndices[it]] }
             population = sampler.initialize(np)
-            info("Engine alternated to [${sampler.javaClass.simpleName}] with population of [${np.size}]]")
+            info("Engine alternated to [${sampler.javaClass.simpleName}] with population of [${np.size}]")
             updateFitness()
             stagnation = 0
         }

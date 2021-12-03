@@ -69,6 +69,7 @@ public interface Problem<T> : Serializable {
      * Get fitness value of a solution * goal
      */
     public operator fun invoke(keys: DoubleArray): Double {
+        if (keys.any { di -> di < 0.0 || di > 1.0 }) return Double.MAX_VALUE
         val solution = decode(keys)
         if (!isFeasible(solution)) return Double.MAX_VALUE
         return goal * objective(solution)
@@ -78,7 +79,17 @@ public interface Problem<T> : Serializable {
      * Get fitness values of a set of solutions
      */
     public operator fun invoke(batchKeys: Array<DoubleArray>): DoubleArray {
-        return (batchKeys.indices).map { invoke(batchKeys[it]) }.toDoubleArray()
+        return (batchKeys.indices)
+            .toList()
+            .map {
+                if (batchKeys[it].any { di -> di < 0.0 || di > 1.0 }) Double.MAX_VALUE
+                else {
+                    val solution = decode(batchKeys[it])
+                    if (!isFeasible(solution)) Double.MAX_VALUE
+                    else goal * objective(solution)
+                }
+            }
+            .toDoubleArray()
     }
 }
 

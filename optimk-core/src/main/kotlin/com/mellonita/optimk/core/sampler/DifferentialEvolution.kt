@@ -19,8 +19,8 @@
 
 package com.mellonita.optimk.core.sampler
 
-import com.mellonita.optimk.core.Stateless
 import com.mellonita.optimk.core.Sampler
+import com.mellonita.optimk.core.Stateless
 import com.mellonita.optimk.core.math.minus
 import com.mellonita.optimk.core.math.plus
 import com.mellonita.optimk.core.math.times
@@ -34,28 +34,29 @@ public typealias MutationStrategy = (Array<DoubleArray>, DoubleArray, Random) ->
 public class DifferentialEvolution @JvmOverloads constructor(
     d: Int,
     p: Int,
-    private val cr: Double = 0.8,
+    private val cr: Double,
     private val mutation: MutationStrategy,
     rng: Random = Random(0)
 ) : Sampler(d, p, rng), Stateless {
 
-    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.8, mutation = best2(0.3,0.7), rng)
+    public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.8, mutation = rand1(0.7), rng)
+
+    private val pSize = populationSize / 2
 
     /**
      *
      */
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
 
-        require(population.size == this.populationSize * 2) { "Invalid population" }
         require(fitness.size == population.size)
 
-        val pp = population.sliceArray(0 until this.populationSize)
-        val fp = fitness.sliceArray(0 until this.populationSize)
-        val t = population.sliceArray(this.populationSize until population.size)
-        val ft = fitness.sliceArray(this.populationSize until population.size)
+        val pp = population.sliceArray(0 until pSize)
+        val fp = fitness.sliceArray(0 until pSize)
+        val t = population.sliceArray(pSize until population.size)
+        val ft = fitness.sliceArray(pSize until population.size)
 
-        val n = Array(this.populationSize) { doubleArrayOf() }
-        val fn = DoubleArray(this.populationSize)
+        val n = Array(pSize) { doubleArrayOf() }
+        val fn = DoubleArray(pSize)
 
         //Selection
         pp.indices.forEach { i ->
@@ -79,23 +80,6 @@ public class DifferentialEvolution @JvmOverloads constructor(
         return n.plus(tn)
     }
 
-    /**
-     *
-     */
-    override fun initialize(): Array<DoubleArray> {
-        return Array(populationSize * 2) { DoubleArray(dimensions) { rng.nextDouble() } }
-    }
-
-    /**
-     *
-     */
-    override fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
-        if (init.size >= populationSize * 2) return init.sliceArray(0 until populationSize * 2)
-        return Array(populationSize * 2) {
-            if (it < init.size) init[it]
-            else DoubleArray(dimensions) { rng.nextDouble() }
-        }
-    }
 
     /**
      * Mutation Strategies

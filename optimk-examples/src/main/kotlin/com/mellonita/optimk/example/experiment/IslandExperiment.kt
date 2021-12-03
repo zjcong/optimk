@@ -189,9 +189,9 @@ fun populationExperiment() {
 
 fun tspWithVariousSamplers() {
     val tsp = DANTZIG42()
-    val maxItr = 30_000
-    val population: Int = 90
-    val maxEval = 10_000
+    val maxItr = 10_000
+    val population = 90
+    val maxEval = Int.MAX_VALUE
     val chart = experiment(tsp, population, maxItr, maxEval)
 
     FlatLightLaf.setup() //I like it pretty
@@ -199,7 +199,7 @@ fun tspWithVariousSamplers() {
 }
 
 fun main() {
-    populationExperiment()
+    //populationExperiment()
     //continuousBenchmarkProblems()
-    //tspWithVariousSamplers()
+    tspWithVariousSamplers()
 }

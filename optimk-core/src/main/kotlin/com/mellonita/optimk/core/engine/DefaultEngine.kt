@@ -70,18 +70,12 @@ public open class DefaultEngine<T>(
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
         val targetIndex = rng.nextInt(population.size)
-        //val bs = bestSolution
-        //val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index //pick the worst individual
         if (fitness[targetIndex] < f) {
             debug("Immigrant [$f] is worse than target individual [${this.fitness[targetIndex]}].")
-            // reject immigrant if it is worse than the target
-            //return false
         }
 
         if (sampler !is Stateless) {
             debug("Immigrant arrived but island is closed.")
-            //population[0] = bs
-            //sampler.initialize(population)
             return false
         }
         population[targetIndex] = s

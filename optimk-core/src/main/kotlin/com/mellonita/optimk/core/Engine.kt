@@ -109,17 +109,22 @@ public abstract class Engine<T> : Serializable, Island {
      */
     protected open fun evaluateIndividual(keys: DoubleArray): Double {
         evaluations++
-        if (keys.any { it !in (0.0).rangeTo(1.0) }) return Double.MAX_VALUE
+        //if (keys.any { it !in (0.0).rangeTo(1.0) }) return Double.MAX_VALUE
         val f = problem(keys)
         if (f.isNaN()) throw RuntimeException("Solution: ${problem.decode(keys)} yields NaN value")
         return f
     }
 
     /**
-     *
+     * Evaluate a batch of solutions
      */
     protected open fun evaluatePopulation(batchKeys: Array<DoubleArray>): DoubleArray {
-        return batchKeys.map { evaluateIndividual(it) }.toDoubleArray()
+        evaluations += batchKeys.size
+        val fs = problem(batchKeys)
+        fs.indices.forEach { si ->
+            if (fs[si].isNaN()) throw RuntimeException("Solution: ${problem.decode(batchKeys[si])} yields NaN value")
+        }
+        return fs
     }
 
     /**
