@@ -18,8 +18,8 @@
 
 package com.mellonita.optimk.core.sampler
 
-import com.mellonita.optimk.core.*
-
+import com.mellonita.optimk.core.Stateless
+import com.mellonita.optimk.core.Sampler
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -32,9 +32,9 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
     p: Int,
     private val bias: Double = 0.70,
     elites: Double = 0.25,
-    mutants: Double = 0.2,
+    mutants: Double = 0.20,
     rng: Random = Random(0)
-) : Sampler(d, p, rng), OpenBorder {
+) : Sampler(d, p, rng), Stateless {
 
     private val nElites: Int = (p * elites).roundToInt()
     private val nMutants: Int = (p * mutants).roundToInt()
@@ -54,7 +54,7 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
      */
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
 
-        val nextGeneration: Array<DoubleArray> = Array(this.p) { DoubleArray(0) }
+        val nextGeneration: Array<DoubleArray> = Array(this.populationSize) { DoubleArray(0) }
 
         val indicesSorted = fitness
             .withIndex()
@@ -66,14 +66,14 @@ public class BiasedGeneticAlgorithm @JvmOverloads constructor(
 
         // Generate Mutants
         (0 until nMutants).forEach { i ->
-            nextGeneration[i + nElites] = DoubleArray(d) { rng.nextDouble() }
+            nextGeneration[i + nElites] = DoubleArray(dimensions) { rng.nextDouble() }
         }
 
         // Crossover
-        ((nElites + nMutants) until this.p).forEach { s ->
+        ((nElites + nMutants) until this.populationSize).forEach { s ->
             val eliteParent = population[indicesSorted.subList(0, nElites)[rng.nextInt(0, nElites)]]
-            val normalParent = population[rng.nextInt(nElites, this.p)]
-            val child = DoubleArray(d) { i ->
+            val normalParent = population[rng.nextInt(nElites, this.populationSize)]
+            val child = DoubleArray(dimensions) { i ->
                 if (rng.nextDouble() < bias) eliteParent[i] else normalParent[i]
             }
             nextGeneration[s] = child

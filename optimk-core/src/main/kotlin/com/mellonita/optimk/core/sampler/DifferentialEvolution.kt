@@ -19,7 +19,7 @@
 
 package com.mellonita.optimk.core.sampler
 
-import com.mellonita.optimk.core.OpenBorder
+import com.mellonita.optimk.core.Stateless
 import com.mellonita.optimk.core.Sampler
 import com.mellonita.optimk.core.math.minus
 import com.mellonita.optimk.core.math.plus
@@ -37,7 +37,7 @@ public class DifferentialEvolution @JvmOverloads constructor(
     private val cr: Double = 0.8,
     private val mutation: MutationStrategy,
     rng: Random = Random(0)
-) : Sampler(d, p, rng), OpenBorder {
+) : Sampler(d, p, rng), Stateless {
 
     public constructor(d: Int, p: Int, rng: Random) : this(d, p, 0.8, mutation = best2(0.3,0.7), rng)
 
@@ -46,16 +46,16 @@ public class DifferentialEvolution @JvmOverloads constructor(
      */
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
 
-        require(population.size == this.p * 2) { "Invalid population" }
+        require(population.size == this.populationSize * 2) { "Invalid population" }
         require(fitness.size == population.size)
 
-        val pp = population.sliceArray(0 until this.p)
-        val fp = fitness.sliceArray(0 until this.p)
-        val t = population.sliceArray(this.p until population.size)
-        val ft = fitness.sliceArray(this.p until population.size)
+        val pp = population.sliceArray(0 until this.populationSize)
+        val fp = fitness.sliceArray(0 until this.populationSize)
+        val t = population.sliceArray(this.populationSize until population.size)
+        val ft = fitness.sliceArray(this.populationSize until population.size)
 
-        val n = Array(this.p) { doubleArrayOf() }
-        val fn = DoubleArray(this.p)
+        val n = Array(this.populationSize) { doubleArrayOf() }
+        val fn = DoubleArray(this.populationSize)
 
         //Selection
         pp.indices.forEach { i ->
@@ -66,11 +66,11 @@ public class DifferentialEvolution @JvmOverloads constructor(
 
         // Mutation and crossover
         val tn = mutation(n, fn, rng).withIndex().map { m ->
-            check(m.value.size == d)
+            check(m.value.size == dimensions)
             val i = m.index
             val mutation = m.value
-            val jRand = rng.nextInt(0, d)
-            DoubleArray(d) { j ->
+            val jRand = rng.nextInt(0, dimensions)
+            DoubleArray(dimensions) { j ->
                 if (rng.nextDouble() < cr || j == jRand) mutation[j]
                 else n[i][j]
             }
@@ -83,17 +83,17 @@ public class DifferentialEvolution @JvmOverloads constructor(
      *
      */
     override fun initialize(): Array<DoubleArray> {
-        return Array(p * 2) { DoubleArray(d) { rng.nextDouble() } }
+        return Array(populationSize * 2) { DoubleArray(dimensions) { rng.nextDouble() } }
     }
 
     /**
      *
      */
     override fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
-        if (init.size >= p * 2) return init.sliceArray(0 until p * 2)
-        return Array(p * 2) {
+        if (init.size >= populationSize * 2) return init.sliceArray(0 until populationSize * 2)
+        return Array(populationSize * 2) {
             if (it < init.size) init[it]
-            else DoubleArray(d) { rng.nextDouble() }
+            else DoubleArray(dimensions) { rng.nextDouble() }
         }
     }
 

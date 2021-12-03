@@ -63,7 +63,8 @@ fun main() {
                 return engine.iterations >= maxIteration
             }
         },
-        islands = (0 until islandNumber).map { getEngine("Island-$it", it, (population / islandNumber), problem) }
+        islands = (0 until islandNumber).map { getEngine("Island-$it", it, (population / islandNumber), problem) },
+        threshold = 10
     )
     engine.optimize()
 }

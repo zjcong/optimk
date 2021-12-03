@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'java'
+    id 'application'
 }
 
 group 'com.mellonita.optimk'
@@ -13,9 +14,11 @@ repositories {
 
 dependencies {
     implementation project(":optimk-core")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+}
+
+application {
+    mainClass = 'com.mellonita.optimk.coco.COCOExperimentKt'
 }
 
 test {

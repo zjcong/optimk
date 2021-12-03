@@ -31,21 +31,11 @@ public open class IslandEngine<T>(
     override val name: String,
     override val problem: Problem<T>,
     protected val islands: List<Engine<T>>,
+    protected val threshold: Int = 1,
     override val monitor: Monitor<T>,
     protected val rng: Random = Random(0)
 ) : Engine<T>() {
 
-    /**
-     * Collection of open islands
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    protected val openIslands: List<Engine<T>> = islands.filter { it.isOpen }
-
-
-    /**
-     * If this engine is open
-     */
-    override val isOpen: Boolean = openIslands.isNotEmpty()
 
     /**
      * Perform optimization
@@ -77,12 +67,15 @@ public open class IslandEngine<T>(
      * immediately without migration
      */
     public open fun migrate() {
-        if (openIslands.isEmpty()) return
-        val destination1 = openIslands[rng.nextInt(openIslands.size)]
-        //openIslands.forEach { destination1 ->
+        if (iterations.rem(threshold) != 0L) return
+        val destination = islands[rng.nextInt(islands.size)]
+        //islands.forEach { destination ->
         val origin = islands[rng.nextInt(islands.size)]
-        if (destination1 != origin)
-            destination1.arrival(origin.bestSolution, origin.bestFitness)
+        //islands.forEach { origin ->
+        if (destination != origin)
+            destination.arrival(origin.bestSolution, origin.bestFitness)
+
+        //}
         //}
     }
 
@@ -121,30 +114,8 @@ public open class IslandEngine<T>(
      * @return if the migrant is accepted
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
-        if (!isOpen) return false
-        val destination = openIslands[rng.nextInt(openIslands.size)]
+        val destination = islands[rng.nextInt(islands.size)]
         return destination.arrival(s, f)
     }
 
-    public companion object {
-
-        /**
-         *
-         */
-        public fun <T> islandsOf(
-            n: Int,
-            problem: Problem<T>,
-            monitor: Monitor<T>,
-            samplers: List<Sampler>
-        ): List<Engine<T>> {
-            return (0 until n).map {
-                DefaultEngine(
-                    name = "Island-${samplers[it.rem(samplers.size)].javaClass.simpleName}",
-                    problem = problem,
-                    sampler = samplers[it.rem(samplers.size)],
-                    monitor = monitor
-                )
-            }
-        }
-    }
 }

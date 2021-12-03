@@ -18,18 +18,19 @@
 package com.mellonita.optimk.example.experiment
 
 import com.formdev.flatlaf.FlatLightLaf
+import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.Monitor
 import com.mellonita.optimk.core.Problem
+import com.mellonita.optimk.core.Sampler
 import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.engine.IslandEngine
-import com.mellonita.optimk.core.engine.IslandEngine.Companion.islandsOf
+import com.mellonita.optimk.core.engine.RestartEngine
 import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
 import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
 import com.mellonita.optimk.core.sampler.DifferentialEvolution
 import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
 import com.mellonita.optimk.example.benchmark.Benchmark
 import com.mellonita.optimk.example.benchmark.Rastrigin
-import com.mellonita.optimk.example.tsp.ATT48
 import com.mellonita.optimk.example.tsp.DANTZIG42
 import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChart
@@ -39,10 +40,29 @@ import org.knowm.xchart.style.markers.SeriesMarkers
 import kotlin.random.Random
 import kotlin.reflect.full.primaryConstructor
 
+/**
+ *
+ */
+fun <T> islandsOf(
+    n: Int,
+    problem: Problem<T>,
+    monitor: Monitor<T>,
+    samplers: List<Sampler>
+): List<Engine<T>> {
+    return (0 until n).map {
+        RestartEngine(
+            name = "Island-${samplers[it.rem(samplers.size)].javaClass.simpleName}",
+            problem = problem,
+            sampler = samplers[it.rem(samplers.size)],
+            //samplers = samplers,
+            monitor = monitor,
+            threshold = problem.d * 10
+        )
+    }
+}
 
-fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? {
 
-    val maxEval = Int.MAX_VALUE
+fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int, maxEval: Int): XYChart? {
 
     val names = setOf(
         "PSO",
@@ -52,7 +72,7 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? 
         "Islands",
     )
 
-    val islandNumber = 5
+    val islandNumber = 4
 
     val engineExperiment = EngineExperiment(maxItr, maxEval, names) { name, monitor: Monitor<T> ->
         when (name) {
@@ -61,7 +81,7 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? 
                 problem = problem,
                 sampler = DifferentialEvolution(
                     problem.d,
-                    population / islandNumber + 1,
+                    population,
                     Random(System.nanoTime())
                 ),
                 monitor = monitor
@@ -71,7 +91,7 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? 
                 problem = problem,
                 sampler = ParticleSwampOptimization(
                     problem.d,
-                    population / islandNumber + 1,
+                    population,
                     Random(System.nanoTime())
                 ),
                 monitor = monitor
@@ -81,7 +101,7 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? 
                 problem = problem,
                 sampler = CovarianceMatrixAdaption(
                     problem.d,
-                    population / islandNumber + 1,
+                    population,
                     Random(System.nanoTime())
                 ),
                 monitor = monitor
@@ -89,7 +109,11 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? 
             "GA" -> DefaultEngine(
                 name = name,
                 problem = problem,
-                sampler = BiasedGeneticAlgorithm(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
+                sampler = BiasedGeneticAlgorithm(
+                    problem.d,
+                    population,
+                    Random(System.nanoTime())
+                ),
                 monitor = monitor
             )
             "Islands" -> IslandEngine(
@@ -98,13 +122,12 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? 
                 monitor = monitor,
                 islands = islandsOf(
                     islandNumber, problem, monitor, listOf(
-                        BiasedGeneticAlgorithm(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
-                        DifferentialEvolution(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
-                        ParticleSwampOptimization(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
-                        CovarianceMatrixAdaption(problem.d, population / islandNumber + 1, Random(System.nanoTime())),
-                        DifferentialEvolution(problem.d, population / islandNumber + 1, Random(System.nanoTime()))
-                    )
-                )
+                        CovarianceMatrixAdaption(problem.d, population / islandNumber, Random(System.nanoTime())),
+                        BiasedGeneticAlgorithm(problem.d, population / islandNumber, Random(System.nanoTime())),
+                        ParticleSwampOptimization(problem.d, population / islandNumber, Random(System.nanoTime())),
+                        DifferentialEvolution(problem.d, population / islandNumber, Random(System.nanoTime()))
+                    ).shuffled()
+                ),
             )
             else -> throw IllegalStateException("Unexpected engine $name")
         }
@@ -136,12 +159,17 @@ fun <T> experiment(problem: Problem<T>, population: Int, maxItr: Int): XYChart? 
     return convergenceChart
 }
 
+/**
+ *
+ */
 fun continuousBenchmarkProblems() {
-    val dimensions = 50
-    val population = 150
-    val maxItr = 3000
+    val dimensions = 40
+    val population = 120
+    val maxItr = 5_000
+    val maxEval = Int.MAX_VALUE
+
     val problems = Benchmark::class.sealedSubclasses.map { it.primaryConstructor!!.call(dimensions) }
-    val charts = problems.map { experiment(it, population, maxItr) }
+    val charts = problems.map { experiment(it, population, maxItr, maxEval) }
     FlatLightLaf.setup() //I like it pretty
     SwingWrapper<XYChart>(charts).displayChartMatrix()
 }
@@ -149,9 +177,11 @@ fun continuousBenchmarkProblems() {
 
 fun populationExperiment() {
     val dimensions = 10
-    val maxItr = 8_000
+    val maxItr = 1_000
+    val maxEval = Int.MAX_VALUE
+
     val charts = (50..500 step 50).map { p ->
-        experiment(Rastrigin(dimensions), p, maxItr)
+        experiment(Rastrigin(dimensions), p, maxItr, maxEval)
     }
     FlatLightLaf.setup() //I like it pretty
     SwingWrapper<XYChart>(charts).displayChartMatrix()
@@ -161,14 +191,15 @@ fun tspWithVariousSamplers() {
     val tsp = DANTZIG42()
     val maxItr = 30_000
     val population: Int = 90
-    val chart = experiment(tsp, population, maxItr)
+    val maxEval = 10_000
+    val chart = experiment(tsp, population, maxItr, maxEval)
 
     FlatLightLaf.setup() //I like it pretty
     SwingWrapper<XYChart>(chart).displayChart()
 }
 
 fun main() {
-    //populationExperiment()
-    continuousBenchmarkProblems()
+    populationExperiment()
+    //continuousBenchmarkProblems()
     //tspWithVariousSamplers()
 }

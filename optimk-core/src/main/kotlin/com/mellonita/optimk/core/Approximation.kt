@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.mellonita.optimk.core.math
+package com.mellonita.optimk.core
 
-internal class RealVector(array: DoubleArray) : RealMatrix(arrayOf(array)) {
-    val size: Int = array.size
+public class Approximation {
 }

@@ -25,10 +25,6 @@ import java.io.*
  * Island Interface
  */
 public interface Island : Serializable {
-    /**
-     * If this island is open
-     */
-    public val isOpen: Boolean
 
     /**
      * Upon immigrant arrival
@@ -123,15 +119,7 @@ public abstract class Engine<T> : Serializable, Island {
      *
      */
     protected open fun evaluatePopulation(batchKeys: Array<DoubleArray>): DoubleArray {
-        evaluations += batchKeys.size
-        val fs = problem(batchKeys)
-        fs.withIndex().forEach {
-            if (it.value.isNaN())
-                throw RuntimeException(
-                    "Solution: ${problem.decode(batchKeys[it.index])} yields NaN, please check objective function."
-                )
-        }
-        return fs
+        return batchKeys.map { evaluateIndividual(it) }.toDoubleArray()
     }
 
     /**

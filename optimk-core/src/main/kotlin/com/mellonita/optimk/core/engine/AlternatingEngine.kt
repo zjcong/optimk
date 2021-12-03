@@ -52,7 +52,7 @@ public open class AlternatingEngine<T>(
     init {
         require(samplers.isNotEmpty()) { "At least one optimizer must be specified" }
         require(threshold > 0) { "Stagnation threshold must be greater than zero" }
-        require(samplers.all { it.d == samplers[0].d }) { "Optimizers must have consistent dimensionality" }
+        require(samplers.all { it.dimensions == samplers[0].dimensions }) { "Optimizers must have consistent dimensionality" }
     }
 
 
@@ -77,7 +77,7 @@ public open class AlternatingEngine<T>(
             activeOptimizerIndex++
             sampler = samplers[activeOptimizerIndex.rem(samplers.size)]
             val pIndices = fitness.withIndex().sortedBy { it.value }.map { it.index }
-            val np = Array(min(sampler.p, population.size)) { population[pIndices[it]] }
+            val np = Array(min(sampler.populationSize, population.size)) { population[pIndices[it]] }
             population = sampler.initialize(np)
             info("Engine alternated to [${sampler.javaClass.simpleName}] with population of [${np.size}]]")
             updateFitness()

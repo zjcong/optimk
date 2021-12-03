@@ -28,19 +28,21 @@ public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Sampler(d, 
 
     private var cma: CMAEvolutionStrategy = CMAEvolutionStrategy()
 
-
     override fun iterate(population: Array<DoubleArray>, fitness: DoubleArray): Array<DoubleArray> {
         if ((cma.stopConditions.number != 0)) return population
-        cma.updateDistribution(fitness)
-        return cma.samplePopulation()
+
+        cma.updateDistribution(fitness.copyOfRange(0, populationSize - 1))
+
+        val sampled = cma.samplePopulation()
+        return sampled.plusElement(DoubleArray(dimensions) { di -> sampled.sumOf { it[di] } / sampled.size.toDouble() })
     }
 
     private fun inriaCMAESInit() {
         cma = CMAEvolutionStrategy()
-        cma.dimension = d
-        cma.setInitialX(0.5)
-        cma.setInitialStandardDeviation(0.05)
-        cma.parameters.populationSize = p
+        cma.dimension = dimensions
+        cma.setInitialX(0.65)
+        cma.setInitialStandardDeviation(0.01)
+        cma.parameters.populationSize = populationSize - 1
         cma.options.stopTolFunHist = 1e-13
         cma.seed = rng.nextLong()
         cma.options.verbosity = -2
@@ -49,13 +51,13 @@ public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Sampler(d, 
     override fun initialize(): Array<DoubleArray> {
         inriaCMAESInit()
         cma.init()
-        return cma.samplePopulation()
+        return cma.samplePopulation().plusElement(DoubleArray(dimensions) { rng.nextDouble() })
     }
 
     override fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
         inriaCMAESInit()
         cma.initialX = init[0]
         cma.init()
-        return cma.samplePopulation()
+        return cma.samplePopulation().plusElement(DoubleArray(dimensions) { rng.nextDouble() })
     }
 }

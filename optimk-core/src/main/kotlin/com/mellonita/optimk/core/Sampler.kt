@@ -26,24 +26,24 @@ import kotlin.random.Random
 /**
  * Migratable marker interface
  */
-public interface OpenBorder : Serializable
+public interface Stateless : Serializable
 
 
 /**
  * Optimizer
- * @property d Dimensionality
- * @property p Size of population
+ * @property dimensions Dimensionality
+ * @property populationSize Size of population
  * @property rng Random number generator
  */
 public abstract class Sampler(
-    public val d: Int,
-    public val p: Int,
+    public val dimensions: Int,
+    public val populationSize: Int,
     public val rng: Random
 ) : Serializable {
 
     init {
-        require(d > 1) { "Dimensions (d) must be greater than 1" }
-        require(p > 1) { "Population (p) must be greater than 1" }
+        require(dimensions > 0) { "Dimensions must be greater than 0" }
+        require(populationSize > 0) { "Population must be greater than 0" }
         //Check constructor
         val constructors = this.javaClass.constructors
         val requiredConstructor = constructors.any {
@@ -68,7 +68,7 @@ public abstract class Sampler(
      * @return an initial population
      */
     public open fun initialize(): Array<DoubleArray> {
-        return Array(p) { DoubleArray(d) { rng.nextDouble() } }
+        return Array(populationSize) { DoubleArray(dimensions) { rng.nextDouble() } }
     }
 
 
@@ -78,10 +78,10 @@ public abstract class Sampler(
      * @return an initial population
      */
     public open fun initialize(init: Array<DoubleArray>): Array<DoubleArray> {
-        if (init.size >= p) return init.sliceArray(0 until p)
-        return Array(p) {
+        if (init.size >= populationSize) return init.sliceArray(0 until populationSize)
+        return Array(populationSize) {
             if (it < init.size) init[it]
-            else DoubleArray(d) { rng.nextDouble() }
+            else DoubleArray(dimensions) { rng.nextDouble() }
         }
     }
 }

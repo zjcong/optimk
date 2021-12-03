@@ -17,7 +17,7 @@
 
 package com.mellonita.optimk.core.sampler
 
-import com.mellonita.optimk.core.OpenBorder
+import com.mellonita.optimk.core.Stateless
 import com.mellonita.optimk.core.Sampler
 import com.mellonita.optimk.core.math.minus
 import com.mellonita.optimk.core.math.plus
@@ -31,11 +31,11 @@ import kotlin.random.Random
 public class ParticleSwampOptimization(
     d: Int,
     p: Int,
-    private val w: Double = 0.5,
-    private val c1: Double = 2.0,
-    private val c2: Double = 2.0,
+    private val w: Double = 0.792,
+    private val c1: Double = 1.49,
+    private val c2: Double = 1.49,
     rng: Random = Random(0)
-) : Sampler(d, p, rng), OpenBorder {
+) : Sampler(d, p, rng), Stateless {
 
     private val pBest = Array(p) { Pair(doubleArrayOf(), Double.MAX_VALUE) }
     private var gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
@@ -82,7 +82,7 @@ public class ParticleSwampOptimization(
         // Clear history
         pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
         gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(dimensions) { rng.nextDouble() } }
         return randomPopulation
     }
 
@@ -94,7 +94,7 @@ public class ParticleSwampOptimization(
         // Clear history
         pBest.indices.forEach { i -> pBest[i] = Pair(doubleArrayOf(), Double.MAX_VALUE) }
         gBest = Pair(doubleArrayOf(), Double.MAX_VALUE)
-        velocities.indices.forEach { i -> velocities[i] = DoubleArray(d) { rng.nextDouble() } }
+        velocities.indices.forEach { i -> velocities[i] = DoubleArray(dimensions) { rng.nextDouble() } }
         return randomPopulation
     }
 }

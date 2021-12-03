@@ -37,3 +37,4 @@ class Griewank(dimensions: Int) : Benchmark(dimensions) {
         return sum - pdt + 1.0
     }
 }
+

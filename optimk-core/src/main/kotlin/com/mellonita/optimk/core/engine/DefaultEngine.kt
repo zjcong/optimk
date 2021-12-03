@@ -18,7 +18,7 @@
 package com.mellonita.optimk.core.engine
 
 import com.mellonita.optimk.core.Monitor
-import com.mellonita.optimk.core.OpenBorder
+import com.mellonita.optimk.core.Stateless
 import com.mellonita.optimk.core.Problem
 import com.mellonita.optimk.core.Sampler
 import java.time.Instant
@@ -53,12 +53,6 @@ public open class DefaultEngine<T>(
     protected var fitness: DoubleArray = doubleArrayOf()
 
     /**
-     * This engine is open if the optimizer is open border
-     */
-    override var isOpen: Boolean = sampler is OpenBorder
-        protected set
-
-    /**
      * Update fitness
      */
     public override fun updateFitness() {
@@ -75,17 +69,21 @@ public open class DefaultEngine<T>(
      * Upon immigrant arrival
      */
     override fun arrival(s: DoubleArray, f: Double): Boolean {
-        if (!isOpen) {
-            debug("Immigrant arrived but island is closed.")
-            return false
-        }
         val targetIndex = rng.nextInt(population.size)
+        //val bs = bestSolution
         //val targetIndex = this.fitness.withIndex().maxByOrNull { it.value }!!.index //pick the worst individual
         if (fitness[targetIndex] < f) {
             debug("Immigrant [$f] is worse than target individual [${this.fitness[targetIndex]}].")
+            // reject immigrant if it is worse than the target
             //return false
         }
 
+        if (sampler !is Stateless) {
+            debug("Immigrant arrived but island is closed.")
+            //population[0] = bs
+            //sampler.initialize(population)
+            return false
+        }
         population[targetIndex] = s
         fitness[targetIndex] = f
         debug("Immigrant [$f] is admitted")
