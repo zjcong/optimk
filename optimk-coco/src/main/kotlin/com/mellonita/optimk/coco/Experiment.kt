@@ -23,16 +23,18 @@ import Timing
 import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.engine.AlternatingEngine
+import com.mellonita.optimk.core.engine.DefaultEngine
 import com.mellonita.optimk.core.engine.IslandEngine
 import com.mellonita.optimk.core.engine.RestartEngine
 import com.mellonita.optimk.core.sampler.BiasedGeneticAlgorithm
 import com.mellonita.optimk.core.sampler.CovarianceMatrixAdaption
 import com.mellonita.optimk.core.sampler.DifferentialEvolution
 import com.mellonita.optimk.core.sampler.ParticleSwampOptimization
+import java.lang.Math.max
+import kotlin.math.min
 import kotlin.random.Random
 
-const val restartMultiplier = 35
-const val populationMultiplier = 50
+const val restartMultiplier = 30
 val LOGLEVEL = LogLevel.WARN
 
 /**
@@ -45,7 +47,7 @@ private fun engineOf(
     population: Int,
     seed: Int,
 ): Engine<DoubleArray> {
-    require(population > 10) { "population too small" }
+    require(population > 25) { "population too small" }
     @Suppress("SpellCheckingInspection")
     return when (name) {
         "CMAES" -> RestartEngine(
@@ -162,7 +164,7 @@ fun runExperiment(benchmark: COCOBenchmark) {
 
     while (problem != null) {
 
-        val population = problem.d * populationMultiplier
+        val population = problem.d * 3 + 20
         val engine = engineOf(benchmark.algorithmName, problem, population, 0x1980416)
 
         engine.optimize()
@@ -188,13 +190,13 @@ fun main(args: Array<String>) {
             args[1].uppercase(),
             "OptimK Implementation of ${args[1].uppercase()}",
             "dimensions: 2,3,5,10,20,40",
-            5E4.toLong()
+            1E4.toLong()
         )
         "bbob-mixint" -> BBOBBMixIntBenchmark(
             args[1].uppercase(),
             "OptimK Implementation of ${args[1].uppercase()}",
             "dimensions: 5,10,20,40,80,160",
-            5E4.toLong()
+            1E4.toLong()
         )
         else -> throw IllegalArgumentException()
     }

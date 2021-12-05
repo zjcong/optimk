@@ -46,7 +46,7 @@ sealed class COCOBenchmark(
             .append("algorithm_name: ${algorithmName.uppercase()} ")
             .append("algorithm_info \"$algorithmInfo\"").toString()
 
-    private val suite = Suite(suiteName, "", suiteOptions)
+    private val suite = Suite(suiteName, "year: 2018", suiteOptions)
     private val observer = Observer(observerName, observationOptions)
     protected val benchmark = Benchmark(suite, observer)
 

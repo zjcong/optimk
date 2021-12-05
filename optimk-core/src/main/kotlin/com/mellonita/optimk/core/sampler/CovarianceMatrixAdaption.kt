@@ -39,10 +39,10 @@ public class CovarianceMatrixAdaption(d: Int, p: Int, rng: Random) : Sampler(d, 
     private fun inriaCMAESInit() {
         cma = CMAEvolutionStrategy()
         cma.dimension = dimensions
-        cma.setInitialX(0.5)
-        cma.setInitialStandardDeviation(0.01)
+        cma.setInitialX(0.50)
+        cma.setInitialStandardDeviation(0.20)
         cma.parameters.populationSize = populationSize
-        cma.options.stopTolFunHist = 1e-13
+        cma.options.stopTolFunHist = 1e-20
         cma.seed = rng.nextLong()
         cma.options.verbosity = -2
     }
