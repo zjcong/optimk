@@ -75,7 +75,7 @@ public class Timing {
     /**
      * Outputs the collected timing data.
      */
-    void output() {
+    public void output() {
 
         /* Record the last problem */
         timeProblem(null);

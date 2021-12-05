@@ -200,6 +200,6 @@ fun tspWithVariousSamplers() {
 
 fun main() {
     //populationExperiment()
-    //continuousBenchmarkProblems()
-    tspWithVariousSamplers()
+    continuousBenchmarkProblems()
+    //tspWithVariousSamplers()
 }

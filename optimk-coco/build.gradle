@@ -13,11 +13,12 @@ repositories {
 
 dependencies {
     implementation project(":optimk-core")
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+    implementation 'com.github.ajalt.clikt:clikt:3.3.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.31'
 }
 
 application {
-    mainClass = 'com.mellonita.optimk.coco.COCOExperimentKt'
+    mainClass = 'com.mellonita.optimk.coco.ExperimentKt'
 }
 
 test {

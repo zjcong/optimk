@@ -88,8 +88,7 @@ public interface Problem<T> : Serializable {
                     if (!isFeasible(solution)) Double.MAX_VALUE
                     else goal * objective(solution)
                 }
-            }
-            .toDoubleArray()
+            }.toDoubleArray()
     }
 }
 

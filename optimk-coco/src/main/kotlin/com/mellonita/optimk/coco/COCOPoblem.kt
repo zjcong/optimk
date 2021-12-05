@@ -20,22 +20,65 @@ package com.mellonita.optimk.coco
 import Problem
 import com.mellonita.optimk.core.Engine
 import com.mellonita.optimk.core.Goal
-import com.mellonita.optimk.core.LogLevel
 import com.mellonita.optimk.core.Monitor
 import com.mellonita.optimk.core.math.valueIn
 import com.mellonita.optimk.core.monitor.DefaultMonitor
 
+
 /**
- * A wrapper class of COCO Problem
+ *
  */
-internal class SingleObjCOCOMixIntProblem(private val cocoProblem: Problem) :
-    com.mellonita.optimk.core.Problem<DoubleArray> {
+abstract class SingleObjectiveCOCOProblem(
+    val cocoProblem: Problem,
+    private val maxEvalMultiplier: Long
+) : com.mellonita.optimk.core.Problem<DoubleArray> {
+
     override val d: Int = cocoProblem.dimension
     override val goal: Goal = Goal.Minimize
+
+    init {
+        //println("problemid: ${cocoProblem.id}")
+    }
+
+    fun getMonitor(): Monitor<DoubleArray> = COCOMonitor(cocoProblem, d * maxEvalMultiplier)
 
     override fun objective(solution: DoubleArray): Double {
         return cocoProblem.evaluateFunction(solution)[0]
     }
+
+    private class COCOMonitor(val p: Problem, val maxEvaluations: Long) : DefaultMonitor<DoubleArray>(LOGLEVEL) {
+        override fun stop(engine: Engine<DoubleArray>): Boolean {
+            if (p.isFinalTargetHit) print("@")
+            return (p.evaluations >= maxEvaluations || p.isFinalTargetHit)
+        }
+
+    }
+}
+
+
+/**
+ * Continuous problem
+ */
+internal class ContinuousProblem(
+    cocoProblem: Problem,
+    maxEvalMultiplier: Long
+) : SingleObjectiveCOCOProblem(cocoProblem, maxEvalMultiplier) {
+
+    override fun decode(keys: DoubleArray): DoubleArray {
+        return keys.indices.map { keys[it].valueIn((-5.0).rangeTo(5.0)) }.toDoubleArray()
+    }
+
+
+}
+
+
+/**
+ * Mix Int problem
+ */
+internal class MixIntProblem(
+    cocoProblem: Problem,
+    maxEvalMultiplier: Long
+) : SingleObjectiveCOCOProblem(cocoProblem, maxEvalMultiplier) {
 
     override fun decode(keys: DoubleArray): DoubleArray {
         require(keys.size.rem(5) == 0)
@@ -63,13 +106,7 @@ internal class SingleObjCOCOMixIntProblem(private val cocoProblem: Problem) :
         return solution
     }
 
-    fun getMonitor(): Monitor<DoubleArray> {
-        return object : DefaultMonitor<DoubleArray>(LogLevel.WARN) {
-            override fun stop(engine: Engine<DoubleArray>): Boolean {
-                if (cocoProblem.isFinalTargetHit) print("@")
-                return (engine.iterations >= maxItr || cocoProblem.isFinalTargetHit)
-            }
-        }
-    }
+
 }
+
 

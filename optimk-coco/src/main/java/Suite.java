@@ -38,7 +38,6 @@ public class Suite {
 
 	/**
 	 * Finalizes the suite.
-	 * @throws Exception 
 	 */
 	public void finalizeSuite() throws Exception {
 		try {

@@ -123,5 +123,6 @@ gradle-app.setting
 /outcmaesstddev.dat
 /outcmaesxmean.dat
 /outcmaesxrecentbest.dat
+/outcmaes*
 /exdata/
 /CocoJNI.dll

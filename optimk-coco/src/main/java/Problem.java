@@ -21,20 +21,20 @@
  */
 public class Problem {
 
-	private long pointer; // Pointer to the coco_problem_t object
+	private final long pointer; // Pointer to the coco_problem_t object
 	
-	private int dimension;
-	private int number_of_objectives;
-	private int number_of_constraints;
+	private final int dimension;
+	private final int number_of_objectives;
+	private final int number_of_constraints;
 	
-	private double[] lower_bounds;
-	private double[] upper_bounds;
-	private int number_of_integer_variables;
+	private final double[] lower_bounds;
+	private final double[] upper_bounds;
+	private final int number_of_integer_variables;
 	
-	private String id;
-	private String name;
+	private final String id;
+	private final String name;
 	
-	private long index;
+	private final long index;
 
 	/**
 	 * Constructs the problem from the pointer.
@@ -66,7 +66,6 @@ public class Problem {
 	
 	/**
 	 * Evaluates the function in point x and returns the result as an array of doubles. 
-	 * @param x
 	 * @return the result of the function evaluation in point x
 	 */
 	public double[] evaluateFunction(double[] x) {
@@ -75,7 +74,6 @@ public class Problem {
 
 	/**
 	 * Evaluates the constraint in point x and returns the result as an array of doubles. 
-	 * @param x
 	 * @return the result of the constraint evaluation in point x
 	 */
 	public double[] evaluateConstraint(double[] x) {

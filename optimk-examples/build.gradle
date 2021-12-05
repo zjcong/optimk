@@ -17,10 +17,10 @@ dependencies {
     implementation project(":optimk-core")
 
     implementation 'com.formdev:flatlaf:1.6.4'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.0"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.31"
     implementation 'org.knowm.xchart:xchart:3.8.1'
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.31'
     implementation 'org.jzy3d:jzy3d-api:1.0.3'
 
 }
